@@ -4,7 +4,7 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm ci
 COPY . .
-RUN npm run build --configuration production
+RUN npm run build:prod
 
 # ---- Runtime
 FROM nginx:1.28-alpine
