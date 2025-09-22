@@ -45,7 +45,7 @@ jobs:
       with:
         repository: ${{ env.INFRA_REPO }}
         path: ./infra-source
-        token: ${{ secrets.GITHUB_TOKEN }}
+        token: ${{ secrets.PAT_TOKEN }}
         ref: main
     
     - name: Set up Docker Buildx
@@ -102,6 +102,7 @@ jobs:
           - Built from: ${{ env.BLOG_REPO }}@${{ steps.blog-info.outputs.branch }}
           - Commit: ${{ steps.blog-info.outputs.commit_message }}
           - SHA: ${{ steps.blog-info.outputs.commit_sha }}"
+          git remote set-url origin https://${{ secrets.PAT_TOKEN }}@github.com/${{ env.INFRA_REPO }}.git
           git push origin main
           
           echo "✅ Deployment manifest updated and pushed to infrastructure repository"
