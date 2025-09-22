@@ -1,4 +1,7 @@
+# This goes in: my-blog-site-sudhanverse/.github/workflows/docker.yml
+
 name: build-and-push
+
 on:
   push:
     branches: [ main ]
@@ -7,7 +10,10 @@ on:
 jobs:
   docker:
     runs-on: ubuntu-latest
-    permissions: { contents: read }
+    permissions: 
+      contents: read
+      packages: write
+    
     steps:
       - uses: actions/checkout@v4
 
@@ -36,3 +42,21 @@ jobs:
           tags: |
             docker.io/${{ secrets.DOCKERHUB_USERNAME }}/blog-site:latest
             docker.io/${{ secrets.DOCKERHUB_USERNAME }}/blog-site:${{ github.sha }}
+
+      # NEW: Trigger infra repo update
+      - name: Trigger Infrastructure Update
+        uses: peter-evans/repository-dispatch@v3
+        if: github.ref == 'refs/heads/main'
+        with:
+          token: ${{ secrets.INFRA_REPO_TOKEN }}
+          repository: Sudhan30/my-blog-site-cluster-infra
+          event-type: blog-updated
+          client-payload: |
+            {
+              "image_tag": "${{ github.sha }}",
+              "image_name": "blog-site",
+              "dockerhub_username": "${{ secrets.DOCKERHUB_USERNAME }}",
+              "commit_message": "${{ github.event.head_commit.message }}",
+              "author": "${{ github.actor }}",
+              "timestamp": "${{ github.event.head_commit.timestamp }}"
+            }
