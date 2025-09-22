@@ -17,6 +17,7 @@ env:
   REGISTRY: docker.io
   IMAGE_NAME_BLOG: sudhan03/blog-site
   BLOG_REPO: Sudhan30/my-blog-site-sudhanverse
+  INFRA_REPO: Sudhan30/sudhanverse-infra  # Update this to your infrastructure repo
 
 jobs:
   build-blog-from-external:
@@ -38,6 +39,14 @@ jobs:
         path: ./blog-source
         token: ${{ secrets.GITHUB_TOKEN }}
         ref: ${{ github.event.inputs.blog_repo_branch || 'main' }}
+    
+    - name: Checkout infrastructure repository
+      uses: actions/checkout@v4
+      with:
+        repository: ${{ env.INFRA_REPO }}
+        path: ./infra-source
+        token: ${{ secrets.GITHUB_TOKEN }}
+        ref: main
     
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v3
@@ -75,24 +84,39 @@ jobs:
         cache-from: type=gha
         cache-to: type=gha,mode=max
     
-    - name: Build completed notification
+    - name: Update blog deployment manifest
       run: |
-        echo "✅ Blog image built successfully!"
-        echo "📦 Image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_BLOG }}:blog-${{ steps.blog-info.outputs.commit_sha }}"
-        echo "📝 Source: ${{ env.BLOG_REPO }}@${{ steps.blog-info.outputs.branch }}"
-        echo "🔗 Commit: ${{ steps.blog-info.outputs.commit_message }}"
-        echo ""
-        echo "ℹ️  Note: This repository doesn't contain deployment manifests."
-        echo "📋 To deploy this image, update your deployment configuration manually."
+        echo "📝 Updating blog deployment manifest with new image..."
+        
+        # Check if deployment file exists
+        if [ -f "infra-source/clusters/prod/apps/blog/deployment.yaml" ]; then
+          sed -i "s|image: docker.io/sudhan03/blog-site:.*|image: docker.io/sudhan03/blog-site:blog-${{ steps.blog-info.outputs.commit_sha }}|g" infra-source/clusters/prod/apps/blog/deployment.yaml
+          
+          # Commit and push the updated manifest
+          cd infra-source
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add clusters/prod/apps/blog/deployment.yaml
+          git commit -m "🚀 Update blog image to blog-${{ steps.blog-info.outputs.commit_sha }}
+
+          - Built from: ${{ env.BLOG_REPO }}@${{ steps.blog-info.outputs.branch }}
+          - Commit: ${{ steps.blog-info.outputs.commit_message }}
+          - SHA: ${{ steps.blog-info.outputs.commit_sha }}"
+          git push origin main
+          
+          echo "✅ Deployment manifest updated and pushed to infrastructure repository"
+        else
+          echo "⚠️  Deployment manifest not found at infra-source/clusters/prod/apps/blog/deployment.yaml"
+          echo "📋 Please check the path in your infrastructure repository"
+        fi
     
-    - name: Build summary
+    - name: Deployment summary
       run: |
-        echo "✅ Blog image built successfully!"
+        echo "✅ Blog image built and deployment updated successfully!"
         echo "📦 Image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_BLOG }}:blog-${{ steps.blog-info.outputs.commit_sha }}"
         echo "📝 Source: ${{ env.BLOG_REPO }}@${{ steps.blog-info.outputs.branch }}"
         echo "🔗 Commit: ${{ steps.blog-info.outputs.commit_message }}"
         echo ""
-        echo "📋 Next steps:"
-        echo "   1. Update your deployment configuration with the new image"
-        echo "   2. Deploy the updated image to your cluster"
-        echo "   3. Verify the deployment is working correctly"
+        echo "🔄 Flux CD will now deploy the updated image to your cluster"
+        echo "⏱️  Expected deployment time: 2-3 minutes"
+        echo "🔍 Monitor with: kubectl get pods -n web"
