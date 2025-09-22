@@ -75,29 +75,24 @@ jobs:
         cache-from: type=gha
         cache-to: type=gha,mode=max
     
-    - name: Update blog deployment manifest
+    - name: Build completed notification
       run: |
-        echo "📝 Updating blog deployment manifest with new image..."
-        sed -i "s|image: docker.io/sudhan03/blog-site:.*|image: docker.io/sudhan03/blog-site:blog-${{ steps.blog-info.outputs.commit_sha }}|g" clusters/prod/apps/blog/deployment.yaml
-        
-        # Commit and push the updated manifest
-        git config --local user.email "action@github.com"
-        git config --local user.name "GitHub Action"
-        git add clusters/prod/apps/blog/deployment.yaml
-        git commit -m "🚀 Update blog image to blog-${{ steps.blog-info.outputs.commit_sha }}
-
-        - Built from: ${{ env.BLOG_REPO }}@${{ steps.blog-info.outputs.branch }}
-        - Commit: ${{ steps.blog-info.outputs.commit_message }}
-        - SHA: ${{ steps.blog-info.outputs.commit_sha }}"
-        git push origin main
-    
-    - name: Deployment summary
-      run: |
-        echo "✅ Blog image built and deployed successfully!"
+        echo "✅ Blog image built successfully!"
         echo "📦 Image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_BLOG }}:blog-${{ steps.blog-info.outputs.commit_sha }}"
         echo "📝 Source: ${{ env.BLOG_REPO }}@${{ steps.blog-info.outputs.branch }}"
         echo "🔗 Commit: ${{ steps.blog-info.outputs.commit_message }}"
         echo ""
-        echo "🔄 Flux CD will now deploy the updated image to your cluster"
-        echo "⏱️  Expected deployment time: 2-3 minutes"
-        echo "🔍 Monitor with: kubectl get pods -n web"
+        echo "ℹ️  Note: This repository doesn't contain deployment manifests."
+        echo "📋 To deploy this image, update your deployment configuration manually."
+    
+    - name: Build summary
+      run: |
+        echo "✅ Blog image built successfully!"
+        echo "📦 Image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_BLOG }}:blog-${{ steps.blog-info.outputs.commit_sha }}"
+        echo "📝 Source: ${{ env.BLOG_REPO }}@${{ steps.blog-info.outputs.branch }}"
+        echo "🔗 Commit: ${{ steps.blog-info.outputs.commit_message }}"
+        echo ""
+        echo "📋 Next steps:"
+        echo "   1. Update your deployment configuration with the new image"
+        echo "   2. Deploy the updated image to your cluster"
+        echo "   3. Verify the deployment is working correctly"
