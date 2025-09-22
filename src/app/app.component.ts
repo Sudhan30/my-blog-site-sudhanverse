@@ -18,7 +18,7 @@ import { FeedbackComponent } from './components/feedback.component';
       
       <footer class="app-footer fade-in">
         <div class="footer-content">
-          <p>&copy; {{year}} Sudharsana. Built with Angular + Traefik + K3s • CI/CD by GitHub Actions + Flux</p>
+          <p>&copy; {{year}} Sudharsana Rajasekaran. All rights reserved.</p>
         </div>
       </footer>
       
@@ -46,20 +46,69 @@ import { FeedbackComponent } from './components/feedback.component';
       margin-top: 2rem;
       border-top: 1px solid #404040;
       box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.3);
+      width: 100%;
+      margin-left: 0;
+      margin-right: 0;
     }
     
     .footer-content {
-      max-width: 100%;
-      margin: 0;
+      width: 100%;
+      margin: 0 auto;
       padding: 2rem 2rem;
       text-align: center;
+      box-sizing: border-box;
+      max-width: 1200px;
     }
     
     .footer-content p {
       margin: 0;
-      font-size: 0.875rem;
+      font-size: 1rem;
       font-family: 'IBM Plex Sans', sans-serif;
       text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+      line-height: 1.4;
+    }
+    
+    /* Mobile responsive styles */
+    @media (max-width: 768px) {
+      .app-footer {
+        width: 100vw;
+        margin-left: calc(-50vw + 50%);
+        margin-right: calc(-50vw + 50%);
+      }
+      
+      .footer-content {
+        padding: 3rem 3rem;
+        width: 100%;
+        max-width: none;
+        margin: 0;
+      }
+      
+      .footer-content p {
+        font-size: 0.9rem;
+        text-align: center;
+        word-wrap: break-word;
+        hyphens: auto;
+      }
+    }
+    
+    @media (max-width: 480px) {
+      .app-footer {
+        width: 100vw;
+        margin-left: calc(-50vw + 50%);
+        margin-right: calc(-50vw + 50%);
+      }
+      
+      .footer-content {
+        padding: 2rem 2rem;
+        width: 100%;
+        max-width: none;
+        margin: 0;
+      }
+      
+      .footer-content p {
+        font-size: 0.85rem;
+        line-height: 1.3;
+      }
     }
     
   `]

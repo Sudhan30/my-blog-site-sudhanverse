@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+  <rss version="2.0">
+    <channel>
+      <title>Sudharsana Blog</title>
+      <link>https://blog.sudharsana.dev</link>
+      <description>Posts from Sudharsana</description>
+      <lastBuildDate>Tue, 20 Feb 2024 00:00:00 GMT</lastBuildDate>
+      
+    <item>
+      <title><![CDATA[Deploying to the Cloud: My Infrastructure Journey]]></title>
+      <link>https://blog.sudharsana.dev/post/my-cloud-site</link>
+      <guid>https://blog.sudharsana.dev/post/my-cloud-site</guid>
+      <pubDate>Tue, 20 Feb 2024 00:00:00 GMT</pubDate>
+      <description><![CDATA[From local development to production deployment. Exploring cloud platforms, CI/CD pipelines, and modern deployment strategies.]]></description>
+      <category><![CDATA[cloud]]></category><category><![CDATA[deployment]]></category><category><![CDATA[infrastructure]]></category><category><![CDATA[devops]]></category>
+    </item>
+
+    <item>
+      <title><![CDATA[Building My First Website]]></title>
+      <link>https://blog.sudharsana.dev/post/my-first-site</link>
+      <guid>https://blog.sudharsana.dev/post/my-first-site</guid>
+      <pubDate>Mon, 15 Jan 2024 00:00:00 GMT</pubDate>
+      <description><![CDATA[A journey through building my very first website from scratch. Learn about the challenges, discoveries, and lessons learned along the way.]]></description>
+      <category><![CDATA[web-development]]></category><category><![CDATA[beginner]]></category><category><![CDATA[html]]></category><category><![CDATA[css]]></category>
+    </item>
+    </channel>
+  </rss>
