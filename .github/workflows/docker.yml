@@ -17,7 +17,7 @@ env:
   REGISTRY: docker.io
   IMAGE_NAME_BLOG: sudhan03/blog-site
   BLOG_REPO: Sudhan30/my-blog-site-sudhanverse
-  INFRA_REPO: Sudhan30/sudhanverse-infra  # Update this to your infrastructure repo
+  INFRA_REPO: Sudhan30/my-blog-site-cluster-infra
 
 jobs:
   build-blog-from-external:
