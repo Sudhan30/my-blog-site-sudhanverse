@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { PostsService } from '../services/posts.service';
+import { ApiService, Comment, LikeResponse, CommentsResponse } from '../services/api.service';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -9,6 +10,7 @@ import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
 import { MatTooltipModule } from '@angular/material/tooltip';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 
@@ -23,6 +25,7 @@ import { CommonModule } from '@angular/common';
     MatInputModule, 
     MatSnackBarModule,
     MatTooltipModule,
+    MatProgressSpinnerModule,
     ReactiveFormsModule,
     CommonModule
   ],
@@ -54,9 +57,9 @@ import { CommonModule } from '@angular/common';
                 class="interaction-btn"
                 [class.clapped]="hasClapped"
                 (click)="clap()"
-                [disabled]="hasClapped">
+                [disabled]="hasClapped || isLoadingLikes">
                 <mat-icon>{{ hasClapped ? 'thumb_up' : 'thumb_up_off_alt' }}</mat-icon>
-                <span>{{ clapCount }}</span>
+                <span>{{ isLoadingLikes ? '...' : clapCount }}</span>
               </button>
               
               <button class="interaction-btn">
@@ -147,32 +150,30 @@ import { CommonModule } from '@angular/common';
 
           <!-- Responses List -->
           <div class="responses-list">
+            <div *ngIf="isLoadingComments" class="loading-comments">
+              <mat-spinner diameter="30"></mat-spinner>
+              <p>Loading comments...</p>
+            </div>
+            
             <div 
               *ngFor="let comment of comments; let i = index" 
               class="response-item">
                       <img
                         alt="Avatar"
                         class="response-avatar"
-                        src="https://ui-avatars.com/api/?name={{ comment.name }}&size=32&background=6b7280&color=ffffff&bold=true">
+                        src="https://ui-avatars.com/api/?name={{ comment.display_name }}&size=32&background=6b7280&color=ffffff&bold=true">
               <div class="response-content">
                 <div class="response-card">
-                  <p class="response-author">{{ comment.name }}</p>
-                  <p class="response-text">{{ comment.comment }}</p>
+                  <p class="response-author">{{ comment.display_name }}</p>
+                  <p class="response-text">{{ comment.content }}</p>
                 </div>
                 <div class="response-actions">
-                  <button 
-                    class="like-btn"
-                    [class.liked]="comment.liked"
-                    (click)="toggleLike(comment)">
-                    <mat-icon>{{ comment.liked ? 'thumb_up' : 'thumb_up_off_alt' }}</mat-icon>
-                    <span>Like</span>
-                  </button>
-                          <span class="response-date">{{ getTimeAgo(comment.date) }}</span>
+                  <span class="response-date">{{ getTimeAgo(comment.created_at) }}</span>
                 </div>
               </div>
             </div>
             
-            <div *ngIf="comments.length === 0" class="no-responses">
+            <div *ngIf="!isLoadingComments && comments.length === 0" class="no-responses">
               <p>No responses yet. Be the first to share your thoughts!</p>
             </div>
           </div>
@@ -637,6 +638,16 @@ import { CommonModule } from '@angular/common';
       font-style: italic;
     }
 
+    .loading-comments {
+      text-align: center;
+      padding: 2rem;
+      color: #6b7280;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+
     /* Responsive Design */
     @media (max-width: 768px) {
       .blog-main {
@@ -717,13 +728,17 @@ export class PostComponent implements OnInit {
   clapCount = 0;
   hasClapped = false;
   commentForm: FormGroup;
-  comments: any[] = [];
+  comments: Comment[] = [];
   isSubmitting = false;
   currentSlug = '';
+  postId = '';
+  isLoadingLikes = false;
+  isLoadingComments = false;
 
   constructor(
     private route: ActivatedRoute, 
     private posts: PostsService, 
+    private apiService: ApiService,
     private sanitizer: DomSanitizer,
     private fb: FormBuilder,
     private snackBar: MatSnackBar
@@ -737,6 +752,7 @@ export class PostComponent implements OnInit {
   ngOnInit() {
     this.route.params.subscribe(params => {
       this.currentSlug = params['slug'];
+      this.postId = params['slug']; // Using slug as postId for now
       this.loadPost();
       this.loadClapCount();
       this.loadComments();
@@ -781,11 +797,19 @@ export class PostComponent implements OnInit {
   }
 
   clap() {
-    if (!this.hasClapped) {
-      this.clapCount++;
-      this.hasClapped = true;
-      this.saveClapCount();
-    }
+    if (this.hasClapped) return;
+    
+    this.apiService.likePost(this.postId).subscribe({
+      next: (response: LikeResponse) => {
+        this.clapCount = response.likes;
+        this.hasClapped = true;
+        this.snackBar.open('Thanks for the like!', 'Close', { duration: 3000 });
+      },
+      error: (error) => {
+        console.error('Error liking post:', error);
+        this.snackBar.open('Error liking post. Please try again.', 'Close', { duration: 3000 });
+      }
+    });
   }
 
   shareOnTwitter() {
@@ -817,22 +841,22 @@ export class PostComponent implements OnInit {
       this.isSubmitting = true;
       
       const name = this.commentForm.value.name?.trim() || this.generateAnonymousName();
+      const content = this.commentForm.value.comment;
       
-      const newComment = {
-        name: name,
-        comment: this.commentForm.value.comment,
-        date: new Date(),
-        likes: 0,
-        liked: false
-      };
-
-      setTimeout(() => {
-        this.comments.unshift(newComment);
-        this.saveComments();
-        this.commentForm.reset();
-        this.isSubmitting = false;
-        this.snackBar.open('Response posted successfully!', 'Close', { duration: 3000 });
-      }, 1000);
+      this.apiService.addComment(this.postId, content, name).subscribe({
+        next: (response) => {
+          // Reload comments to get the latest from the server
+          this.loadComments();
+          this.commentForm.reset();
+          this.isSubmitting = false;
+          this.snackBar.open('Comment added successfully!', 'Close', { duration: 3000 });
+        },
+        error: (error) => {
+          console.error('Error adding comment:', error);
+          this.isSubmitting = false;
+          this.snackBar.open('Error adding comment. Please try again.', 'Close', { duration: 3000 });
+        }
+      });
     }
   }
 
@@ -848,12 +872,24 @@ export class PostComponent implements OnInit {
   }
 
   private loadClapCount() {
-    const saved = localStorage.getItem(`claps_${this.currentSlug}`);
-    if (saved) {
-      const data = JSON.parse(saved);
-      this.clapCount = data.count || 0;
-      this.hasClapped = data.hasClapped || false;
-    }
+    this.isLoadingLikes = true;
+    this.apiService.getLikes(this.postId).subscribe({
+      next: (response) => {
+        this.clapCount = response.likes;
+        this.isLoadingLikes = false;
+      },
+      error: (error) => {
+        console.error('Error loading likes:', error);
+        this.isLoadingLikes = false;
+        // Fallback to local storage if API fails
+        const saved = localStorage.getItem(`claps_${this.currentSlug}`);
+        if (saved) {
+          const data = JSON.parse(saved);
+          this.clapCount = data.count || 0;
+          this.hasClapped = data.hasClapped || false;
+        }
+      }
+    });
   }
 
   private saveClapCount() {
@@ -865,12 +901,24 @@ export class PostComponent implements OnInit {
   }
 
   private loadComments() {
-    const saved = localStorage.getItem(`comments_${this.currentSlug}`);
-    if (saved) {
-      this.comments = JSON.parse(saved).sort((a: any, b: any) => 
-        new Date(b.date).getTime() - new Date(a.date).getTime()
-      );
-    }
+    this.isLoadingComments = true;
+    this.apiService.getComments(this.postId).subscribe({
+      next: (response: CommentsResponse) => {
+        this.comments = response.comments;
+        this.isLoadingComments = false;
+      },
+      error: (error) => {
+        console.error('Error loading comments:', error);
+        this.isLoadingComments = false;
+        // Fallback to local storage if API fails
+        const saved = localStorage.getItem(`comments_${this.currentSlug}`);
+        if (saved) {
+          this.comments = JSON.parse(saved).sort((a: any, b: any) => 
+            new Date(b.date).getTime() - new Date(a.date).getTime()
+          );
+        }
+      }
+    });
   }
 
   private saveComments() {

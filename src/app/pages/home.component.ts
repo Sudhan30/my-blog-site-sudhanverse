@@ -1,8 +1,10 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { AsyncPipe, DatePipe, NgFor, NgIf } from '@angular/common';
 import { PostsService } from '../services/posts.service';
-import { Observable } from 'rxjs';
+import { ApiService } from '../services/api.service';
+import { Observable, forkJoin, of } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
@@ -77,6 +79,12 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
                   </div>
                   <p class="post-excerpt">{{ p.excerpt }}</p>
                   <div class="post-footer">
+                    <div class="post-stats">
+                      <span class="stat-item">
+                        <mat-icon>thumb_up</mat-icon>
+                        <span>{{ p.likeCount || 0 }}</span>
+                      </span>
+                    </div>
                     <a [routerLink]="['/post', p.slug]" class="read-more">Read more →</a>
                     <div class="social-links">
                       <a href="#" class="social-link"><i class="fab fa-facebook-f"></i></a>
@@ -352,6 +360,26 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
       align-items: center;
       justify-content: space-between;
       margin-top: auto;
+    }
+
+    .post-stats {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .stat-item {
+      display: flex;
+      align-items: center;
+      gap: 0.25rem;
+      color: #6b7280;
+      font-size: 0.875rem;
+    }
+
+    .stat-item mat-icon {
+      font-size: 16px;
+      width: 16px;
+      height: 16px;
     }
     
     .read-more {
@@ -669,9 +697,58 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
     }
   `]
 })
-export class HomeComponent {
+export class HomeComponent implements OnInit {
   idx$: Observable<any>;
-  constructor(posts: PostsService){
-    this.idx$ = posts.getIndex();
+  
+  constructor(
+    private posts: PostsService,
+    private apiService: ApiService
+  ){
+    this.idx$ = this.loadPostsWithStats();
+  }
+
+  ngOnInit() {
+    // Component initialization if needed
+  }
+
+  private loadPostsWithStats(): Observable<any> {
+    return this.posts.getIndex().pipe(
+      map(indexData => {
+        // Create an array of observables to get likes for each post
+        const likeRequests = indexData.posts.map((post: any) => 
+          this.apiService.getLikes(post.slug).pipe(
+            map(likesResponse => ({
+              ...post,
+              likeCount: likesResponse.likes
+            })),
+            catchError(error => {
+              console.error(`Error loading likes for ${post.slug}:`, error);
+              return of({
+                ...post,
+                likeCount: 0
+              });
+            })
+          )
+        );
+
+        // Use forkJoin to get all likes at once
+        return forkJoin(likeRequests).pipe(
+          map(postsWithLikes => ({
+            ...indexData,
+            posts: postsWithLikes
+          })),
+          catchError(error => {
+            console.error('Error loading posts with stats:', error);
+            // Return original data if API fails
+            return of(indexData);
+          })
+        );
+      }),
+      map(observable => observable), // Flatten the observable
+      catchError(error => {
+        console.error('Error in loadPostsWithStats:', error);
+        return this.posts.getIndex(); // Fallback to original data
+      })
+    );
   }
 }
