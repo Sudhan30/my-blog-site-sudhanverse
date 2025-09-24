@@ -797,17 +797,30 @@ export class PostComponent implements OnInit {
   }
 
   clap() {
-    if (this.hasClapped) return;
+    if (this.hasClapped || this.isLoadingLikes) return;
+    
+    this.isLoadingLikes = true;
     
     this.apiService.likePost(this.postId).subscribe({
       next: (response: LikeResponse) => {
         this.clapCount = response.likes;
         this.hasClapped = true;
+        this.isLoadingLikes = false;
         this.snackBar.open('Thanks for the like!', 'Close', { duration: 3000 });
       },
       error: (error) => {
         console.error('Error liking post:', error);
-        this.snackBar.open('Error liking post. Please try again.', 'Close', { duration: 3000 });
+        this.isLoadingLikes = false;
+        
+        // Handle specific error messages
+        let errorMessage = 'Error liking post. Please try again.';
+        if (error.message && error.message.includes('Invalid session')) {
+          errorMessage = 'Session expired. Please refresh the page and try again.';
+        } else if (error.message && error.message.includes('clientId')) {
+          errorMessage = 'Invalid session. Please refresh the page.';
+        }
+        
+        this.snackBar.open(errorMessage, 'Close', { duration: 5000 });
       }
     });
   }

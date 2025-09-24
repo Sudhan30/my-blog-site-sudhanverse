@@ -1,8 +1,8 @@
-import { Injectable, inject, PLATFORM_ID } from '@angular/core';
+import { Injectable, inject, PLATFORM_ID, OnDestroy } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, BehaviorSubject, throwError } from 'rxjs';
-import { catchError, map, tap } from 'rxjs/operators';
+import { Observable, BehaviorSubject, throwError, Subject } from 'rxjs';
+import { catchError, map, tap, takeUntil } from 'rxjs/operators';
 
 export interface Comment {
   id: number;
@@ -37,7 +37,7 @@ export interface LikesResponse {
 @Injectable({
   providedIn: 'root'
 })
-export class ApiService {
+export class ApiService implements OnDestroy {
   private http = inject(HttpClient);
   private readonly API_BASE_URL = 'https://blog.sudharsana.dev/api';
   private platformId = inject(PLATFORM_ID);
@@ -45,6 +45,9 @@ export class ApiService {
   // Client ID for tracking likes/comments
   private clientIdSubject = new BehaviorSubject<string>('');
   public clientId$ = this.clientIdSubject.asObservable();
+  
+  // Subject for cleanup
+  private destroy$ = new Subject<void>();
 
   constructor() {
     // Initialize client ID only on the browser
@@ -67,7 +70,12 @@ export class ApiService {
   }
 
   private generateClientId(): string {
-    return 'client_' + Math.random().toString(36).substr(2, 9) + '_' + Date.now();
+    // Generate a proper UUID v4
+    return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+      const r = Math.random() * 16 | 0;
+      const v = c === 'x' ? r : (r & 0x3 | 0x8);
+      return v.toString(16);
+    });
   }
 
   private getClientId(): string {
@@ -184,6 +192,18 @@ export class ApiService {
       errorMessage = error.message;
     } else if (error.status === 0) {
       errorMessage = 'Unable to connect to the server. Please check your internet connection.';
+    } else if (error.status === 400) {
+      // Handle client ID validation errors
+      if (error.error && error.error.includes('clientId')) {
+        errorMessage = 'Invalid session. Please refresh the page.';
+        // Clear invalid client ID and generate new one
+        if (isPlatformBrowser(this.platformId)) {
+          localStorage.removeItem('blog_client_id');
+          this.getOrCreateClientId();
+        }
+      } else {
+        errorMessage = 'Bad request. Please try again.';
+      }
     } else if (error.status === 404) {
       errorMessage = 'The requested resource was not found.';
     } else if (error.status === 500) {
@@ -191,5 +211,11 @@ export class ApiService {
     }
     
     return throwError(() => new Error(errorMessage));
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+    this.clientIdSubject.complete();
   }
 }
