@@ -52,7 +52,11 @@ export class ApiService implements OnDestroy {
   constructor() {
     // Initialize client ID only on the browser
     if (isPlatformBrowser(this.platformId)) {
-      this.getOrCreateClientId();
+      try {
+        this.getOrCreateClientId();
+      } catch (error) {
+        console.warn('Error initializing client ID:', error);
+      }
     }
   }
 
@@ -79,7 +83,12 @@ export class ApiService implements OnDestroy {
   }
 
   private getClientId(): string {
-    return this.clientIdSubject.value;
+    try {
+      return this.clientIdSubject?.value || '';
+    } catch (error) {
+      console.warn('Error getting client ID:', error);
+      return '';
+    }
   }
 
   private getUserIP(): string {
@@ -101,7 +110,7 @@ export class ApiService implements OnDestroy {
     }).pipe(
       catchError(error => {
         // Handle CORS errors and network failures gracefully
-        if (error.status === 0 || error.name === 'HttpErrorResponse') {
+        if (error.status === 0 || (error.name === 'HttpErrorResponse' && error.status === 0)) {
           console.warn('API not accessible (likely CORS issue in development). Using fallback data.');
           return of({
             postId: postId,
@@ -134,7 +143,7 @@ export class ApiService implements OnDestroy {
       }),
       catchError(error => {
         // Handle CORS errors and network failures gracefully
-        if (error.status === 0 || error.name === 'HttpErrorResponse') {
+        if (error.status === 0 || (error.name === 'HttpErrorResponse' && error.status === 0)) {
           console.warn('API not accessible (likely CORS issue in development). Using fallback response.');
           return of({
             success: true,
@@ -142,6 +151,7 @@ export class ApiService implements OnDestroy {
             clientId: clientId
           });
         }
+        // For actual server errors (500, etc.), still throw the error
         return this.handleError(error);
       })
     );
@@ -158,7 +168,7 @@ export class ApiService implements OnDestroy {
     }).pipe(
       catchError(error => {
         // Handle CORS errors and network failures gracefully
-        if (error.status === 0 || error.name === 'HttpErrorResponse') {
+        if (error.status === 0 || (error.name === 'HttpErrorResponse' && error.status === 0)) {
           console.warn('API not accessible (likely CORS issue in development). Using fallback data.');
           return of({
             postId: postId,
@@ -198,7 +208,7 @@ export class ApiService implements OnDestroy {
       }),
       catchError(error => {
         // Handle CORS errors and network failures gracefully
-        if (error.status === 0 || error.name === 'HttpErrorResponse') {
+        if (error.status === 0 || (error.name === 'HttpErrorResponse' && error.status === 0)) {
           console.warn('API not accessible (likely CORS issue in development). Simulating successful comment.');
           return of({
             success: true,
@@ -263,8 +273,16 @@ export class ApiService implements OnDestroy {
   }
 
   ngOnDestroy(): void {
-    this.destroy$.next();
-    this.destroy$.complete();
-    this.clientIdSubject.complete();
+    try {
+      if (this.destroy$) {
+        this.destroy$.next();
+        this.destroy$.complete();
+      }
+      if (this.clientIdSubject && !this.clientIdSubject.closed) {
+        this.clientIdSubject.complete();
+      }
+    } catch (error) {
+      console.warn('Error during service cleanup:', error);
+    }
   }
 }
