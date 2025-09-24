@@ -818,6 +818,8 @@ export class PostComponent implements OnInit {
           errorMessage = 'Session expired. Please refresh the page and try again.';
         } else if (error.message && error.message.includes('clientId')) {
           errorMessage = 'Invalid session. Please refresh the page.';
+        } else if (error.message && error.message.includes('CORS')) {
+          errorMessage = 'API not accessible in development mode. Like functionality is simulated.';
         }
         
         this.snackBar.open(errorMessage, 'Close', { duration: 5000 });
