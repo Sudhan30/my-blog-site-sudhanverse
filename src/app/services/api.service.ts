@@ -216,6 +216,11 @@ export class ApiService implements OnDestroy {
             clientId: clientId
           });
         }
+        // Handle server unavailability (503) - don't provide fallback, let the error propagate
+        if (error.status === 503) {
+          console.error('Server temporarily unavailable (503)');
+          return this.handleError(error);
+        }
         return this.handleError(error);
       })
     );

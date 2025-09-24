@@ -881,7 +881,20 @@ export class PostComponent implements OnInit {
         error: (error) => {
           console.error('Error adding comment:', error);
           this.isSubmitting = false;
-          this.snackBar.open('Error adding comment. Please try again.', 'Close', { duration: 3000 });
+          
+          // Handle specific error messages
+          let errorMessage = 'Error adding comment. Please try again.';
+          if (error.status === 503) {
+            errorMessage = 'Server is temporarily unavailable. Please try again in a few moments.';
+          } else if (error.status === 429) {
+            errorMessage = 'Too many requests. Please wait a moment before commenting again.';
+          } else if (error.status === 500) {
+            errorMessage = 'Server error. Please try again later.';
+          } else if (error.status === 0) {
+            errorMessage = 'Unable to connect to the server. Please check your connection.';
+          }
+          
+          this.snackBar.open(errorMessage, 'Close', { duration: 5000 });
         }
       });
     }
