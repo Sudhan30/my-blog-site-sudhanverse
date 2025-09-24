@@ -296,6 +296,44 @@ export class ApiService implements OnDestroy {
     );
   }
 
+  // Get all comments for a post (no pagination)
+  getAllComments(postId: string): Observable<CommentsResponse> {
+    return this.http.get<CommentsResponse>(`${this.API_BASE_URL}/posts/${postId}/comments`, {
+      headers: this.getHeaders(),
+      params: {
+        page: '1',
+        limit: '1000' // Large number to get all comments
+      }
+    }).pipe(
+      retry({
+        count: this.retryConfig.retries,
+        delay: (error, retryCount) => {
+          if (error.status >= 500 || error.status === 429 || error.status === 408) {
+            console.log(`Retrying getAllComments (attempt ${retryCount}/${this.retryConfig.retries}) in ${this.retryConfig.delay}ms...`);
+            return of(null).pipe(delay(this.retryConfig.delay + (retryCount * this.retryConfig.backoff)));
+          }
+          throw error;
+        }
+      }),
+      catchError(error => {
+        if (error.status === 0 || (error.name === 'HttpErrorResponse' && error.status === 0)) {
+          console.warn('API not accessible (likely CORS issue in development). Using fallback data.');
+          return of({
+            postId: postId,
+            comments: [],
+            pagination: {
+              page: 1,
+              limit: 1000,
+              total: 0,
+              pages: 1
+            }
+          });
+        }
+        return this.handleError(error);
+      })
+    );
+  }
+
   // Add a comment
   addComment(postId: string, content: string, displayName: string): Observable<any> {
     const clientId = this.getClientId();

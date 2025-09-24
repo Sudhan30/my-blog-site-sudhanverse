@@ -118,7 +118,7 @@ import { CommonModule } from '@angular/common';
 
         <!-- Responses Section -->
         <section class="responses-section">
-          <h3 class="responses-title">Responses ({{ comments.length }})</h3>
+          <h3 class="responses-title">Responses ({{ totalComments }})</h3>
           
           <!-- Response Form -->
           <div class="response-form">
@@ -175,6 +175,62 @@ import { CommonModule } from '@angular/common';
             
             <div *ngIf="!isLoadingComments && comments.length === 0" class="no-responses">
               <p>No responses yet. Be the first to share your thoughts!</p>
+            </div>
+          </div>
+          
+          <!-- Load All Comments Button -->
+          <div *ngIf="showPagination && totalPages > 1 && !showAllComments" class="load-all-container">
+            <button 
+              class="load-all-btn"
+              (click)="loadAllComments()"
+              [disabled]="isLoadingComments">
+              {{ isLoadingComments ? 'Loading...' : 'Load All Comments (' + totalComments + ')' }}
+            </button>
+          </div>
+
+          <!-- Back to Pagination Button -->
+          <div *ngIf="showAllComments && totalPages > 1" class="load-all-container">
+            <button 
+              class="load-all-btn"
+              (click)="backToPagination()"
+              [disabled]="isLoadingComments">
+              Back to Pagination ({{ totalPages }} pages)
+            </button>
+          </div>
+
+          <!-- Pagination Controls -->
+          <div *ngIf="showPagination && totalPages > 1 && !showAllComments" class="pagination-container">
+            <div class="pagination-info">
+              <span>Showing {{ (currentPage - 1) * commentsPerPage + 1 }} to {{ Math.min(currentPage * commentsPerPage, totalComments) }} of {{ totalComments }} comments</span>
+            </div>
+            
+            <div class="pagination-controls">
+              <button 
+                class="pagination-btn"
+                [disabled]="currentPage === 1 || isLoadingComments"
+                (click)="goToPage(currentPage - 1)">
+                <mat-icon>chevron_left</mat-icon>
+                Previous
+              </button>
+              
+              <div class="page-numbers">
+                <button 
+                  *ngFor="let page of getVisiblePages()" 
+                  class="page-btn"
+                  [class.active]="page === currentPage"
+                  [disabled]="isLoadingComments"
+                  (click)="goToPage(page)">
+                  {{ page }}
+                </button>
+              </div>
+              
+              <button 
+                class="pagination-btn"
+                [disabled]="currentPage === totalPages || isLoadingComments"
+                (click)="goToPage(currentPage + 1)">
+                Next
+                <mat-icon>chevron_right</mat-icon>
+              </button>
             </div>
           </div>
         </section>
@@ -648,6 +704,120 @@ import { CommonModule } from '@angular/common';
       gap: 1rem;
     }
 
+    /* Load All Comments Styles */
+    .load-all-container {
+      text-align: center;
+      margin-top: 2rem;
+      padding-top: 2rem;
+      border-top: 1px solid #e5e7eb;
+    }
+
+    .load-all-btn {
+      background-color: #f3f4f6;
+      color: #374151;
+      border: 1px solid #d1d5db;
+      padding: 0.75rem 1.5rem;
+      border-radius: 0.375rem;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .load-all-btn:hover:not(:disabled) {
+      background-color: #e5e7eb;
+      border-color: #9ca3af;
+    }
+
+    .load-all-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    /* Pagination Styles */
+    .pagination-container {
+      margin-top: 2rem;
+      padding-top: 2rem;
+      border-top: 1px solid #e5e7eb;
+    }
+
+    .pagination-info {
+      text-align: center;
+      margin-bottom: 1rem;
+      color: #6b7280;
+      font-size: 0.875rem;
+    }
+
+    .pagination-controls {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 1rem;
+      flex-wrap: wrap;
+    }
+
+    .pagination-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      background-color: #f3f4f6;
+      border: 1px solid #d1d5db;
+      border-radius: 0.375rem;
+      color: #374151;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .pagination-btn:hover:not(:disabled) {
+      background-color: #e5e7eb;
+      border-color: #9ca3af;
+    }
+
+    .pagination-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .page-numbers {
+      display: flex;
+      gap: 0.25rem;
+    }
+
+    .page-btn {
+      width: 2.5rem;
+      height: 2.5rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background-color: #ffffff;
+      border: 1px solid #d1d5db;
+      border-radius: 0.375rem;
+      color: #374151;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .page-btn:hover:not(:disabled) {
+      background-color: #f3f4f6;
+      border-color: #9ca3af;
+    }
+
+    .page-btn.active {
+      background-color: #3b82f6;
+      border-color: #3b82f6;
+      color: #ffffff;
+    }
+
+    .page-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
     /* Responsive Design */
     @media (max-width: 768px) {
       .blog-main {
@@ -734,6 +904,14 @@ export class PostComponent implements OnInit {
   postId = '';
   isLoadingLikes = false;
   isLoadingComments = false;
+  
+  // Pagination properties
+  currentPage = 1;
+  totalComments = 0;
+  totalPages = 0;
+  commentsPerPage = 10;
+  showPagination = false;
+  showAllComments = false;
 
   constructor(
     private route: ActivatedRoute, 
@@ -871,7 +1049,7 @@ export class PostComponent implements OnInit {
       this.apiService.addComment(this.postId, content, name).subscribe({
         next: (response) => {
           // Reload comments to get the latest from the server
-          this.loadComments();
+          this.loadComments(1); // Reload first page after adding comment
           this.commentForm.reset();
           this.isSubmitting = false;
           this.snackBar.open('Comment added successfully!', 'Close', { duration: 3000 });
@@ -938,11 +1116,17 @@ export class PostComponent implements OnInit {
     localStorage.setItem(`claps_${this.currentSlug}`, JSON.stringify(data));
   }
 
-  private loadComments() {
+  private loadComments(page: number = 1) {
     this.isLoadingComments = true;
-    this.apiService.getComments(this.postId).subscribe({
+    this.currentPage = page;
+    
+    this.apiService.getComments(this.postId, page, this.commentsPerPage).subscribe({
       next: (response: CommentsResponse) => {
         this.comments = response.comments;
+        this.totalComments = response.pagination.total;
+        this.totalPages = response.pagination.pages;
+        this.currentPage = response.pagination.page;
+        this.showPagination = this.totalPages > 1;
         this.isLoadingComments = false;
       },
       error: (error) => {
@@ -954,6 +1138,8 @@ export class PostComponent implements OnInit {
           this.comments = JSON.parse(saved).sort((a: any, b: any) => 
             new Date(b.date).getTime() - new Date(a.date).getTime()
           );
+          this.totalComments = this.comments.length;
+          this.showPagination = false; // Disable pagination for fallback data
         }
       }
     });
@@ -966,4 +1152,79 @@ export class PostComponent implements OnInit {
     );
     localStorage.setItem(`comments_${this.currentSlug}`, JSON.stringify(sortedComments));
   }
+
+  // Pagination methods
+  goToPage(page: number) {
+    if (page >= 1 && page <= this.totalPages && page !== this.currentPage && !this.isLoadingComments) {
+      this.loadComments(page);
+      // Scroll to comments section
+      const commentsSection = document.querySelector('.responses-section');
+      if (commentsSection) {
+        commentsSection.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  }
+
+  getVisiblePages(): number[] {
+    const visiblePages: number[] = [];
+    const maxVisible = 5; // Show max 5 page numbers
+    
+    if (this.totalPages <= maxVisible) {
+      // Show all pages if total is less than max visible
+      for (let i = 1; i <= this.totalPages; i++) {
+        visiblePages.push(i);
+      }
+    } else {
+      // Show pages around current page
+      const start = Math.max(1, this.currentPage - Math.floor(maxVisible / 2));
+      const end = Math.min(this.totalPages, start + maxVisible - 1);
+      
+      // Adjust start if we're near the end
+      if (end - start + 1 < maxVisible) {
+        const adjustedStart = Math.max(1, end - maxVisible + 1);
+        for (let i = adjustedStart; i <= end; i++) {
+          visiblePages.push(i);
+        }
+      } else {
+        for (let i = start; i <= end; i++) {
+          visiblePages.push(i);
+        }
+      }
+    }
+    
+    return visiblePages;
+  }
+
+  loadAllComments() {
+    this.isLoadingComments = true;
+    this.apiService.getAllComments(this.postId).subscribe({
+      next: (response: CommentsResponse) => {
+        this.comments = response.comments;
+        this.totalComments = response.pagination.total;
+        this.showAllComments = true;
+        this.showPagination = false;
+        this.isLoadingComments = false;
+        // Scroll to comments section
+        const commentsSection = document.querySelector('.responses-section');
+        if (commentsSection) {
+          commentsSection.scrollIntoView({ behavior: 'smooth' });
+        }
+      },
+      error: (error) => {
+        console.error('Error loading all comments:', error);
+        this.isLoadingComments = false;
+        this.snackBar.open('Error loading all comments. Please try again.', 'Close', { duration: 3000 });
+      }
+    });
+  }
+
+  backToPagination() {
+    this.showAllComments = false;
+    this.showPagination = true;
+    this.currentPage = 1;
+    this.loadComments(1);
+  }
+
+  // Make Math available in template
+  Math = Math;
 }
