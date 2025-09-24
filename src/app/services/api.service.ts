@@ -35,17 +35,6 @@ export interface LikesResponse {
   cached: boolean;
 }
 
-export interface LikeStatusResponse {
-  postId: string;
-  hasLiked: boolean;
-  likes: number;
-}
-
-export interface UnlikeResponse {
-  success: boolean;
-  likes: number;
-  clientId: string;
-}
 
 @Injectable({
   providedIn: 'root'
@@ -273,81 +262,6 @@ export class ApiService implements OnDestroy {
     );
   }
 
-  // Check if user has liked a post
-  checkLikeStatus(postId: string): Observable<LikeStatusResponse> {
-    const clientId = this.getClientId();
-    
-    return this.http.get<LikeStatusResponse>(`${this.API_BASE_URL}/posts/${postId}/like-status`, {
-      headers: this.getHeaders(),
-      params: {
-        clientId: clientId
-      }
-    }).pipe(
-      retry({
-        count: this.retryConfig.retries,
-        delay: (error, retryCount) => {
-          if (error.status >= 500 || error.status === 429 || error.status === 408) {
-            console.log(`Retrying checkLikeStatus (attempt ${retryCount}/${this.retryConfig.retries}) in ${this.retryConfig.delay}ms...`);
-            return of(null).pipe(delay(this.retryConfig.delay + (retryCount * this.retryConfig.backoff)));
-          }
-          throw error;
-        }
-      }),
-      catchError(error => {
-        if (error.status === 0 || (error.name === 'HttpErrorResponse' && error.status === 0)) {
-          console.warn('API not accessible (likely CORS issue in development). Using fallback response.');
-          return of({
-            postId: postId,
-            hasLiked: false,
-            likes: 0
-          });
-        }
-        return this.handleError(error);
-      })
-    );
-  }
-
-  // Unlike a post
-  unlikePost(postId: string): Observable<UnlikeResponse> {
-    const clientId = this.getClientId();
-    const userIP = this.getUserIP();
-    
-    return this.http.delete<UnlikeResponse>(`${this.API_BASE_URL}/posts/${postId}/like`, {
-      headers: this.getHeaders(),
-      body: {
-        clientId,
-        userIP
-      }
-    }).pipe(
-      retry({
-        count: this.retryConfig.retries,
-        delay: (error, retryCount) => {
-          if (error.status >= 500 || error.status === 429 || error.status === 408) {
-            console.log(`Retrying unlikePost (attempt ${retryCount}/${this.retryConfig.retries}) in ${this.retryConfig.delay}ms...`);
-            return of(null).pipe(delay(this.retryConfig.delay + (retryCount * this.retryConfig.backoff)));
-          }
-          throw error;
-        }
-      }),
-      tap(response => {
-        if (response.clientId && response.clientId !== clientId) {
-          localStorage.setItem('blog_client_id', response.clientId);
-          this.clientIdSubject.next(response.clientId);
-        }
-      }),
-      catchError(error => {
-        if (error.status === 0 || (error.name === 'HttpErrorResponse' && error.status === 0)) {
-          console.warn('API not accessible (likely CORS issue in development). Using fallback response.');
-          return of({
-            success: true,
-            likes: 0,
-            clientId: clientId
-          });
-        }
-        return this.handleError(error);
-      })
-    );
-  }
 
   // Get comments for a post
   getComments(postId: string, page: number = 1, limit: number = 10, status: string = 'approved'): Observable<CommentsResponse> {

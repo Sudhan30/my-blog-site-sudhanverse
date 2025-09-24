@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { PostsService } from '../services/posts.service';
-import { ApiService, Comment, LikeResponse, CommentsResponse, LikeStatusResponse, UnlikeResponse } from '../services/api.service';
+import { ApiService, Comment, LikeResponse, CommentsResponse } from '../services/api.service';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -1053,31 +1053,12 @@ export class PostComponent implements OnInit {
     this.isLoadingLikes = true;
     
     if (this.hasClapped) {
-      // Unlike the post
-      this.apiService.unlikePost(this.postId).subscribe({
-        next: (response: UnlikeResponse) => {
-          this.clapCount = response.likes;
-          this.hasClapped = false;
-          this.isLoadingLikes = false;
-          this.snackBar.open('Like removed!', 'Close', { duration: 2000 });
-          this.saveClapCount();
-        },
-        error: (error) => {
-          console.error('Error unliking post:', error);
-          this.isLoadingLikes = false;
-          
-          let errorMessage = 'Error removing like. Please try again.';
-          if (error.message && error.message.includes('CORS')) {
-            errorMessage = 'API not accessible in development mode. Unlike functionality is simulated.';
-            // Simulate successful unlike
-            this.hasClapped = false;
-            this.clapCount = Math.max(0, this.clapCount - 1);
-            this.saveClapCount();
-          }
-          
-          this.snackBar.open(errorMessage, 'Close', { duration: 3000 });
-        }
-      });
+      // Unlike the post (client-side only since backend doesn't support it)
+      this.hasClapped = false;
+      this.clapCount = Math.max(0, this.clapCount - 1);
+      this.isLoadingLikes = false;
+      this.snackBar.open('Like removed!', 'Close', { duration: 2000 });
+      this.saveClapCount();
     } else {
       // Like the post
       this.apiService.likePost(this.postId).subscribe({
@@ -1193,40 +1174,39 @@ export class PostComponent implements OnInit {
   private loadClapCount() {
     this.isLoadingLikes = true;
     
-    // Check like status to see if user has already liked this post
-    this.apiService.checkLikeStatus(this.postId).subscribe({
+    // First, load the like count from the server
+    this.apiService.getLikes(this.postId).subscribe({
       next: (response) => {
         this.clapCount = response.likes;
-        this.hasClapped = response.hasLiked;
         this.isLoadingLikes = false;
         
-        // Save to local storage for fallback
-        this.saveClapCount();
+        // Check localStorage to see if user has liked this post
+        this.loadLikeStatusFromStorage();
       },
       error: (error) => {
-        console.error('Error loading like status:', error);
+        console.error('Error loading likes:', error);
+        this.isLoadingLikes = false;
         
-        // Fallback to getLikes if checkLikeStatus fails
-        this.apiService.getLikes(this.postId).subscribe({
-          next: (response) => {
-            this.clapCount = response.likes;
-            this.isLoadingLikes = false;
-            // Don't set hasClapped from getLikes since it doesn't provide user-specific data
-          },
-          error: (error) => {
-            console.error('Error loading likes:', error);
-            this.isLoadingLikes = false;
-            // Final fallback to local storage
-            const saved = localStorage.getItem(`claps_${this.currentSlug}`);
-            if (saved) {
-              const data = JSON.parse(saved);
-              this.clapCount = data.count || 0;
-              this.hasClapped = data.hasClapped || false;
-            }
-          }
-        });
+        // Fallback to local storage if API fails
+        this.loadLikeStatusFromStorage();
       }
     });
+  }
+
+  private loadLikeStatusFromStorage() {
+    const saved = localStorage.getItem(`claps_${this.currentSlug}`);
+    if (saved) {
+      try {
+        const data = JSON.parse(saved);
+        this.clapCount = data.count || this.clapCount;
+        this.hasClapped = data.hasClapped || false;
+      } catch (error) {
+        console.warn('Error parsing saved like data:', error);
+        this.hasClapped = false;
+      }
+    } else {
+      this.hasClapped = false;
+    }
   }
 
   private saveClapCount() {
