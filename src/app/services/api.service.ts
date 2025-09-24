@@ -59,6 +59,11 @@ export class ApiService implements OnDestroy {
         console.warn('Error initializing client ID:', error);
       }
     }
+    
+    // Ensure destroy$ is always initialized
+    if (!this.destroy$) {
+      this.destroy$ = new Subject<void>();
+    }
   }
 
   private getOrCreateClientId(): string {
@@ -437,10 +442,13 @@ export class ApiService implements OnDestroy {
 
   ngOnDestroy(): void {
     try {
-      if (this.destroy$) {
+      // Clean up destroy$ subject
+      if (this.destroy$ && !this.destroy$.closed) {
         this.destroy$.next();
         this.destroy$.complete();
       }
+      
+      // Clean up clientIdSubject
       if (this.clientIdSubject && !this.clientIdSubject.closed) {
         this.clientIdSubject.complete();
       }

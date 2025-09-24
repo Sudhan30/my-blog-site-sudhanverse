@@ -137,8 +137,16 @@ import { CommonModule } from '@angular/common';
                   rows="4" 
                   placeholder="Share your thoughts..."
                   required
-                  class="form-textarea">
+                  class="form-textarea"
+                  [class.error]="commentForm.get('comment')?.invalid && commentForm.get('comment')?.touched">
                 </textarea>
+                <div class="character-counter" [class.error]="commentForm.get('comment')?.invalid && commentForm.get('comment')?.touched">
+                  {{ commentForm.get('comment')?.value?.length || 0 }}/2000 characters
+                </div>
+                <div *ngIf="commentForm.get('comment')?.invalid && commentForm.get('comment')?.touched" class="error-message">
+                  <span *ngIf="commentForm.get('comment')?.errors?.['required']">Comment is required.</span>
+                  <span *ngIf="commentForm.get('comment')?.errors?.['maxlength']">Comment must be 2000 characters or less.</span>
+                </div>
               </div>
               <button 
                 type="submit"
@@ -598,6 +606,28 @@ import { CommonModule } from '@angular/common';
       box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
     }
 
+    .form-input.error, .form-textarea.error {
+      border-color: #dc2626;
+      box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.1);
+    }
+
+    .character-counter {
+      font-size: 0.75rem;
+      color: #6b7280;
+      text-align: right;
+      margin-top: 0.25rem;
+    }
+
+    .character-counter.error {
+      color: #dc2626;
+    }
+
+    .error-message {
+      font-size: 0.75rem;
+      color: #dc2626;
+      margin-top: 0.25rem;
+    }
+
     .submit-btn {
       background-color: #3b82f6;
       color: white;
@@ -956,7 +986,7 @@ export class PostComponent implements OnInit {
   ) {
     this.commentForm = this.fb.group({
       name: [''],
-      comment: ['', Validators.required]
+      comment: ['', [Validators.required, Validators.maxLength(2000)]]
     });
   }
 
@@ -1093,12 +1123,16 @@ export class PostComponent implements OnInit {
           
           // Handle specific error messages
           let errorMessage = 'Error adding comment. Please try again.';
-          if (error.status === 503) {
+          if (error.message && error.message.includes('must be between 1 and 2000 characters')) {
+            errorMessage = 'Comment must be between 1 and 2000 characters.';
+          } else if (error.status === 503) {
             errorMessage = 'Server is temporarily unavailable. We tried multiple times but the server is still down. Please try again later.';
           } else if (error.status === 429) {
             errorMessage = 'Too many requests. Please wait a moment before commenting again.';
           } else if (error.status === 500) {
             errorMessage = 'Server error. We tried multiple times but the server is still having issues. Please try again later.';
+          } else if (error.status === 400) {
+            errorMessage = 'Invalid comment. Please check your input and try again.';
           } else if (error.status === 0) {
             errorMessage = 'Unable to connect to the server. Please check your connection.';
           }
