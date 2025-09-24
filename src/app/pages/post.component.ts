@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { PostsService } from '../services/posts.service';
-import { ApiService, Comment, LikeResponse, CommentsResponse } from '../services/api.service';
+import { ApiService, Comment, LikeResponse, CommentsResponse, UnlikeResponse } from '../services/api.service';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -1053,12 +1053,40 @@ export class PostComponent implements OnInit {
     this.isLoadingLikes = true;
     
     if (this.hasClapped) {
-      // Unlike the post (client-side only since backend doesn't support it)
-      this.hasClapped = false;
-      this.clapCount = Math.max(0, this.clapCount - 1);
-      this.isLoadingLikes = false;
-      this.snackBar.open('Like removed!', 'Close', { duration: 2000 });
-      this.saveClapCount();
+      // Unlike the post using the new backend API
+      this.apiService.unlikePost(this.postId).subscribe({
+        next: (response: UnlikeResponse) => {
+          this.clapCount = response.likes;
+          this.hasClapped = false;
+          this.isLoadingLikes = false;
+          this.snackBar.open('Like removed!', 'Close', { duration: 2000 });
+          this.saveClapCount();
+        },
+        error: (error) => {
+          console.error('Error unliking post:', error);
+          this.isLoadingLikes = false;
+          
+          // Handle specific error messages
+          let errorMessage = 'Error removing like. Please try again.';
+          if (error.message && error.message.includes('Already unliked')) {
+            errorMessage = 'You have not liked this post yet!';
+            this.hasClapped = false; // Ensure UI is in correct state
+            this.saveClapCount();
+          } else if (error.message && error.message.includes('Invalid session')) {
+            errorMessage = 'Session expired. Please refresh the page and try again.';
+          } else if (error.message && error.message.includes('clientId')) {
+            errorMessage = 'Invalid session. Please refresh the page.';
+          } else if (error.message && error.message.includes('CORS')) {
+            errorMessage = 'API not accessible in development mode. Unlike functionality is simulated.';
+            // Simulate successful unlike
+            this.hasClapped = false;
+            this.clapCount = Math.max(0, this.clapCount - 1);
+            this.saveClapCount();
+          }
+          
+          this.snackBar.open(errorMessage, 'Close', { duration: 3000 });
+        }
+      });
     } else {
       // Like the post
       this.apiService.likePost(this.postId).subscribe({

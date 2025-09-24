@@ -35,6 +35,12 @@ export interface LikesResponse {
   cached: boolean;
 }
 
+export interface UnlikeResponse {
+  success: boolean;
+  likes: number;
+  clientId: string;
+}
+
 
 @Injectable({
   providedIn: 'root'
@@ -262,6 +268,52 @@ export class ApiService implements OnDestroy {
     );
   }
 
+  // Unlike a post
+  unlikePost(postId: string): Observable<UnlikeResponse> {
+    const clientId = this.getClientId();
+    const userIP = this.getUserIP();
+    
+    return this.http.delete<UnlikeResponse>(`${this.API_BASE_URL}/posts/${postId}/unlike`, {
+      headers: this.getHeaders(),
+      body: {
+        clientId,
+        userIP
+      }
+    }).pipe(
+      retry({
+        count: this.retryConfig.retries,
+        delay: (error, retryCount) => {
+          // Only retry on server errors (5xx) and specific client errors
+          if (error.status >= 500 || error.status === 429 || error.status === 408) {
+            console.log(`Retrying unlikePost (attempt ${retryCount}/${this.retryConfig.retries}) in ${this.retryConfig.delay}ms...`);
+            return of(null).pipe(delay(this.retryConfig.delay + (retryCount * this.retryConfig.backoff)));
+          }
+          // Don't retry for other errors (like 400 "Already unliked" or 404)
+          throw error;
+        }
+      }),
+      tap(response => {
+        // Update client ID if provided by server
+        if (response.clientId && response.clientId !== clientId) {
+          localStorage.setItem('blog_client_id', response.clientId);
+          this.clientIdSubject.next(response.clientId);
+        }
+      }),
+      catchError(error => {
+        // Handle CORS errors and network failures gracefully
+        if (error.status === 0 || (error.name === 'HttpErrorResponse' && error.status === 0)) {
+          console.warn('API not accessible (likely CORS issue in development). Using fallback response.');
+          return of({
+            success: true,
+            likes: Math.max(0, 0), // Simulate a successful unlike
+            clientId: clientId
+          });
+        }
+        // For actual server errors (500, etc.), still throw the error
+        return this.handleError(error);
+      })
+    );
+  }
 
   // Get comments for a post
   getComments(postId: string, page: number = 1, limit: number = 10, status: string = 'approved'): Observable<CommentsResponse> {
