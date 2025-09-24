@@ -548,6 +548,60 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
       margin-top: 1rem;
     }
     
+    /* Animation classes */
+    .fade-in {
+      animation: fadeIn 0.6s ease-in-out;
+    }
+    
+    .slide-up {
+      animation: slideUp 0.8s ease-out;
+    }
+    
+    .hover-lift {
+      transition: all 0.3s ease;
+    }
+    
+    .hover-lift:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    }
+    
+    .stagger-animation {
+      opacity: 0;
+      animation: fadeInUp 0.6s ease-out forwards;
+    }
+    
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+      }
+      to {
+        opacity: 1;
+      }
+    }
+    
+    @keyframes slideUp {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
+    @keyframes fadeInUp {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    
     @media (max-width: 1024px) {
       .content-layout {
         flex-direction: column;
@@ -714,37 +768,17 @@ export class HomeComponent implements OnInit {
   private loadPostsWithStats(): Observable<any> {
     return this.posts.getIndex().pipe(
       map(indexData => {
-        // Create an array of observables to get likes for each post
-        const likeRequests = indexData.posts.map((post: any) => 
-          this.apiService.getLikes(post.slug).pipe(
-            map(likesResponse => ({
-              ...post,
-              likeCount: likesResponse.likes
-            })),
-            catchError(error => {
-              console.error(`Error loading likes for ${post.slug}:`, error);
-              return of({
-                ...post,
-                likeCount: 0
-              });
-            })
-          )
-        );
-
-        // Use forkJoin to get all likes at once
-        return forkJoin(likeRequests).pipe(
-          map(postsWithLikes => ({
-            ...indexData,
-            posts: postsWithLikes
-          })),
-          catchError(error => {
-            console.error('Error loading posts with stats:', error);
-            // Return original data if API fails
-            return of(indexData);
-          })
-        );
+        // Add default likeCount to each post
+        const postsWithLikes = indexData.posts.map((post: any) => ({
+          ...post,
+          likeCount: 0
+        }));
+        
+        return {
+          ...indexData,
+          posts: postsWithLikes
+        };
       }),
-      map(observable => observable), // Flatten the observable
       catchError(error => {
         console.error('Error in loadPostsWithStats:', error);
         return this.posts.getIndex(); // Fallback to original data
