@@ -2,7 +2,7 @@ import { Injectable, inject, PLATFORM_ID, OnDestroy } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, BehaviorSubject, throwError, Subject, of } from 'rxjs';
-import { catchError, map, tap, takeUntil } from 'rxjs/operators';
+import { catchError, map, tap, takeUntil, retry, retryWhen, delay, take } from 'rxjs/operators';
 
 export interface Comment {
   id: number;
@@ -103,11 +103,40 @@ export class ApiService implements OnDestroy {
     });
   }
 
+  // Retry configuration for API calls
+  private retryConfig = {
+    retries: 3,
+    delay: 2000, // 2 seconds
+    backoff: 1000 // 1 second additional delay per retry
+  };
+
+  // Custom retry logic for server errors
+  private retryWithBackoff() {
+    return retryWhen(errors =>
+      errors.pipe(
+        delay(this.retryConfig.delay),
+        take(this.retryConfig.retries)
+      )
+    );
+  }
+
   // Get likes for a post
   getLikes(postId: string): Observable<LikesResponse> {
     return this.http.get<LikesResponse>(`${this.API_BASE_URL}/posts/${postId}/likes`, {
       headers: this.getHeaders()
     }).pipe(
+      retry({
+        count: this.retryConfig.retries,
+        delay: (error, retryCount) => {
+          // Only retry on server errors (5xx) and specific client errors
+          if (error.status >= 500 || error.status === 429 || error.status === 408) {
+            console.log(`Retrying getLikes (attempt ${retryCount}/${this.retryConfig.retries}) in ${this.retryConfig.delay}ms...`);
+            return of(null).pipe(delay(this.retryConfig.delay + (retryCount * this.retryConfig.backoff)));
+          }
+          // Don't retry for other errors
+          throw error;
+        }
+      }),
       catchError(error => {
         // Handle CORS errors and network failures gracefully
         if (error.status === 0 || (error.name === 'HttpErrorResponse' && error.status === 0)) {
@@ -134,6 +163,18 @@ export class ApiService implements OnDestroy {
     }, {
       headers: this.getHeaders()
     }).pipe(
+      retry({
+        count: this.retryConfig.retries,
+        delay: (error, retryCount) => {
+          // Only retry on server errors (5xx) and specific client errors
+          if (error.status >= 500 || error.status === 429 || error.status === 408) {
+            console.log(`Retrying likePost (attempt ${retryCount}/${this.retryConfig.retries}) in ${this.retryConfig.delay}ms...`);
+            return of(null).pipe(delay(this.retryConfig.delay + (retryCount * this.retryConfig.backoff)));
+          }
+          // Don't retry for other errors (like 400 "Already liked")
+          throw error;
+        }
+      }),
       tap(response => {
         // Update client ID if provided by server
         if (response.clientId && response.clientId !== clientId) {
@@ -166,6 +207,18 @@ export class ApiService implements OnDestroy {
         limit: limit.toString()
       }
     }).pipe(
+      retry({
+        count: this.retryConfig.retries,
+        delay: (error, retryCount) => {
+          // Only retry on server errors (5xx) and specific client errors
+          if (error.status >= 500 || error.status === 429 || error.status === 408) {
+            console.log(`Retrying getComments (attempt ${retryCount}/${this.retryConfig.retries}) in ${this.retryConfig.delay}ms...`);
+            return of(null).pipe(delay(this.retryConfig.delay + (retryCount * this.retryConfig.backoff)));
+          }
+          // Don't retry for other errors
+          throw error;
+        }
+      }),
       catchError(error => {
         // Handle CORS errors and network failures gracefully
         if (error.status === 0 || (error.name === 'HttpErrorResponse' && error.status === 0)) {
@@ -199,6 +252,18 @@ export class ApiService implements OnDestroy {
     }, {
       headers: this.getHeaders()
     }).pipe(
+      retry({
+        count: this.retryConfig.retries,
+        delay: (error, retryCount) => {
+          // Only retry on server errors (5xx) and specific client errors
+          if (error.status >= 500 || error.status === 429 || error.status === 408) {
+            console.log(`Retrying addComment (attempt ${retryCount}/${this.retryConfig.retries}) in ${this.retryConfig.delay}ms...`);
+            return of(null).pipe(delay(this.retryConfig.delay + (retryCount * this.retryConfig.backoff)));
+          }
+          // Don't retry for other errors (like 400 validation errors)
+          throw error;
+        }
+      }),
       tap((response: any) => {
         // Update client ID if provided by server
         if (response.clientId && response.clientId !== clientId) {
@@ -215,11 +280,6 @@ export class ApiService implements OnDestroy {
             message: 'Comment added successfully (offline mode)',
             clientId: clientId
           });
-        }
-        // Handle server unavailability (503) - don't provide fallback, let the error propagate
-        if (error.status === 503) {
-          console.error('Server temporarily unavailable (503)');
-          return this.handleError(error);
         }
         return this.handleError(error);
       })

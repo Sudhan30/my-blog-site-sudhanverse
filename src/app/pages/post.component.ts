@@ -885,11 +885,11 @@ export class PostComponent implements OnInit {
           // Handle specific error messages
           let errorMessage = 'Error adding comment. Please try again.';
           if (error.status === 503) {
-            errorMessage = 'Server is temporarily unavailable. Please try again in a few moments.';
+            errorMessage = 'Server is temporarily unavailable. We tried multiple times but the server is still down. Please try again later.';
           } else if (error.status === 429) {
             errorMessage = 'Too many requests. Please wait a moment before commenting again.';
           } else if (error.status === 500) {
-            errorMessage = 'Server error. Please try again later.';
+            errorMessage = 'Server error. We tried multiple times but the server is still having issues. Please try again later.';
           } else if (error.status === 0) {
             errorMessage = 'Unable to connect to the server. Please check your connection.';
           }
