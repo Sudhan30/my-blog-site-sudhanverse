@@ -1,7 +1,7 @@
 import { Injectable, inject, PLATFORM_ID, OnDestroy } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Observable, BehaviorSubject, throwError, Subject } from 'rxjs';
+import { Observable, BehaviorSubject, throwError, Subject, of } from 'rxjs';
 import { catchError, map, tap, takeUntil } from 'rxjs/operators';
 
 export interface Comment {
