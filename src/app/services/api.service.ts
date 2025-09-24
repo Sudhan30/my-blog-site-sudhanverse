@@ -1,4 +1,5 @@
-import { Injectable, inject } from '@angular/core';
+import { Injectable, inject, PLATFORM_ID } from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, BehaviorSubject, throwError } from 'rxjs';
 import { catchError, map, tap } from 'rxjs/operators';
@@ -39,24 +40,30 @@ export interface LikesResponse {
 export class ApiService {
   private http = inject(HttpClient);
   private readonly API_BASE_URL = 'https://blog.sudharsana.dev/api';
-  
+  private platformId = inject(PLATFORM_ID);
+
   // Client ID for tracking likes/comments
-  private clientIdSubject = new BehaviorSubject<string>(this.getOrCreateClientId());
+  private clientIdSubject = new BehaviorSubject<string>('');
   public clientId$ = this.clientIdSubject.asObservable();
 
   constructor() {
-    // Initialize client ID
-    this.getOrCreateClientId();
+    // Initialize client ID only on the browser
+    if (isPlatformBrowser(this.platformId)) {
+      this.getOrCreateClientId();
+    }
   }
 
   private getOrCreateClientId(): string {
-    let clientId = localStorage.getItem('blog_client_id');
-    if (!clientId) {
-      clientId = this.generateClientId();
-      localStorage.setItem('blog_client_id', clientId);
+    if (isPlatformBrowser(this.platformId)) {
+      let clientId = localStorage.getItem('blog_client_id');
+      if (!clientId) {
+        clientId = this.generateClientId();
+        localStorage.setItem('blog_client_id', clientId);
+      }
+      this.clientIdSubject.next(clientId);
+      return clientId;
     }
-    this.clientIdSubject.next(clientId);
-    return clientId;
+    return '';
   }
 
   private generateClientId(): string {
