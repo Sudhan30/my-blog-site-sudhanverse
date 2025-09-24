@@ -119,6 +119,7 @@ import { CommonModule } from '@angular/common';
         <!-- Responses Section -->
         <section class="responses-section">
           <h3 class="responses-title">Responses ({{ totalComments }})</h3>
+          <p class="responses-note">Only approved comments are displayed.</p>
           
           <!-- Response Form -->
           <div class="response-form">
@@ -164,7 +165,10 @@ import { CommonModule } from '@angular/common';
                         src="https://ui-avatars.com/api/?name={{ comment.display_name }}&size=32&background=6b7280&color=ffffff&bold=true">
               <div class="response-content">
                 <div class="response-card">
-                  <p class="response-author">{{ comment.display_name }}</p>
+                  <div class="response-author-info">
+                    <p class="response-author">{{ comment.display_name }}</p>
+                    <span *ngIf="comment.status === 'approved'" class="status-badge approved">✓ Approved</span>
+                  </div>
                   <p class="response-text">{{ comment.content }}</p>
                 </div>
                 <div class="response-actions">
@@ -559,8 +563,15 @@ import { CommonModule } from '@angular/common';
     .responses-title {
       font-size: 1.5rem;
       font-weight: bold;
-      margin-bottom: 2rem;
+      margin-bottom: 0.5rem;
       color: #111827;
+    }
+
+    .responses-note {
+      font-size: 0.875rem;
+      color: #6b7280;
+      margin-bottom: 2rem;
+      font-style: italic;
     }
 
     /* Response Form */
@@ -639,10 +650,32 @@ import { CommonModule } from '@angular/common';
       box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
     }
 
+    .response-author-info {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.5rem;
+    }
+
     .response-author {
       font-weight: 600;
-      margin: 0 0 0.5rem 0;
+      margin: 0;
       color: #111827;
+    }
+
+    .status-badge {
+      font-size: 0.75rem;
+      font-weight: 500;
+      padding: 0.25rem 0.5rem;
+      border-radius: 0.25rem;
+      text-transform: uppercase;
+      letter-spacing: 0.025em;
+    }
+
+    .status-badge.approved {
+      background-color: #d1fae5;
+      color: #065f46;
+      border: 1px solid #a7f3d0;
     }
 
     .response-text {
@@ -1120,7 +1153,7 @@ export class PostComponent implements OnInit {
     this.isLoadingComments = true;
     this.currentPage = page;
     
-    this.apiService.getComments(this.postId, page, this.commentsPerPage).subscribe({
+    this.apiService.getComments(this.postId, page, this.commentsPerPage, 'approved').subscribe({
       next: (response: CommentsResponse) => {
         this.comments = response.comments;
         this.totalComments = response.pagination.total;
@@ -1197,7 +1230,7 @@ export class PostComponent implements OnInit {
 
   loadAllComments() {
     this.isLoadingComments = true;
-    this.apiService.getAllComments(this.postId).subscribe({
+    this.apiService.getAllComments(this.postId, 'approved').subscribe({
       next: (response: CommentsResponse) => {
         this.comments = response.comments;
         this.totalComments = response.pagination.total;

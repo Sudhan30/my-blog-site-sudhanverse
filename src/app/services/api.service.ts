@@ -9,6 +9,7 @@ export interface Comment {
   display_name: string;
   content: string;
   created_at: string;
+  status?: string; // 'approved', 'pending', 'rejected', etc.
 }
 
 export interface LikeResponse {
@@ -256,12 +257,13 @@ export class ApiService implements OnDestroy {
   }
 
   // Get comments for a post
-  getComments(postId: string, page: number = 1, limit: number = 10): Observable<CommentsResponse> {
+  getComments(postId: string, page: number = 1, limit: number = 10, status: string = 'approved'): Observable<CommentsResponse> {
     return this.http.get<CommentsResponse>(`${this.API_BASE_URL}/posts/${postId}/comments`, {
       headers: this.getHeaders(),
       params: {
         page: page.toString(),
-        limit: limit.toString()
+        limit: limit.toString(),
+        status: status
       }
     }).pipe(
       retry({
@@ -297,12 +299,13 @@ export class ApiService implements OnDestroy {
   }
 
   // Get all comments for a post (no pagination)
-  getAllComments(postId: string): Observable<CommentsResponse> {
+  getAllComments(postId: string, status: string = 'approved'): Observable<CommentsResponse> {
     return this.http.get<CommentsResponse>(`${this.API_BASE_URL}/posts/${postId}/comments`, {
       headers: this.getHeaders(),
       params: {
         page: '1',
-        limit: '1000' // Large number to get all comments
+        limit: '1000', // Large number to get all comments
+        status: status
       }
     }).pipe(
       retry({
