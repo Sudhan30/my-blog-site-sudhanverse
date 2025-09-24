@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { PostsService } from '../services/posts.service';
-import { ApiService, Comment, LikeResponse, CommentsResponse } from '../services/api.service';
+import { ApiService, Comment, LikeResponse, CommentsResponse, LikeStatusResponse, UnlikeResponse } from '../services/api.service';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
@@ -57,7 +57,8 @@ import { CommonModule } from '@angular/common';
                 class="interaction-btn"
                 [class.clapped]="hasClapped"
                 (click)="clap()"
-                [disabled]="hasClapped || isLoadingLikes">
+                [disabled]="isLoadingLikes"
+                [title]="hasClapped ? 'Unlike this post' : 'Like this post'">
                 <mat-icon>{{ hasClapped ? 'thumb_up' : 'thumb_up_off_alt' }}</mat-icon>
                 <span>{{ isLoadingLikes ? '...' : clapCount }}</span>
               </button>
@@ -1047,37 +1048,72 @@ export class PostComponent implements OnInit {
   }
 
   clap() {
-    if (this.hasClapped || this.isLoadingLikes) return;
+    if (this.isLoadingLikes) return;
     
     this.isLoadingLikes = true;
     
-    this.apiService.likePost(this.postId).subscribe({
-      next: (response: LikeResponse) => {
-        this.clapCount = response.likes;
-        this.hasClapped = true;
-        this.isLoadingLikes = false;
-        this.snackBar.open('Thanks for the like!', 'Close', { duration: 3000 });
-      },
-      error: (error) => {
-        console.error('Error liking post:', error);
-        this.isLoadingLikes = false;
-        
-        // Handle specific error messages
-        let errorMessage = 'Error liking post. Please try again.';
-        if (error.message && error.message.includes('Already liked')) {
-          errorMessage = 'You have already liked this post!';
-          this.hasClapped = true; // Mark as clapped since they already liked it
-        } else if (error.message && error.message.includes('Invalid session')) {
-          errorMessage = 'Session expired. Please refresh the page and try again.';
-        } else if (error.message && error.message.includes('clientId')) {
-          errorMessage = 'Invalid session. Please refresh the page.';
-        } else if (error.message && error.message.includes('CORS')) {
-          errorMessage = 'API not accessible in development mode. Like functionality is simulated.';
+    if (this.hasClapped) {
+      // Unlike the post
+      this.apiService.unlikePost(this.postId).subscribe({
+        next: (response: UnlikeResponse) => {
+          this.clapCount = response.likes;
+          this.hasClapped = false;
+          this.isLoadingLikes = false;
+          this.snackBar.open('Like removed!', 'Close', { duration: 2000 });
+          this.saveClapCount();
+        },
+        error: (error) => {
+          console.error('Error unliking post:', error);
+          this.isLoadingLikes = false;
+          
+          let errorMessage = 'Error removing like. Please try again.';
+          if (error.message && error.message.includes('CORS')) {
+            errorMessage = 'API not accessible in development mode. Unlike functionality is simulated.';
+            // Simulate successful unlike
+            this.hasClapped = false;
+            this.clapCount = Math.max(0, this.clapCount - 1);
+            this.saveClapCount();
+          }
+          
+          this.snackBar.open(errorMessage, 'Close', { duration: 3000 });
         }
-        
-        this.snackBar.open(errorMessage, 'Close', { duration: 3000 });
-      }
-    });
+      });
+    } else {
+      // Like the post
+      this.apiService.likePost(this.postId).subscribe({
+        next: (response: LikeResponse) => {
+          this.clapCount = response.likes;
+          this.hasClapped = true;
+          this.isLoadingLikes = false;
+          this.snackBar.open('Thanks for the like!', 'Close', { duration: 3000 });
+          this.saveClapCount();
+        },
+        error: (error) => {
+          console.error('Error liking post:', error);
+          this.isLoadingLikes = false;
+          
+          // Handle specific error messages
+          let errorMessage = 'Error liking post. Please try again.';
+          if (error.message && error.message.includes('Already liked')) {
+            errorMessage = 'You have already liked this post!';
+            this.hasClapped = true; // Mark as clapped since they already liked it
+            this.saveClapCount();
+          } else if (error.message && error.message.includes('Invalid session')) {
+            errorMessage = 'Session expired. Please refresh the page and try again.';
+          } else if (error.message && error.message.includes('clientId')) {
+            errorMessage = 'Invalid session. Please refresh the page.';
+          } else if (error.message && error.message.includes('CORS')) {
+            errorMessage = 'API not accessible in development mode. Like functionality is simulated.';
+            // Simulate successful like
+            this.hasClapped = true;
+            this.clapCount += 1;
+            this.saveClapCount();
+          }
+          
+          this.snackBar.open(errorMessage, 'Close', { duration: 3000 });
+        }
+      });
+    }
   }
 
   shareOnTwitter() {
@@ -1156,21 +1192,39 @@ export class PostComponent implements OnInit {
 
   private loadClapCount() {
     this.isLoadingLikes = true;
-    this.apiService.getLikes(this.postId).subscribe({
+    
+    // Check like status to see if user has already liked this post
+    this.apiService.checkLikeStatus(this.postId).subscribe({
       next: (response) => {
         this.clapCount = response.likes;
+        this.hasClapped = response.hasLiked;
         this.isLoadingLikes = false;
+        
+        // Save to local storage for fallback
+        this.saveClapCount();
       },
       error: (error) => {
-        console.error('Error loading likes:', error);
-        this.isLoadingLikes = false;
-        // Fallback to local storage if API fails
-        const saved = localStorage.getItem(`claps_${this.currentSlug}`);
-        if (saved) {
-          const data = JSON.parse(saved);
-          this.clapCount = data.count || 0;
-          this.hasClapped = data.hasClapped || false;
-        }
+        console.error('Error loading like status:', error);
+        
+        // Fallback to getLikes if checkLikeStatus fails
+        this.apiService.getLikes(this.postId).subscribe({
+          next: (response) => {
+            this.clapCount = response.likes;
+            this.isLoadingLikes = false;
+            // Don't set hasClapped from getLikes since it doesn't provide user-specific data
+          },
+          error: (error) => {
+            console.error('Error loading likes:', error);
+            this.isLoadingLikes = false;
+            // Final fallback to local storage
+            const saved = localStorage.getItem(`claps_${this.currentSlug}`);
+            if (saved) {
+              const data = JSON.parse(saved);
+              this.clapCount = data.count || 0;
+              this.hasClapped = data.hasClapped || false;
+            }
+          }
+        });
       }
     });
   }
