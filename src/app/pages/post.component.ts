@@ -752,11 +752,20 @@ export class PostComponent implements OnInit {
   ngOnInit() {
     this.route.params.subscribe(params => {
       this.currentSlug = params['slug'];
-      this.postId = params['slug']; // Using slug as postId for now
+      this.postId = this.getPostIdFromSlug(this.currentSlug);
       this.loadPost();
       this.loadClapCount();
       this.loadComments();
     });
+  }
+
+  private getPostIdFromSlug(slug: string): string {
+    // Map slugs to database IDs
+    const slugToIdMap: { [key: string]: string } = {
+      'my-first-site': 'post-001',
+      'my-cloud-site': 'post-002'
+    };
+    return slugToIdMap[slug] || slug; // Fallback to slug if not found
   }
 
   loadPost() {
