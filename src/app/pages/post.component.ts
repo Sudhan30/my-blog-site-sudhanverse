@@ -857,10 +857,8 @@ export class PostComponent implements OnInit {
   }
 
   generateAnonymousName(): string {
-    const stars = ['★', '☆', '✦', '✧', '✩', '✪', '✫', '✬', '✭', '✮', '✯', '✰', '⭐', '🌟', '💫', '✨'];
-    const randomStar = stars[Math.floor(Math.random() * stars.length)];
-    const timestamp = Date.now().toString(16).slice(-6);
-    return `anonymous_${randomStar}_${timestamp}`;
+    // Use the API service's improved anonymous name generation
+    return this.apiService.generateAnonymousName();
   }
 
   submitComment() {

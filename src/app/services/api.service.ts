@@ -91,6 +91,63 @@ export class ApiService implements OnDestroy {
     }
   }
 
+  // Generate a catchy anonymous name based on UUID
+  generateAnonymousName(): string {
+    const clientId = this.getClientId();
+    
+    // Check if we already have a name for this UUID
+    if (isPlatformBrowser(this.platformId)) {
+      const storedName = localStorage.getItem(`anonymous_name_${clientId}`);
+      if (storedName) {
+        return storedName;
+      }
+    }
+
+    // Generate new name if not found
+    const newName = this.createCatchyAnonymousName(clientId);
+    
+    // Store it for future use
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.setItem(`anonymous_name_${clientId}`, newName);
+    }
+    
+    return newName;
+  }
+
+  private createCatchyAnonymousName(clientId: string): string {
+    // Animal names - catchy and memorable
+    const animals = [
+      'Tiger', 'Lion', 'Eagle', 'Wolf', 'Fox', 'Bear', 'Panda', 'Dolphin',
+      'Shark', 'Octopus', 'Penguin', 'Owl', 'Falcon', 'Lynx', 'Cheetah', 'Panther',
+      'Phoenix', 'Dragon', 'Unicorn', 'Griffin', 'Phoenix', 'Sphinx', 'Pegasus',
+      'Raven', 'Crow', 'Hawk', 'Falcon', 'Osprey', 'Kestrel', 'Merlin',
+      'Lynx', 'Bobcat', 'Cougar', 'Jaguar', 'Leopard', 'Snow Leopard',
+      'Orca', 'Narwhal', 'Beluga', 'Seal', 'Walrus', 'Manatee',
+      'Koala', 'Kangaroo', 'Wombat', 'Platypus', 'Echidna', 'Quokka',
+      'Sloth', 'Capybara', 'Tapir', 'Anteater', 'Armadillo', 'Pangolin'
+    ];
+
+    // Get a consistent animal based on UUID
+    const uuidHash = this.hashString(clientId);
+    const animalIndex = uuidHash % animals.length;
+    const selectedAnimal = animals[animalIndex];
+
+    // Generate a 5-character hash from UUID
+    const hash = clientId.replace(/[^a-f0-9]/g, '').substring(0, 5);
+    
+    return `anonymous_${hash}_${selectedAnimal}`;
+  }
+
+  private hashString(str: string): number {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+      const char = str.charCodeAt(i);
+      hash = ((hash << 5) - hash) + char;
+      hash = hash & hash; // Convert to 32-bit integer
+    }
+    return Math.abs(hash);
+  }
+
   private getUserIP(): string {
     // This will be set by the backend based on the request
     return '';
