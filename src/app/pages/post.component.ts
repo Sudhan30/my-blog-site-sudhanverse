@@ -823,7 +823,10 @@ export class PostComponent implements OnInit {
         
         // Handle specific error messages
         let errorMessage = 'Error liking post. Please try again.';
-        if (error.message && error.message.includes('Invalid session')) {
+        if (error.message && error.message.includes('Already liked')) {
+          errorMessage = 'You have already liked this post!';
+          this.hasClapped = true; // Mark as clapped since they already liked it
+        } else if (error.message && error.message.includes('Invalid session')) {
           errorMessage = 'Session expired. Please refresh the page and try again.';
         } else if (error.message && error.message.includes('clientId')) {
           errorMessage = 'Invalid session. Please refresh the page.';
@@ -831,7 +834,7 @@ export class PostComponent implements OnInit {
           errorMessage = 'API not accessible in development mode. Like functionality is simulated.';
         }
         
-        this.snackBar.open(errorMessage, 'Close', { duration: 5000 });
+        this.snackBar.open(errorMessage, 'Close', { duration: 3000 });
       }
     });
   }
