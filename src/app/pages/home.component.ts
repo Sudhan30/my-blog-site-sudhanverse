@@ -853,16 +853,23 @@ export class HomeComponent implements OnInit {
             
             // Add like counts and like state to posts
             const postsWithLikes = indexData.posts.map((post: any) => {
-              const postId = post.id; // Use database ID for API calls
+              // Temporary workaround: Map slugs to IDs since production deployment has caching issues
+              const slugToIdMap: { [key: string]: string } = {
+                'my-first-site': 'post-001',
+                'my-cloud-site': 'post-002'
+              };
+              
+              const postId = post.id || slugToIdMap[post.slug]; // Use database ID or fallback to slug mapping
               
               // Temporary debugging
               console.log('🔍 DEBUG: Processing post:', post);
-              console.log('🔍 DEBUG: Post ID from post.id:', postId);
-              console.log('🔍 DEBUG: Post has id property:', 'id' in post);
-              console.log('🔍 DEBUG: Post keys:', Object.keys(post));
+              console.log('🔍 DEBUG: Post ID from post.id:', post.id);
+              console.log('🔍 DEBUG: Mapped ID from slug:', slugToIdMap[post.slug]);
+              console.log('🔍 DEBUG: Final postId:', postId);
               
               return {
                 ...post,
+                id: postId, // Ensure ID is set
                 likeCount: likesMap[postId] || 0,
                 hasLiked: this.loadLikeState(postId),
                 isLoadingLike: false
@@ -927,13 +934,20 @@ export class HomeComponent implements OnInit {
     if (post.isLoadingLike) return;
     
     post.isLoadingLike = true;
-    // Use database ID instead of slug for API calls
-    const postId = post.id;
+    
+    // Temporary workaround: Map slugs to IDs since production deployment has caching issues
+    const slugToIdMap: { [key: string]: string } = {
+      'my-first-site': 'post-001',
+      'my-cloud-site': 'post-002'
+    };
+    
+    const postId = post.id || slugToIdMap[post.slug]; // Use database ID or fallback to slug mapping
     
     // Temporary debugging to check if fix is working
     console.log('🔍 DEBUG: Post object:', post);
-    console.log('🔍 DEBUG: Post ID:', postId);
-    console.log('🔍 DEBUG: Post keys:', Object.keys(post));
+    console.log('🔍 DEBUG: Post ID from post.id:', post.id);
+    console.log('🔍 DEBUG: Mapped ID from slug:', slugToIdMap[post.slug]);
+    console.log('🔍 DEBUG: Final postId:', postId);
     
     if (!postId) {
       console.error('❌ Post ID is still undefined!', post);
