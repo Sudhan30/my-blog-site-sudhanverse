@@ -4,7 +4,7 @@ import { AsyncPipe, DatePipe, NgFor, NgIf } from '@angular/common';
 import { PostsService } from '../services/posts.service';
 import { ApiService } from '../services/api.service';
 import { Observable, forkJoin, of } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
+import { map, catchError, switchMap } from 'rxjs/operators';
 import { MatCardModule } from '@angular/material/card';
 import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
@@ -768,20 +768,72 @@ export class HomeComponent implements OnInit {
   private loadPostsWithStats(): Observable<any> {
     return this.posts.getIndex().pipe(
       map(indexData => {
-        // Add default likeCount to each post
-        const postsWithLikes = indexData.posts.map((post: any) => ({
-          ...post,
-          likeCount: 0
-        }));
+        // Get all post IDs for fetching like counts
+        const postIds = indexData.posts.map((post: any) => post.id || post.slug);
         
-        return {
-          ...indexData,
-          posts: postsWithLikes
-        };
+        // Create observables for each post's like count
+        const likeObservables = postIds.map((postId: string) => 
+          this.apiService.getLikes(postId).pipe(
+            map(response => ({ postId, likes: response.likes })),
+            catchError(error => {
+              console.warn(`Error fetching likes for ${postId}:`, error);
+              return of({ postId, likes: 0 });
+            })
+          )
+        );
+        
+        // Use forkJoin to fetch all like counts in parallel
+        return forkJoin(likeObservables).pipe(
+          map(likeData => {
+            // Create a map of postId to like count
+            const likesMap = likeData.reduce((acc, item) => {
+              acc[item.postId] = item.likes;
+              return acc;
+            }, {} as { [key: string]: number });
+            
+            // Add like counts to posts
+            const postsWithLikes = indexData.posts.map((post: any) => ({
+              ...post,
+              likeCount: likesMap[post.id || post.slug] || 0
+            }));
+            
+            return {
+              ...indexData,
+              posts: postsWithLikes
+            };
+          }),
+          catchError(error => {
+            console.error('Error fetching like counts:', error);
+            // Fallback: return posts with default like counts
+            const postsWithLikes = indexData.posts.map((post: any) => ({
+              ...post,
+              likeCount: 0
+            }));
+            return of({
+              ...indexData,
+              posts: postsWithLikes
+            });
+          })
+        );
       }),
+      // Flatten the nested observable
+      map(observable => observable),
+      // Use switchMap to handle the nested observable
+      switchMap(observable => observable),
       catchError(error => {
         console.error('Error in loadPostsWithStats:', error);
-        return this.posts.getIndex(); // Fallback to original data
+        return this.posts.getIndex().pipe(
+          map(indexData => {
+            const postsWithLikes = indexData.posts.map((post: any) => ({
+              ...post,
+              likeCount: 0
+            }));
+            return {
+              ...indexData,
+              posts: postsWithLikes
+            };
+          })
+        );
       })
     );
   }
