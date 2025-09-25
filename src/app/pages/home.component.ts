@@ -3,6 +3,7 @@ import { RouterLink } from '@angular/router';
 import { AsyncPipe, DatePipe, NgFor, NgIf } from '@angular/common';
 import { PostsService } from '../services/posts.service';
 import { ApiService } from '../services/api.service';
+import { PostIdMapperService } from '../services/post-id-mapper.service';
 import { Observable, forkJoin, of } from 'rxjs';
 import { map, catchError, switchMap } from 'rxjs/operators';
 import { MatCardModule } from '@angular/material/card';
@@ -816,13 +817,16 @@ export class HomeComponent implements OnInit {
   constructor(
     private posts: PostsService,
     private apiService: ApiService,
+    private postIdMapper: PostIdMapperService,
     private snackBar: MatSnackBar
   ){
     this.idx$ = this.loadPostsWithStats();
   }
 
   ngOnInit() {
-    // Component initialization if needed
+    // Version identifier to verify deployment
+    console.log('🚀 HomeComponent loaded - Version: 2025-09-25-09:00');
+    console.log('🔧 Slug-to-ID mapping workaround active');
   }
 
   private loadPostsWithStats(): Observable<any> {
@@ -853,23 +857,17 @@ export class HomeComponent implements OnInit {
             
             // Add like counts and like state to posts
             const postsWithLikes = indexData.posts.map((post: any) => {
-              // Temporary workaround: Map slugs to IDs since production deployment has caching issues
-              const slugToIdMap: { [key: string]: string } = {
-                'my-first-site': 'post-001',
-                'my-cloud-site': 'post-002'
-              };
+              // Use the PostIdMapperService to get the correct ID
+              const postId = this.postIdMapper.getPostId(post);
+              const postWithId = this.postIdMapper.ensurePostId(post);
               
-              const postId = post.id || slugToIdMap[post.slug]; // Use database ID or fallback to slug mapping
-              
-              // Temporary debugging
+              // Debug logging
               console.log('🔍 DEBUG: Processing post:', post);
-              console.log('🔍 DEBUG: Post ID from post.id:', post.id);
-              console.log('🔍 DEBUG: Mapped ID from slug:', slugToIdMap[post.slug]);
-              console.log('🔍 DEBUG: Final postId:', postId);
+              console.log('🔍 DEBUG: Post ID from service:', postId);
+              console.log('🔍 DEBUG: Post with ID:', postWithId);
               
               return {
-                ...post,
-                id: postId, // Ensure ID is set
+                ...postWithId,
                 likeCount: likesMap[postId] || 0,
                 hasLiked: this.loadLikeState(postId),
                 isLoadingLike: false
@@ -935,24 +933,18 @@ export class HomeComponent implements OnInit {
     
     post.isLoadingLike = true;
     
-    // Temporary workaround: Map slugs to IDs since production deployment has caching issues
-    const slugToIdMap: { [key: string]: string } = {
-      'my-first-site': 'post-001',
-      'my-cloud-site': 'post-002'
-    };
+    // Use the PostIdMapperService to get the correct ID
+    const postId = this.postIdMapper.getPostId(post);
     
-    const postId = post.id || slugToIdMap[post.slug]; // Use database ID or fallback to slug mapping
-    
-    // Temporary debugging to check if fix is working
+    // Debug logging
     console.log('🔍 DEBUG: Post object:', post);
-    console.log('🔍 DEBUG: Post ID from post.id:', post.id);
-    console.log('🔍 DEBUG: Mapped ID from slug:', slugToIdMap[post.slug]);
-    console.log('🔍 DEBUG: Final postId:', postId);
+    console.log('🔍 DEBUG: Post ID from service:', postId);
+    console.log('🔍 DEBUG: Service validation:', this.postIdMapper.isValidPostId(postId));
     
-    if (!postId) {
-      console.error('❌ Post ID is still undefined!', post);
+    if (!postId || !this.postIdMapper.isValidPostId(postId)) {
+      console.error('❌ Invalid Post ID:', postId, 'for post:', post);
       post.isLoadingLike = false;
-      this.snackBar.open('Error: Post ID not found. Please refresh the page.', 'Close', { duration: 3000 });
+      this.snackBar.open('Error: Invalid post ID. Please refresh the page.', 'Close', { duration: 3000 });
       return;
     }
     
