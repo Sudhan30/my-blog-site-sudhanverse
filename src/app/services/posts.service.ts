@@ -4,7 +4,12 @@ import { map, shareReplay } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 
 export interface PostIndexItem {
-  slug: string; title: string; date: string; tags: string[]; excerpt: string;
+  slug: string; 
+  id: string;
+  title: string; 
+  date: string; 
+  tags: string[]; 
+  excerpt: string;
 }
 export interface IndexData { posts: PostIndexItem[]; tags: Record<string, number>; }
 
