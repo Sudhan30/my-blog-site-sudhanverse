@@ -855,6 +855,12 @@ export class HomeComponent implements OnInit {
             const postsWithLikes = indexData.posts.map((post: any) => {
               const postId = post.id; // Use database ID for API calls
               
+              // Temporary debugging
+              console.log('🔍 DEBUG: Processing post:', post);
+              console.log('🔍 DEBUG: Post ID from post.id:', postId);
+              console.log('🔍 DEBUG: Post has id property:', 'id' in post);
+              console.log('🔍 DEBUG: Post keys:', Object.keys(post));
+              
               return {
                 ...post,
                 likeCount: likesMap[postId] || 0,
@@ -923,6 +929,18 @@ export class HomeComponent implements OnInit {
     post.isLoadingLike = true;
     // Use database ID instead of slug for API calls
     const postId = post.id;
+    
+    // Temporary debugging to check if fix is working
+    console.log('🔍 DEBUG: Post object:', post);
+    console.log('🔍 DEBUG: Post ID:', postId);
+    console.log('🔍 DEBUG: Post keys:', Object.keys(post));
+    
+    if (!postId) {
+      console.error('❌ Post ID is still undefined!', post);
+      post.isLoadingLike = false;
+      this.snackBar.open('Error: Post ID not found. Please refresh the page.', 'Close', { duration: 3000 });
+      return;
+    }
     
     if (post.hasLiked) {
       // Unlike the post
