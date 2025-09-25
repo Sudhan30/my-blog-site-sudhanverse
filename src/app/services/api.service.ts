@@ -515,4 +515,12 @@ export class ApiService implements OnDestroy {
   private isDestroyed(): boolean {
     return !this.destroy$ || this.destroy$.closed;
   }
+
+  // Safe observable creation
+  private createSafeObservable<T>(observableFactory: () => Observable<T>): Observable<T> {
+    if (this.isDestroyed()) {
+      return of(null as any);
+    }
+    return observableFactory();
+  }
 }
