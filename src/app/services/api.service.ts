@@ -510,4 +510,9 @@ export class ApiService implements OnDestroy {
       console.warn('Error during service cleanup:', error);
     }
   }
+
+  // Safety check for onDestroy
+  private isDestroyed(): boolean {
+    return !this.destroy$ || this.destroy$.closed;
+  }
 }

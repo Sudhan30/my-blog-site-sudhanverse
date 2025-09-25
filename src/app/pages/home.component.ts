@@ -853,7 +853,7 @@ export class HomeComponent implements OnInit {
             
             // Add like counts and like state to posts
             const postsWithLikes = indexData.posts.map((post: any) => {
-              const postId = post.id || post.slug;
+              const postId = post.id; // Use database ID for API calls
               return {
                 ...post,
                 likeCount: likesMap[postId] || 0,
@@ -871,7 +871,7 @@ export class HomeComponent implements OnInit {
             console.error('Error fetching like counts:', error);
             // Fallback: return posts with default like counts and state
             const postsWithLikes = indexData.posts.map((post: any) => {
-              const postId = post.id || post.slug;
+              const postId = post.id; // Use database ID for API calls
               return {
                 ...post,
                 likeCount: 0,
@@ -895,7 +895,7 @@ export class HomeComponent implements OnInit {
         return this.posts.getIndex().pipe(
           map(indexData => {
             const postsWithLikes = indexData.posts.map((post: any) => {
-              const postId = post.id || post.slug;
+              const postId = post.id; // Use database ID for API calls
               return {
                 ...post,
                 likeCount: 0,
@@ -920,7 +920,8 @@ export class HomeComponent implements OnInit {
     if (post.isLoadingLike) return;
     
     post.isLoadingLike = true;
-    const postId = post.id || post.slug;
+    // Use database ID instead of slug for API calls
+    const postId = post.id;
     
     if (post.hasLiked) {
       // Unlike the post
