@@ -10,10 +10,11 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
 
 @Component({
   standalone: true,
-  imports: [RouterLink, NgFor, NgIf, AsyncPipe, DatePipe, MatCardModule, MatButtonModule, MatChipsModule, MatIconModule, MatProgressSpinnerModule],
+  imports: [RouterLink, NgFor, NgIf, AsyncPipe, DatePipe, MatCardModule, MatButtonModule, MatChipsModule, MatIconModule, MatProgressSpinnerModule, MatSnackBarModule],
   template: `
     <div class="home-container">
       <!-- Hero Section -->
@@ -80,10 +81,14 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
                   <p class="post-excerpt">{{ p.excerpt }}</p>
                   <div class="post-footer">
                     <div class="post-stats">
-                      <span class="stat-item">
-                        <mat-icon>thumb_up</mat-icon>
+                      <button class="like-btn" 
+                              [class.liked]="p.hasLiked" 
+                              [disabled]="p.isLoadingLike"
+                              (click)="toggleLike(p, $event)">
+                        <mat-icon>{{ p.hasLiked ? 'thumb_up' : 'thumb_up_off_alt' }}</mat-icon>
                         <span>{{ p.likeCount || 0 }}</span>
-                      </span>
+                        <span *ngIf="p.isLoadingLike" class="loading-dots">...</span>
+                      </button>
                     </div>
                     <a [routerLink]="['/post', p.slug]" class="read-more">Read more →</a>
                     <div class="social-links">
@@ -380,6 +385,60 @@ import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
       font-size: 16px;
       width: 16px;
       height: 16px;
+    }
+
+    .like-btn {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      padding: 0.5rem 1rem;
+      border: 2px solid #e5e7eb;
+      border-radius: 8px;
+      background-color: #ffffff;
+      color: #6b7280;
+      font-size: 0.875rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      font-family: 'Roboto', sans-serif;
+    }
+
+    .like-btn:hover:not(:disabled) {
+      border-color: #0f62fe;
+      color: #0f62fe;
+      transform: translateY(-1px);
+    }
+
+    .like-btn.liked {
+      background-color: #0f62fe;
+      border-color: #0f62fe;
+      color: #ffffff;
+    }
+
+    .like-btn.liked:hover:not(:disabled) {
+      background-color: #0043ce;
+      border-color: #0043ce;
+    }
+
+    .like-btn:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    .like-btn mat-icon {
+      font-size: 18px;
+      width: 18px;
+      height: 18px;
+    }
+
+    .loading-dots {
+      animation: pulse 1.5s ease-in-out infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
     }
     
     .read-more {
@@ -756,7 +815,8 @@ export class HomeComponent implements OnInit {
   
   constructor(
     private posts: PostsService,
-    private apiService: ApiService
+    private apiService: ApiService,
+    private snackBar: MatSnackBar
   ){
     this.idx$ = this.loadPostsWithStats();
   }
@@ -791,11 +851,16 @@ export class HomeComponent implements OnInit {
               return acc;
             }, {} as { [key: string]: number });
             
-            // Add like counts to posts
-            const postsWithLikes = indexData.posts.map((post: any) => ({
-              ...post,
-              likeCount: likesMap[post.id || post.slug] || 0
-            }));
+            // Add like counts and like state to posts
+            const postsWithLikes = indexData.posts.map((post: any) => {
+              const postId = post.id || post.slug;
+              return {
+                ...post,
+                likeCount: likesMap[postId] || 0,
+                hasLiked: this.loadLikeState(postId),
+                isLoadingLike: false
+              };
+            });
             
             return {
               ...indexData,
@@ -804,11 +869,16 @@ export class HomeComponent implements OnInit {
           }),
           catchError(error => {
             console.error('Error fetching like counts:', error);
-            // Fallback: return posts with default like counts
-            const postsWithLikes = indexData.posts.map((post: any) => ({
-              ...post,
-              likeCount: 0
-            }));
+            // Fallback: return posts with default like counts and state
+            const postsWithLikes = indexData.posts.map((post: any) => {
+              const postId = post.id || post.slug;
+              return {
+                ...post,
+                likeCount: 0,
+                hasLiked: this.loadLikeState(postId),
+                isLoadingLike: false
+              };
+            });
             return of({
               ...indexData,
               posts: postsWithLikes
@@ -824,10 +894,15 @@ export class HomeComponent implements OnInit {
         console.error('Error in loadPostsWithStats:', error);
         return this.posts.getIndex().pipe(
           map(indexData => {
-            const postsWithLikes = indexData.posts.map((post: any) => ({
-              ...post,
-              likeCount: 0
-            }));
+            const postsWithLikes = indexData.posts.map((post: any) => {
+              const postId = post.id || post.slug;
+              return {
+                ...post,
+                likeCount: 0,
+                hasLiked: this.loadLikeState(postId),
+                isLoadingLike: false
+              };
+            });
             return {
               ...indexData,
               posts: postsWithLikes
@@ -836,5 +911,91 @@ export class HomeComponent implements OnInit {
         );
       })
     );
+  }
+
+  toggleLike(post: any, event: Event) {
+    event.preventDefault();
+    event.stopPropagation();
+    
+    if (post.isLoadingLike) return;
+    
+    post.isLoadingLike = true;
+    const postId = post.id || post.slug;
+    
+    if (post.hasLiked) {
+      // Unlike the post
+      this.apiService.unlikePost(postId).subscribe({
+        next: (response) => {
+          post.likeCount = response.likes;
+          post.hasLiked = false;
+          post.isLoadingLike = false;
+          this.snackBar.open('Like removed!', 'Close', { duration: 2000 });
+          this.saveLikeState(postId, false);
+        },
+        error: (error) => {
+          console.error('Error unliking post:', error);
+          post.isLoadingLike = false;
+          
+          let errorMessage = 'Error removing like. Please try again.';
+          if (error.message && error.message.includes('Already unliked')) {
+            errorMessage = 'You have not liked this post yet!';
+            post.hasLiked = false;
+            this.saveLikeState(postId, false);
+          } else if (error.message && error.message.includes('CORS')) {
+            errorMessage = 'API not accessible in development mode. Unlike functionality is simulated.';
+            post.hasLiked = false;
+            post.likeCount = Math.max(0, post.likeCount - 1);
+            this.saveLikeState(postId, false);
+          }
+          
+          this.snackBar.open(errorMessage, 'Close', { duration: 3000 });
+        }
+      });
+    } else {
+      // Like the post
+      this.apiService.likePost(postId).subscribe({
+        next: (response) => {
+          post.likeCount = response.likes;
+          post.hasLiked = true;
+          post.isLoadingLike = false;
+          this.snackBar.open('Thanks for the like!', 'Close', { duration: 2000 });
+          this.saveLikeState(postId, true);
+        },
+        error: (error) => {
+          console.error('Error liking post:', error);
+          post.isLoadingLike = false;
+          
+          let errorMessage = 'Error liking post. Please try again.';
+          if (error.message && error.message.includes('Already liked')) {
+            errorMessage = 'You have already liked this post!';
+            post.hasLiked = true;
+            this.saveLikeState(postId, true);
+          } else if (error.message && error.message.includes('CORS')) {
+            errorMessage = 'API not accessible in development mode. Like functionality is simulated.';
+            post.hasLiked = true;
+            post.likeCount = (post.likeCount || 0) + 1;
+            this.saveLikeState(postId, true);
+          }
+          
+          this.snackBar.open(errorMessage, 'Close', { duration: 3000 });
+        }
+      });
+    }
+  }
+
+  private saveLikeState(postId: string, hasLiked: boolean) {
+    if (typeof localStorage !== 'undefined') {
+      const clientId = this.apiService.getClientId();
+      localStorage.setItem(`like_${clientId}_${postId}`, hasLiked.toString());
+    }
+  }
+
+  private loadLikeState(postId: string): boolean {
+    if (typeof localStorage !== 'undefined') {
+      const clientId = this.apiService.getClientId();
+      const saved = localStorage.getItem(`like_${clientId}_${postId}`);
+      return saved === 'true';
+    }
+    return false;
   }
 }

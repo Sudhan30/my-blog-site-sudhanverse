@@ -95,7 +95,7 @@ export class ApiService implements OnDestroy {
     });
   }
 
-  private getClientId(): string {
+  getClientId(): string {
     try {
       return this.clientIdSubject?.value || '';
     } catch (error) {
