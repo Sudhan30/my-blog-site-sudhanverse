@@ -54,6 +54,7 @@ import { Subject, takeUntil } from 'rxjs';
       cursor: pointer;
       font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       overflow: hidden;
+      gap: 8px;
     }
 
     .feedback-button:hover {
@@ -74,7 +75,9 @@ import { Subject, takeUntil } from 'rxjs';
       font-size: 24px;
       color: #f4f4f4;
       transition: all 0.3s cubic-bezier(0.2, 0, 0.38, 0.9);
-      position: absolute;
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     .feedback-button:hover .feedback-icon {
@@ -90,8 +93,8 @@ import { Subject, takeUntil } from 'rxjs';
       font-weight: 400;
       font-size: 14px;
       white-space: nowrap;
-      margin-left: 12px;
       letter-spacing: 0.01em;
+      pointer-events: none;
     }
 
     .feedback-button:hover .feedback-text {
