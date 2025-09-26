@@ -770,22 +770,18 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
       }
       
       .nav-list {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: center;
-        gap: 0.5rem;
-        max-width: 100%;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+        max-width: 400px;
         margin: 0 auto;
       }
       
       .nav-link {
-        padding: 0.5rem 0.75rem;
-        font-size: 0.85rem;
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
         justify-content: center;
-        min-height: 40px;
-        flex: 1;
-        min-width: 0;
-        max-width: calc(25% - 0.375rem);
+        min-height: 48px;
       }
       
       .main-content {
@@ -843,49 +839,41 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
     
     @media (max-width: 480px) {
       .nav-list {
-        gap: 0.25rem;
-        padding: 0 0.5rem;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
+        max-width: 320px;
       }
       
       .nav-link {
-        padding: 0.4rem 0.5rem;
-        font-size: 0.8rem;
-        min-height: 36px;
-        max-width: calc(25% - 0.1875rem);
+        padding: 0.5rem 0.75rem;
+        font-size: 0.85rem;
+        min-height: 44px;
       }
       
       .nav-link mat-icon {
-        font-size: 14px;
-        width: 14px;
-        height: 14px;
-      }
-      
-      .nav-link span {
-        font-size: 0.75rem;
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
       }
       
       /* Alternative compact layout for very small screens */
       @media (max-width: 360px) {
         .nav-list {
-          gap: 0.125rem;
-          padding: 0 0.25rem;
+          grid-template-columns: 1fr 1fr;
+          gap: 0.25rem;
+          max-width: 280px;
         }
         
         .nav-link {
-          padding: 0.3rem 0.4rem;
-          font-size: 0.75rem;
-          min-height: 32px;
-          max-width: calc(25% - 0.09375rem);
-        }
-        
-        .nav-link mat-icon {
-          font-size: 12px;
-          width: 12px;
-          height: 12px;
+          padding: 0.5rem;
+          font-size: 0.8rem;
+          min-height: 40px;
+          flex-direction: column;
+          gap: 0.25rem;
         }
         
         .nav-link span {
-          font-size: 0.7rem;
+          font-size: 0.75rem;
         }
       }
       
