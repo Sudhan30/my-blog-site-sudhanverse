@@ -1,316 +1,520 @@
-import { Component } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule, ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
-import { MatCardModule } from '@angular/material/card';
-import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
+import { ApiService, FeedbackSubmission } from '../services/api.service';
+import { Subject, takeUntil } from 'rxjs';
 
 @Component({
-  selector: 'app-feedback',
+  selector: 'app-feedback-button',
   standalone: true,
   imports: [
     CommonModule,
-    FormsModule,
     ReactiveFormsModule,
+    MatDialogModule,
     MatButtonModule,
     MatIconModule,
     MatFormFieldModule,
     MatInputModule,
-    MatSelectModule,
-    MatCardModule,
-    MatSnackBarModule
+    MatSnackBarModule,
+    MatProgressSpinnerModule
   ],
   template: `
-    <div class="feedback-container" [class.expanded]="isExpanded">
-      <div class="feedback-trigger" (click)="toggleFeedback()">
-        <mat-icon>feedback</mat-icon>
-        <span class="feedback-text">Feedback</span>
-      </div>
-      
-      <div class="feedback-popup" *ngIf="isExpanded">
-        <mat-card class="feedback-card">
-          <mat-card-header>
-            <mat-card-title>Share Your Feedback</mat-card-title>
-          </mat-card-header>
-          
-          <mat-card-content>
-            <form [formGroup]="feedbackForm" (ngSubmit)="onSubmit()">
-              <div class="form-row">
-                <mat-form-field appearance="outline" class="half-width">
-                  <mat-label>Name (Optional)</mat-label>
-                  <input matInput formControlName="name" placeholder="Your name">
-                </mat-form-field>
-                
-                <mat-form-field appearance="outline" class="half-width">
-                  <mat-label>Email (Optional)</mat-label>
-                  <input matInput formControlName="email" type="email" placeholder="your@email.com">
-                </mat-form-field>
-              </div>
-              
-              <div class="rating-section">
-                <label class="rating-label">Rating</label>
-                <div class="star-rating">
-                  <mat-icon 
-                    *ngFor="let star of stars; let i = index"
-                    [class.filled]="i < selectedRating"
-                    (click)="setRating(i + 1)"
-                    class="star">
-                    {{ i < selectedRating ? 'star' : 'star_border' }}
-                  </mat-icon>
-                </div>
-              </div>
-              
-              <mat-form-field appearance="outline" class="full-width">
-                <mat-label>Describe your feedback (required)</mat-label>
-                <textarea 
-                  matInput 
-                  formControlName="feedback" 
-                  placeholder="Tell us what you think..."
-                  rows="4"
-                  required>
-                </textarea>
-                <mat-error *ngIf="feedbackForm.get('feedback')?.hasError('required')">
-                  Feedback is required
-                </mat-error>
-              </mat-form-field>
-            </form>
-          </mat-card-content>
-          
-          <mat-card-actions class="feedback-actions">
-            <button mat-button (click)="closeFeedback()">Cancel</button>
-            <button 
-              mat-raised-button 
-              color="primary" 
-              (click)="onSubmit()"
-              [disabled]="feedbackForm.invalid">
-              Submit Feedback
-            </button>
-          </mat-card-actions>
-        </mat-card>
-      </div>
-    </div>
+    <button 
+      class="feedback-button"
+      (click)="openFeedbackDialog()"
+      mat-raised-button
+      color="primary">
+      <mat-icon>feedback</mat-icon>
+      <span>Feedback</span>
+    </button>
   `,
   styles: [`
-    .feedback-container {
+    .feedback-button {
       position: fixed;
       bottom: 20px;
       right: 20px;
       z-index: 1000;
-    }
-    
-    .feedback-trigger {
-      background: linear-gradient(135deg, #2c2c2c 0%, #1a1a1a 100%);
-      color: #e0e0e0;
-      padding: 12px;
-      border-radius: 50%;
-      cursor: pointer;
+      border-radius: 25px;
+      padding: 12px 20px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+      transition: all 0.3s ease;
       display: flex;
       align-items: center;
-      justify-content: center;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      font-weight: 500;
-      animation: float 3s ease-in-out infinite;
-      width: 48px;
-      height: 48px;
-      overflow: hidden;
-      border: 1px solid #404040;
-    }
-    
-    .feedback-trigger:hover {
-      transform: translateY(-2px) scale(1.05);
-      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.5);
-      animation-play-state: paused;
-      border-radius: 25px;
-      width: auto;
-      padding: 12px 20px;
       gap: 8px;
-      background: linear-gradient(135deg, #404040 0%, #2c2c2c 100%);
-      color: #ffffff;
+      font-weight: 500;
     }
-    
-    .feedback-text {
-      opacity: 0;
-      width: 0;
-      overflow: hidden;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      white-space: nowrap;
+
+    .feedback-button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
     }
-    
-    .feedback-trigger:hover .feedback-text {
-      opacity: 1;
-      width: auto;
+
+    @media (max-width: 768px) {
+      .feedback-button {
+        bottom: 15px;
+        right: 15px;
+        padding: 10px 16px;
+        font-size: 14px;
+      }
     }
-    
-    .feedback-popup {
-      position: absolute;
-      bottom: 60px;
-      right: 0;
-      width: 400px;
-      animation: slideUp 0.3s ease-out;
+  `]
+})
+export class FeedbackButtonComponent implements OnInit, OnDestroy {
+  private destroy$ = new Subject<void>();
+
+  constructor(
+    private dialog: MatDialog,
+    private apiService: ApiService
+  ) {}
+
+  ngOnInit() {}
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  openFeedbackDialog() {
+    const dialogRef = this.dialog.open(FeedbackDialogComponent, {
+      width: '500px',
+      maxWidth: '90vw',
+      disableClose: false,
+      panelClass: 'feedback-dialog'
+    });
+
+    dialogRef.afterClosed().pipe(
+      takeUntil(this.destroy$)
+    ).subscribe();
+  }
+}
+
+@Component({
+  selector: 'app-feedback-dialog',
+  standalone: true,
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    MatDialogModule,
+    MatButtonModule,
+    MatIconModule,
+    MatFormFieldModule,
+    MatInputModule,
+    MatSnackBarModule,
+    MatProgressSpinnerModule
+  ],
+  template: `
+    <div class="feedback-dialog-content">
+      <div class="dialog-header">
+        <h2 mat-dialog-title>
+          <mat-icon>feedback</mat-icon>
+          Share Your Feedback
+        </h2>
+        <button mat-icon-button (click)="closeDialog()" class="close-button">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+
+      <div mat-dialog-content class="dialog-content">
+        <p class="dialog-description">
+          Help us improve by sharing your thoughts and suggestions.
+        </p>
+
+        <form [formGroup]="feedbackForm" (ngSubmit)="onSubmit()" class="feedback-form">
+          <!-- Rating Section -->
+          <div class="rating-section">
+            <label class="rating-label">How would you rate your experience? *</label>
+            <div class="star-rating">
+              <button 
+                *ngFor="let star of stars" 
+                type="button"
+                class="star-button"
+                [class.active]="star <= selectedRating"
+                [class.hover]="star <= hoverRating"
+                (click)="selectRating(star)"
+                (mouseenter)="hoverRating = star"
+                (mouseleave)="hoverRating = 0">
+                <mat-icon>{{ star <= selectedRating ? 'star' : 'star_border' }}</mat-icon>
+              </button>
+            </div>
+            <div class="rating-text">
+              {{ getRatingText(selectedRating) }}
+            </div>
+          </div>
+
+          <!-- Feedback Text -->
+          <div class="form-group">
+            <mat-form-field appearance="outline" class="full-width">
+              <mat-label>Your feedback *</mat-label>
+              <textarea 
+                matInput 
+                formControlName="feedback_text"
+                placeholder="Tell us what you think..."
+                rows="4"
+                maxlength="1000">
+              </textarea>
+              <mat-hint align="end">{{ feedbackForm.get('feedback_text')?.value?.length || 0 }}/1000</mat-hint>
+            </mat-form-field>
+            <div *ngIf="feedbackForm.get('feedback_text')?.invalid && feedbackForm.get('feedback_text')?.touched" class="error-message">
+              <span *ngIf="feedbackForm.get('feedback_text')?.errors?.['required']">Feedback is required</span>
+              <span *ngIf="feedbackForm.get('feedback_text')?.errors?.['minlength']">Please provide more detailed feedback</span>
+            </div>
+          </div>
+
+          <!-- Optional Fields -->
+          <div class="optional-fields">
+            <h4>Optional Information</h4>
+            
+            <div class="form-group">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Your name (optional)</mat-label>
+                <input 
+                  matInput 
+                  formControlName="name"
+                  placeholder="Enter your name"
+                  maxlength="100">
+                <mat-hint>We'll generate a fun name if you don't provide one</mat-hint>
+              </mat-form-field>
+            </div>
+
+            <div class="form-group">
+              <mat-form-field appearance="outline" class="full-width">
+                <mat-label>Your email (optional)</mat-label>
+                <input 
+                  matInput 
+                  type="email"
+                  formControlName="email"
+                  placeholder="Enter your email"
+                  maxlength="255">
+                <mat-hint>Only if you'd like a response</mat-hint>
+              </mat-form-field>
+              <div *ngIf="feedbackForm.get('email')?.invalid && feedbackForm.get('email')?.touched" class="error-message">
+                <span *ngIf="feedbackForm.get('email')?.errors?.['email']">Please enter a valid email address</span>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <div mat-dialog-actions class="dialog-actions">
+        <button 
+          mat-button 
+          (click)="closeDialog()"
+          [disabled]="isSubmitting">
+          Cancel
+        </button>
+        <button 
+          mat-raised-button 
+          color="primary"
+          (click)="onSubmit()"
+          [disabled]="feedbackForm.invalid || isSubmitting"
+          class="submit-button">
+          <span *ngIf="!isSubmitting">Submit Feedback</span>
+          <span *ngIf="isSubmitting" class="loading-content">
+            <mat-spinner diameter="20"></mat-spinner>
+            Submitting...
+          </span>
+        </button>
+      </div>
+
+      <!-- Success/Error Message -->
+      <div *ngIf="feedbackMessage" class="feedback-message" [class.success]="feedbackSuccess" [class.error]="!feedbackSuccess">
+        <mat-icon>{{ feedbackSuccess ? 'check_circle' : 'error' }}</mat-icon>
+        <span>{{ feedbackMessage }}</span>
+      </div>
+    </div>
+  `,
+  styles: [`
+    .feedback-dialog-content {
+      padding: 0;
     }
-    
-    .feedback-card {
-      box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
-      border-radius: 0;
-      background: #ffffff;
-      border: 1px solid #e0e0e0;
-    }
-    
-    .form-row {
+
+    .dialog-header {
       display: flex;
-      gap: 16px;
+      justify-content: space-between;
+      align-items: center;
+      padding: 20px 24px 0 24px;
+      border-bottom: 1px solid #e0e0e0;
+    }
+
+    .dialog-header h2 {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #1a1a1a;
+    }
+
+    .close-button {
+      color: #666;
+    }
+
+    .dialog-content {
+      padding: 24px;
+      max-height: 70vh;
+      overflow-y: auto;
+    }
+
+    .dialog-description {
+      color: #666;
+      margin-bottom: 24px;
+      line-height: 1.5;
+    }
+
+    .feedback-form {
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+    }
+
+    .rating-section {
+      text-align: center;
+    }
+
+    .rating-label {
+      display: block;
+      font-weight: 500;
+      margin-bottom: 16px;
+      color: #1a1a1a;
+    }
+
+    .star-rating {
+      display: flex;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+
+    .star-button {
+      background: none;
+      border: none;
+      cursor: pointer;
+      padding: 4px;
+      border-radius: 4px;
+      transition: all 0.2s ease;
+      color: #ddd;
+    }
+
+    .star-button:hover {
+      background-color: #f5f5f5;
+    }
+
+    .star-button.active {
+      color: #ffc107;
+    }
+
+    .star-button.hover {
+      color: #ffc107;
+      transform: scale(1.1);
+    }
+
+    .rating-text {
+      font-size: 0.9rem;
+      color: #666;
+      font-style: italic;
+    }
+
+    .form-group {
       margin-bottom: 16px;
     }
-    
-    .half-width {
-      flex: 1;
-    }
-    
+
     .full-width {
       width: 100%;
     }
-    
-    .rating-section {
-      margin-bottom: 20px;
+
+    .optional-fields {
+      border-top: 1px solid #e0e0e0;
+      padding-top: 20px;
+      margin-top: 20px;
     }
-    
-    .rating-label {
-      display: block;
-      margin-bottom: 8px;
+
+    .optional-fields h4 {
+      margin: 0 0 16px 0;
+      color: #1a1a1a;
+      font-size: 1.1rem;
       font-weight: 500;
-      color: #161616;
-      font-family: 'IBM Plex Sans', sans-serif;
     }
-    
-    .star-rating {
-      display: flex;
-      gap: 4px;
+
+    .error-message {
+      color: #d32f2f;
+      font-size: 0.75rem;
+      margin-top: 4px;
     }
-    
-    .star {
-      cursor: pointer;
-      color: #8d8d8d;
-      transition: color 0.2s ease;
-      font-size: 24px;
-    }
-    
-    .star.filled {
-      color: #a8a8a8;
-    }
-    
-    .star:hover {
-      color: #a8a8a8;
-    }
-    
-    .feedback-actions {
+
+    .dialog-actions {
+      padding: 16px 24px;
+      border-top: 1px solid #e0e0e0;
       display: flex;
       justify-content: flex-end;
       gap: 12px;
-      padding: 16px;
     }
-    
-    @keyframes slideUp {
-      from {
-        opacity: 0;
-        transform: translateY(20px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
+
+    .submit-button {
+      min-width: 140px;
     }
-    
-    @keyframes float {
-      0%, 100% {
-        transform: translateY(0px);
-      }
-      50% {
-        transform: translateY(-5px);
-      }
+
+    .loading-content {
+      display: flex;
+      align-items: center;
+      gap: 8px;
     }
-    
-    @media (max-width: 480px) {
-      .feedback-popup {
-        width: 320px;
-        right: -10px;
+
+    .feedback-message {
+      margin: 16px 24px;
+      padding: 12px 16px;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 0.9rem;
+    }
+
+    .feedback-message.success {
+      background-color: #e8f5e8;
+      color: #2e7d32;
+      border: 1px solid #c8e6c9;
+    }
+
+    .feedback-message.error {
+      background-color: #ffebee;
+      color: #c62828;
+      border: 1px solid #ffcdd2;
+    }
+
+    @media (max-width: 768px) {
+      .dialog-content {
+        padding: 16px;
       }
-      
-      .form-row {
+
+      .dialog-actions {
+        padding: 12px 16px;
         flex-direction: column;
-        gap: 0;
       }
-      
-      .half-width {
+
+      .submit-button {
         width: 100%;
       }
     }
   `]
 })
-export class FeedbackComponent {
-  isExpanded = false;
-  selectedRating = 0;
-  stars = [1, 2, 3, 4, 5];
+export class FeedbackDialogComponent implements OnInit, OnDestroy {
   feedbackForm: FormGroup;
+  isSubmitting = false;
+  feedbackMessage = '';
+  feedbackSuccess = false;
+  selectedRating = 0;
+  hoverRating = 0;
+  stars = [1, 2, 3, 4, 5];
+  private destroy$ = new Subject<void>();
 
   constructor(
     private fb: FormBuilder,
-    private snackBar: MatSnackBar
+    private apiService: ApiService,
+    private snackBar: MatSnackBar,
+    private dialog: MatDialog
   ) {
     this.feedbackForm = this.fb.group({
+      feedback_text: ['', [Validators.required, Validators.minLength(10)]],
       name: [''],
-      email: ['', [Validators.email]],
-      feedback: ['', [Validators.required, Validators.minLength(10)]]
+      email: ['', [Validators.email]]
     });
   }
 
-  toggleFeedback() {
-    this.isExpanded = !this.isExpanded;
+  ngOnInit() {}
+
+  ngOnDestroy() {
+    this.destroy$.next();
+    this.destroy$.complete();
   }
 
-  closeFeedback() {
-    this.isExpanded = false;
-    this.resetForm();
-  }
-
-  setRating(rating: number) {
+  selectRating(rating: number) {
     this.selectedRating = rating;
+    this.feedbackForm.patchValue({ rating });
+  }
+
+  getRatingText(rating: number): string {
+    const texts = {
+      0: 'Select a rating',
+      1: 'Poor - Needs significant improvement',
+      2: 'Fair - Some issues to address',
+      3: 'Good - Meets expectations',
+      4: 'Very Good - Exceeds expectations',
+      5: 'Excellent - Outstanding experience'
+    };
+    return texts[rating as keyof typeof texts] || 'Select a rating';
   }
 
   onSubmit() {
-    if (this.feedbackForm.valid) {
-      const feedbackData = {
-        ...this.feedbackForm.value,
+    if (this.feedbackForm.valid && this.selectedRating > 0 && !this.isSubmitting) {
+      this.isSubmitting = true;
+      this.feedbackMessage = '';
+
+      const feedbackData: FeedbackSubmission = {
         rating: this.selectedRating,
-        timestamp: new Date().toISOString()
+        feedback_text: this.feedbackForm.get('feedback_text')?.value,
+        name: this.feedbackForm.get('name')?.value || undefined,
+        email: this.feedbackForm.get('email')?.value || undefined
       };
-      
-      // Here you would typically send the data to your backend
-      console.log('Feedback submitted:', feedbackData);
-      
-      // Show success message
-      this.snackBar.open('Thank you for your feedback!', 'Close', {
-        duration: 3000,
-        horizontalPosition: 'center',
-        verticalPosition: 'top'
-      });
-      
-      this.closeFeedback();
-    } else {
-      this.snackBar.open('Please fill in all required fields', 'Close', {
-        duration: 3000,
-        horizontalPosition: 'center',
-        verticalPosition: 'top'
+
+      this.apiService.submitFeedback(feedbackData).pipe(
+        takeUntil(this.destroy$)
+      ).subscribe({
+        next: (response) => {
+          this.isSubmitting = false;
+          this.feedbackSuccess = response.success;
+
+          if (response.success) {
+            this.feedbackMessage = response.message || 'Thank you for your feedback!';
+            this.snackBar.open('Feedback submitted successfully!', 'Close', { duration: 3000 });
+            
+            // Reset form and close dialog after a delay
+            setTimeout(() => {
+              this.closeDialog();
+            }, 2000);
+          } else {
+            this.feedbackMessage = response.message || 'Failed to submit feedback. Please try again.';
+          }
+        },
+        error: (error) => {
+          this.isSubmitting = false;
+          this.feedbackSuccess = false;
+
+          let errorMessage = 'Failed to submit feedback. Please try again.';
+          
+          if (error.message && error.message.includes('CORS')) {
+            errorMessage = 'API not accessible in development mode. Feedback is simulated.';
+            this.feedbackMessage = 'Thank you for your feedback! (Simulated in development)';
+            this.feedbackSuccess = true;
+            this.snackBar.open('Feedback submitted successfully! (Simulated)', 'Close', { duration: 3000 });
+            
+            setTimeout(() => {
+              this.closeDialog();
+            }, 2000);
+          } else if (error.message && error.message.includes('Rate limit')) {
+            errorMessage = 'You are submitting feedback too quickly. Please wait a moment and try again.';
+          } else if (error.message && error.message.includes('Invalid rating')) {
+            errorMessage = 'Please select a valid rating.';
+          } else {
+            this.feedbackMessage = errorMessage;
+          }
+
+          if (!this.feedbackSuccess) {
+            this.feedbackMessage = errorMessage;
+          }
+        }
       });
     }
   }
 
-  private resetForm() {
-    this.feedbackForm.reset();
-    this.selectedRating = 0;
+  closeDialog() {
+    this.dialog.closeAll();
   }
 }

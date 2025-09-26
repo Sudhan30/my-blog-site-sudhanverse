@@ -4,12 +4,13 @@ import { MatToolbarModule } from '@angular/material/toolbar';
 import { MatButtonModule } from '@angular/material/button';
 import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
-import { FeedbackComponent } from './components/feedback.component';
+import { MatDialogModule } from '@angular/material/dialog';
+import { FeedbackButtonComponent } from './components/feedback.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, MatToolbarModule, MatButtonModule, MatCardModule, MatIconModule, FeedbackComponent],
+  imports: [RouterOutlet, RouterLink, MatToolbarModule, MatButtonModule, MatCardModule, MatIconModule, MatDialogModule, FeedbackButtonComponent],
   template: `
     <div class="app-container">
       <main class="main-content page-transition">
@@ -22,7 +23,7 @@ import { FeedbackComponent } from './components/feedback.component';
         </div>
       </footer>
       
-      <app-feedback></app-feedback>
+      <app-feedback-button></app-feedback-button>
     </div>
   `,
   styles: [`

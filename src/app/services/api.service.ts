@@ -57,6 +57,28 @@ export interface NewsletterStatusResponse {
   unsubscribedAt?: string;
 }
 
+export interface FeedbackSubmission {
+  rating: number;
+  feedback_text: string;
+  name?: string;
+  email?: string;
+}
+
+export interface FeedbackResponse {
+  success: boolean;
+  message: string;
+  feedback_id?: string;
+  anonymous_name?: string;
+}
+
+export interface FeedbackStatsResponse {
+  success: boolean;
+  total_feedback: number;
+  average_rating: number;
+  rating_distribution: { [key: number]: number };
+  recent_feedback: any[];
+}
+
 
 @Injectable({
   providedIn: 'root'
@@ -562,6 +584,34 @@ export class ApiService implements OnDestroy {
   checkNewsletterStatus(email: string): Observable<NewsletterStatusResponse> {
     return this.createSafeObservable(() => 
       this.http.get<NewsletterStatusResponse>(`${this.API_BASE_URL}/newsletter/status?email=${encodeURIComponent(email)}`).pipe(
+        retry(3),
+        catchError(this.handleError)
+      )
+    );
+  }
+
+  // Feedback collection methods
+  submitFeedback(feedback: FeedbackSubmission): Observable<FeedbackResponse> {
+    return this.createSafeObservable(() => 
+      this.http.post<FeedbackResponse>(`${this.API_BASE_URL}/feedback`, feedback).pipe(
+        retry(3),
+        catchError(this.handleError)
+      )
+    );
+  }
+
+  getFeedbackStats(): Observable<FeedbackStatsResponse> {
+    return this.createSafeObservable(() => 
+      this.http.get<FeedbackStatsResponse>(`${this.API_BASE_URL}/feedback/stats`).pipe(
+        retry(3),
+        catchError(this.handleError)
+      )
+    );
+  }
+
+  getRecentFeedback(limit: number = 10): Observable<any[]> {
+    return this.createSafeObservable(() => 
+      this.http.get<any[]>(`${this.API_BASE_URL}/feedback/recent?limit=${limit}`).pipe(
         retry(3),
         catchError(this.handleError)
       )
