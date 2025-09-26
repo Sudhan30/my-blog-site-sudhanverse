@@ -51,7 +51,7 @@ import { Subject, takeUntil } from 'rxjs';
       justify-content: center;
       cursor: pointer;
       font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-      overflow: hidden;
+      overflow: visible;
       gap: 8px;
       /* Ensure button is visible */
       opacity: 1;
@@ -74,13 +74,15 @@ import { Subject, takeUntil } from 'rxjs';
 
     .feedback-icon {
       font-size: 24px;
-      color: #f4f4f4;
+      color: #f4f4f4 !important;
       transition: all 0.3s cubic-bezier(0.2, 0, 0.38, 0.9);
-      display: flex;
+      display: flex !important;
       align-items: center;
       justify-content: center;
-      opacity: 1;
-      visibility: visible;
+      opacity: 1 !important;
+      visibility: visible !important;
+      position: relative;
+      z-index: 1;
     }
 
     .feedback-button:hover .feedback-icon {
