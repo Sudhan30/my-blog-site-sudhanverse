@@ -114,10 +114,14 @@ export class ApiService implements OnDestroy {
   private getOrCreateClientId(): string {
     if (isPlatformBrowser(this.platformId)) {
       let clientId = localStorage.getItem('blog_client_id');
-      if (!clientId) {
+      
+      // Validate UUID format and regenerate if invalid
+      if (!clientId || !this.isValidUUID(clientId)) {
+        console.log('🔄 Invalid or missing clientId, generating new UUID');
         clientId = this.generateClientId();
         localStorage.setItem('blog_client_id', clientId);
       }
+      
       this.clientIdSubject.next(clientId);
       return clientId;
     }
@@ -131,6 +135,12 @@ export class ApiService implements OnDestroy {
       const v = c === 'x' ? r : (r & 0x3 | 0x8);
       return v.toString(16);
     });
+  }
+
+  private isValidUUID(uuid: string): boolean {
+    // Check if the string is a valid UUID v4 format
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+    return uuidRegex.test(uuid);
   }
 
   getClientId(): string {
