@@ -348,11 +348,11 @@ export class FeedbackButtonComponent implements OnInit, OnDestroy {
       padding: 24px;
       max-height: 70vh;
       overflow-y: auto;
-      background: #262626;
+      background: #ffffff;
     }
 
     .dialog-description {
-      color: #a8a8a8;
+      color: #525252;
       margin-bottom: 24px;
       line-height: 1.5;
       font-family: 'IBM Plex Sans', sans-serif;
@@ -372,7 +372,7 @@ export class FeedbackButtonComponent implements OnInit, OnDestroy {
       display: block;
       font-weight: 400;
       margin-bottom: 16px;
-      color: #f4f4f4;
+      color: #161616;
       font-family: 'IBM Plex Sans', sans-serif;
     }
 
@@ -390,11 +390,11 @@ export class FeedbackButtonComponent implements OnInit, OnDestroy {
       padding: 4px;
       border-radius: 2px;
       transition: all 0.2s ease;
-      color: #525252;
+      color: #ddd;
     }
 
     .star-button:hover {
-      background-color: #393939;
+      background-color: #f5f5f5;
     }
 
     .star-button.active {
@@ -408,7 +408,7 @@ export class FeedbackButtonComponent implements OnInit, OnDestroy {
 
     .rating-text {
       font-size: 0.9rem;
-      color: #a8a8a8;
+      color: #666;
       font-style: italic;
       font-family: 'IBM Plex Sans', sans-serif;
     }
@@ -422,21 +422,21 @@ export class FeedbackButtonComponent implements OnInit, OnDestroy {
     }
 
     .optional-fields {
-      border-top: 1px solid #393939;
+      border-top: 1px solid #e0e0e0;
       padding-top: 20px;
       margin-top: 20px;
     }
 
     .optional-fields h4 {
       margin: 0 0 16px 0;
-      color: #f4f4f4;
+      color: #161616;
       font-size: 1.1rem;
       font-weight: 400;
       font-family: 'IBM Plex Sans', sans-serif;
     }
 
     .error-message {
-      color: #ff6b6b;
+      color: #d32f2f;
       font-size: 0.75rem;
       margin-top: 4px;
       font-family: 'IBM Plex Sans', sans-serif;
@@ -444,11 +444,11 @@ export class FeedbackButtonComponent implements OnInit, OnDestroy {
 
     .dialog-actions {
       padding: 16px 24px;
-      border-top: 1px solid #393939;
+      border-top: 1px solid #e0e0e0;
       display: flex;
       justify-content: flex-end;
       gap: 12px;
-      background: #161616;
+      background: #ffffff;
     }
 
     .submit-button {
@@ -472,15 +472,15 @@ export class FeedbackButtonComponent implements OnInit, OnDestroy {
     }
 
     .feedback-message.success {
-      background-color: #0f2e0f;
-      color: #42be65;
-      border: 1px solid #198038;
+      background-color: #e8f5e8;
+      color: #2e7d32;
+      border: 1px solid #c8e6c9;
     }
 
     .feedback-message.error {
-      background-color: #2d1b1b;
-      color: #ff6b6b;
-      border: 1px solid #da1e28;
+      background-color: #ffebee;
+      color: #c62828;
+      border: 1px solid #ffcdd2;
     }
 
     @media (max-width: 768px) {
