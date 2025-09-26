@@ -57,7 +57,7 @@ import { Subject, takeUntil } from 'rxjs';
     }
 
     .feedback-button:hover {
-      width: 120px;
+      width: 140px;
       border-radius: 28px;
       background: #262626;
       border-color: #525252;
@@ -79,18 +79,18 @@ import { Subject, takeUntil } from 'rxjs';
 
     .feedback-button:hover .feedback-icon {
       color: #0f62fe;
-      transform: translateX(-8px);
+      transform: translateX(-12px);
     }
 
     .feedback-text {
       opacity: 0;
-      transform: translateX(20px);
+      transform: translateX(24px);
       transition: all 0.3s cubic-bezier(0.2, 0, 0.38, 0.9);
       color: #f4f4f4;
       font-weight: 400;
       font-size: 14px;
       white-space: nowrap;
-      margin-left: 8px;
+      margin-left: 12px;
       letter-spacing: 0.01em;
     }
 
@@ -108,7 +108,7 @@ import { Subject, takeUntil } from 'rxjs';
       }
 
       .feedback-button:hover {
-        width: 100px;
+        width: 110px;
         border-radius: 24px;
       }
 
@@ -130,7 +130,7 @@ import { Subject, takeUntil } from 'rxjs';
       }
 
       .feedback-button:hover {
-        width: 90px;
+        width: 100px;
         border-radius: 22px;
       }
 
