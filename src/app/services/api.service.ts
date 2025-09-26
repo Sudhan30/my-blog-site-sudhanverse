@@ -114,17 +114,22 @@ export class ApiService implements OnDestroy {
   private getOrCreateClientId(): string {
     if (isPlatformBrowser(this.platformId)) {
       let clientId = localStorage.getItem('blog_client_id');
+      console.log('🔍 Retrieved clientId from localStorage:', clientId);
       
       // Validate UUID format and regenerate if invalid
       if (!clientId || !this.isValidUUID(clientId)) {
         console.log('🔄 Invalid or missing clientId, generating new UUID');
         clientId = this.generateClientId();
+        console.log('🔄 Generated new clientId:', clientId);
         localStorage.setItem('blog_client_id', clientId);
+        console.log('🔄 Stored clientId in localStorage');
       }
       
       this.clientIdSubject.next(clientId);
+      console.log('🔄 Updated clientIdSubject with:', clientId);
       return clientId;
     }
+    console.log('🔄 Not in browser, returning empty string');
     return '';
   }
 
@@ -611,6 +616,8 @@ export class ApiService implements OnDestroy {
     // Get client ID for the request
     const clientId = this.getClientId();
     console.log('🔑 Generated clientId:', clientId);
+    console.log('🔍 Client ID from localStorage:', isPlatformBrowser(this.platformId) ? localStorage.getItem('blog_client_id') : 'N/A (SSR)');
+    console.log('🔍 Client ID subject value:', this.clientIdSubject?.value);
     
     if (!clientId || clientId === '') {
       console.error('❌ No clientId available, generating new one');
@@ -680,10 +687,10 @@ export class ApiService implements OnDestroy {
               localStorage.setItem('blog_client_id', newClientId);
             }
             
-            // Retry with new clientId
+            // Retry with new UUID
             const retryRequestBody = {
               ...feedback,
-              clientId: newClientId
+              UUID: newClientId
             };
             
             return this.http.post<FeedbackResponse>(`${this.API_BASE_URL}/feedback`, retryRequestBody).pipe(
