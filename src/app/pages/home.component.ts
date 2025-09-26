@@ -770,13 +770,18 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
       }
       
       .nav-list {
-        flex-direction: column;
-        gap: 0.5rem;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 0.75rem;
+        max-width: 400px;
+        margin: 0 auto;
       }
       
       .nav-link {
-        width: 200px;
+        padding: 0.75rem 1rem;
+        font-size: 0.9rem;
         justify-content: center;
+        min-height: 48px;
       }
       
       .main-content {
@@ -833,6 +838,45 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
     }
     
     @media (max-width: 480px) {
+      .nav-list {
+        grid-template-columns: 1fr 1fr;
+        gap: 0.5rem;
+        max-width: 320px;
+      }
+      
+      .nav-link {
+        padding: 0.5rem 0.75rem;
+        font-size: 0.85rem;
+        min-height: 44px;
+      }
+      
+      .nav-link mat-icon {
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
+      }
+      
+      /* Alternative compact layout for very small screens */
+      @media (max-width: 360px) {
+        .nav-list {
+          grid-template-columns: 1fr 1fr;
+          gap: 0.25rem;
+          max-width: 280px;
+        }
+        
+        .nav-link {
+          padding: 0.5rem;
+          font-size: 0.8rem;
+          min-height: 40px;
+          flex-direction: column;
+          gap: 0.25rem;
+        }
+        
+        .nav-link span {
+          font-size: 0.75rem;
+        }
+      }
+      
       .welcome-section {
         padding: 1.5rem 0.75rem;
         margin-bottom: 2rem;
