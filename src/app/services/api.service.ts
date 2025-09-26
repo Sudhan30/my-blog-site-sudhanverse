@@ -653,12 +653,14 @@ export class ApiService implements OnDestroy {
           }
           
           // If it's a 400 with UUID error, try to regenerate clientId
-          const errorText = error.message || error.error?.message || JSON.stringify(error.error) || '';
+          const errorText = error.message || error.error?.message || error.error?.error || JSON.stringify(error.error) || '';
+          console.log('🔍 Error text for UUID detection:', errorText);
           const isUuidError = errorText.includes('UUID') || 
                               errorText.includes('UUID is required') || 
                               errorText.includes('Invalid UUID') ||
                               errorText.includes('clientId') ||
                               (error.status === 400 && errorText.includes('required'));
+          console.log('🔍 Is UUID error detected:', isUuidError);
           
           if (error.status === 400 && isUuidError) {
             console.log('🔄 UUID error detected, regenerating clientId and retrying');
