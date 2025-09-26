@@ -627,6 +627,8 @@ export class ApiService implements OnDestroy {
           console.error('❌ Error status:', error.status);
           console.error('❌ Error message:', error.message);
           console.error('❌ Error URL:', error.url);
+          console.error('❌ Error body:', error.error);
+          console.error('❌ Full error object:', JSON.stringify(error, null, 2));
           
           // If it's a network/CORS error, return a simulated success response
           if (error.status === 0 || error.message?.includes('CORS') || error.message?.includes('Failed to fetch')) {
@@ -651,7 +653,14 @@ export class ApiService implements OnDestroy {
           }
           
           // If it's a 400 with UUID error, try to regenerate clientId
-          if (error.status === 400 && error.message?.includes('UUID')) {
+          const errorText = error.message || error.error?.message || JSON.stringify(error.error) || '';
+          const isUuidError = errorText.includes('UUID') || 
+                              errorText.includes('UUID is required') || 
+                              errorText.includes('Invalid UUID') ||
+                              errorText.includes('clientId') ||
+                              (error.status === 400 && errorText.includes('required'));
+          
+          if (error.status === 400 && isUuidError) {
             console.log('🔄 UUID error detected, regenerating clientId and retrying');
             const newClientId = this.generateClientId();
             this.clientIdSubject.next(newClientId);
