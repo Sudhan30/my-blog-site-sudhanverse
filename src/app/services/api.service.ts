@@ -653,7 +653,7 @@ export class ApiService implements OnDestroy {
           }
           
           // If it's a 400 with UUID error, try to regenerate clientId
-          const errorText = error.message || error.error?.message || error.error?.error || JSON.stringify(error.error) || '';
+          const errorText = error.error?.error || error.error?.message || error.message || JSON.stringify(error.error) || '';
           console.log('🔍 Error text for UUID detection:', errorText);
           const isUuidError = errorText.includes('UUID') || 
                               errorText.includes('UUID is required') || 
