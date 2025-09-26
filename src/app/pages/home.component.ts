@@ -12,10 +12,11 @@ import { MatChipsModule } from '@angular/material/chips';
 import { MatIconModule } from '@angular/material/icon';
 import { MatProgressSpinnerModule } from '@angular/material/progress-spinner';
 import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 
 @Component({
   standalone: true,
-  imports: [RouterLink, NgFor, NgIf, AsyncPipe, DatePipe, MatCardModule, MatButtonModule, MatChipsModule, MatIconModule, MatProgressSpinnerModule, MatSnackBarModule],
+  imports: [RouterLink, NgFor, NgIf, AsyncPipe, DatePipe, MatCardModule, MatButtonModule, MatChipsModule, MatIconModule, MatProgressSpinnerModule, MatSnackBarModule, ReactiveFormsModule],
   template: `
     <div class="home-container">
       <!-- Hero Section -->
@@ -128,11 +129,32 @@ import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
             <div class="sidebar-card">
               <h3>Subscribe to Newsletter</h3>
               <p>Get the latest posts and updates delivered to your inbox.</p>
-              <form class="newsletter-form">
+              <form class="newsletter-form" [formGroup]="newsletterForm" (ngSubmit)="onNewsletterSubmit()">
                 <div class="form-group">
-                  <input type="email" placeholder="Enter your email" class="email-input">
+                  <input 
+                    type="email" 
+                    placeholder="Enter your email" 
+                    class="email-input"
+                    formControlName="email"
+                    [class.error]="newsletterForm.get('email')?.invalid && newsletterForm.get('email')?.touched">
+                  <div *ngIf="newsletterForm.get('email')?.invalid && newsletterForm.get('email')?.touched" class="error-message">
+                    <span *ngIf="newsletterForm.get('email')?.errors?.['required']">Email is required</span>
+                    <span *ngIf="newsletterForm.get('email')?.errors?.['email']">Please enter a valid email address</span>
+                  </div>
                 </div>
-                <button type="submit" class="subscribe-btn">Subscribe</button>
+                <button 
+                  type="submit" 
+                  class="subscribe-btn"
+                  [disabled]="newsletterForm.invalid || isNewsletterLoading">
+                  <span *ngIf="!isNewsletterLoading">Subscribe</span>
+                  <span *ngIf="isNewsletterLoading" class="loading-text">
+                    <mat-icon class="spinning">refresh</mat-icon>
+                    Subscribing...
+                  </span>
+                </button>
+                <div *ngIf="newsletterMessage" class="newsletter-message" [class.success]="newsletterSuccess" [class.error]="!newsletterSuccess">
+                  {{ newsletterMessage }}
+                </div>
               </form>
             </div>
             
@@ -557,6 +579,18 @@ import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
       outline: none;
       border-color: #0f62fe;
     }
+
+    .email-input.error {
+      border-color: #dc2626;
+      background-color: #fef2f2;
+    }
+
+    .error-message {
+      color: #dc2626;
+      font-size: 0.75rem;
+      margin-top: 0.25rem;
+      font-family: 'Roboto', sans-serif;
+    }
     
     .subscribe-btn {
       width: 100%;
@@ -572,8 +606,50 @@ import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
       transition: background-color 0.2s ease;
     }
     
-    .subscribe-btn:hover {
+    .subscribe-btn:hover:not(:disabled) {
       background-color: #0043ce;
+    }
+
+    .subscribe-btn:disabled {
+      background-color: #9ca3af;
+      cursor: not-allowed;
+    }
+
+    .loading-text {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      justify-content: center;
+    }
+
+    .spinning {
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .newsletter-message {
+      margin-top: 1rem;
+      padding: 0.75rem;
+      border-radius: 4px;
+      font-size: 0.875rem;
+      font-family: 'Roboto', sans-serif;
+      text-align: center;
+    }
+
+    .newsletter-message.success {
+      background-color: #f0f9ff;
+      color: #0369a1;
+      border: 1px solid #bae6fd;
+    }
+
+    .newsletter-message.error {
+      background-color: #fef2f2;
+      color: #dc2626;
+      border: 1px solid #fecaca;
     }
     
     .tags-section {
@@ -813,14 +889,22 @@ import { MatSnackBarModule, MatSnackBar } from '@angular/material/snack-bar';
 })
 export class HomeComponent implements OnInit {
   idx$: Observable<any>;
+  newsletterForm: FormGroup;
+  isNewsletterLoading = false;
+  newsletterMessage = '';
+  newsletterSuccess = false;
   
   constructor(
     private posts: PostsService,
     private apiService: ApiService,
     private postIdMapper: PostIdMapperService,
-    private snackBar: MatSnackBar
+    private snackBar: MatSnackBar,
+    private fb: FormBuilder
   ){
     this.idx$ = this.loadPostsWithStats();
+    this.newsletterForm = this.fb.group({
+      email: ['', [Validators.required, Validators.email]]
+    });
   }
 
   ngOnInit() {
@@ -1021,5 +1105,56 @@ export class HomeComponent implements OnInit {
       return saved === 'true';
     }
     return false;
+  }
+
+  onNewsletterSubmit() {
+    if (this.newsletterForm.valid && !this.isNewsletterLoading) {
+      this.isNewsletterLoading = true;
+      this.newsletterMessage = '';
+      
+      const email = this.newsletterForm.get('email')?.value;
+      
+      this.apiService.subscribeToNewsletter(email).subscribe({
+        next: (response) => {
+          this.isNewsletterLoading = false;
+          this.newsletterSuccess = response.success;
+          
+          if (response.success) {
+            if (response.alreadySubscribed) {
+              this.newsletterMessage = 'You are already subscribed to our newsletter!';
+            } else if (response.reactivated) {
+              this.newsletterMessage = 'Welcome back! Your subscription has been reactivated.';
+            } else {
+              this.newsletterMessage = 'Thank you for subscribing! Check your email for confirmation.';
+            }
+            this.newsletterForm.reset();
+          } else {
+            this.newsletterMessage = response.message || 'Subscription failed. Please try again.';
+          }
+        },
+        error: (error) => {
+          this.isNewsletterLoading = false;
+          this.newsletterSuccess = false;
+          
+          let errorMessage = 'Subscription failed. Please try again.';
+          if (error.message && error.message.includes('CORS')) {
+            errorMessage = 'API not accessible in development mode. Subscription is simulated.';
+            this.newsletterMessage = 'Thank you for subscribing! (Simulated in development)';
+            this.newsletterSuccess = true;
+            this.newsletterForm.reset();
+          } else if (error.message && error.message.includes('Invalid email')) {
+            errorMessage = 'Please enter a valid email address.';
+          } else if (error.message && error.message.includes('Bounced')) {
+            errorMessage = 'This email address has been blocked due to previous bounces.';
+          } else {
+            this.newsletterMessage = errorMessage;
+          }
+          
+          if (!this.newsletterSuccess) {
+            this.newsletterMessage = errorMessage;
+          }
+        }
+      });
+    }
   }
 }

@@ -41,6 +41,22 @@ export interface UnlikeResponse {
   clientId: string;
 }
 
+export interface NewsletterResponse {
+  success: boolean;
+  message: string;
+  status?: string;
+  alreadySubscribed?: boolean;
+  reactivated?: boolean;
+}
+
+export interface NewsletterStatusResponse {
+  success: boolean;
+  subscribed: boolean;
+  status?: string;
+  subscribedAt?: string;
+  unsubscribedAt?: string;
+}
+
 
 @Injectable({
   providedIn: 'root'
@@ -522,5 +538,33 @@ export class ApiService implements OnDestroy {
       return of(null as any);
     }
     return observableFactory();
+  }
+
+  // Newsletter subscription methods
+  subscribeToNewsletter(email: string): Observable<NewsletterResponse> {
+    return this.createSafeObservable(() => 
+      this.http.post<NewsletterResponse>(`${this.API_BASE_URL}/newsletter/subscribe`, { email }).pipe(
+        retry(3),
+        catchError(this.handleError)
+      )
+    );
+  }
+
+  unsubscribeFromNewsletter(email: string): Observable<NewsletterResponse> {
+    return this.createSafeObservable(() => 
+      this.http.post<NewsletterResponse>(`${this.API_BASE_URL}/newsletter/unsubscribe`, { email }).pipe(
+        retry(3),
+        catchError(this.handleError)
+      )
+    );
+  }
+
+  checkNewsletterStatus(email: string): Observable<NewsletterStatusResponse> {
+    return this.createSafeObservable(() => 
+      this.http.get<NewsletterStatusResponse>(`${this.API_BASE_URL}/newsletter/status?email=${encodeURIComponent(email)}`).pipe(
+        retry(3),
+        catchError(this.handleError)
+      )
+    );
   }
 }
