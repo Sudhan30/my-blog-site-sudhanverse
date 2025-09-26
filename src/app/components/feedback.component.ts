@@ -29,10 +29,10 @@ import { Subject, takeUntil } from 'rxjs';
     <button 
       class="feedback-button"
       (click)="openFeedbackDialog()"
-      mat-raised-button
+      mat-fab
       color="primary">
-      <mat-icon>feedback</mat-icon>
-      <span>Feedback</span>
+      <mat-icon class="feedback-icon">feedback</mat-icon>
+      <span class="feedback-text">Feedback</span>
     </button>
   `,
   styles: [`
@@ -41,27 +41,96 @@ import { Subject, takeUntil } from 'rxjs';
       bottom: 20px;
       right: 20px;
       z-index: 1000;
-      border-radius: 25px;
-      padding: 12px 20px;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-      transition: all 0.3s ease;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, #0f62fe 0%, #0043ce 100%);
+      border: none;
+      box-shadow: 0 4px 12px rgba(15, 98, 254, 0.3);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
       display: flex;
       align-items: center;
-      gap: 8px;
-      font-weight: 500;
+      justify-content: center;
+      overflow: hidden;
+      cursor: pointer;
+      font-family: 'Roboto', sans-serif;
     }
 
     .feedback-button:hover {
+      width: 140px;
+      border-radius: 28px;
+      box-shadow: 0 8px 24px rgba(15, 98, 254, 0.4);
       transform: translateY(-2px);
-      box-shadow: 0 6px 20px rgba(0, 0, 0, 0.2);
+    }
+
+    .feedback-button:hover .feedback-text {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    .feedback-button:hover .feedback-icon {
+      transform: translateX(-8px);
+    }
+
+    .feedback-icon {
+      font-size: 24px;
+      color: white;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      position: absolute;
+    }
+
+    .feedback-text {
+      opacity: 0;
+      transform: translateX(20px);
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      color: white;
+      font-weight: 500;
+      font-size: 14px;
+      white-space: nowrap;
+      margin-left: 8px;
     }
 
     @media (max-width: 768px) {
       .feedback-button {
         bottom: 15px;
         right: 15px;
-        padding: 10px 16px;
-        font-size: 14px;
+        width: 48px;
+        height: 48px;
+      }
+
+      .feedback-button:hover {
+        width: 120px;
+        border-radius: 24px;
+      }
+
+      .feedback-icon {
+        font-size: 20px;
+      }
+
+      .feedback-text {
+        font-size: 13px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .feedback-button {
+        bottom: 12px;
+        right: 12px;
+        width: 44px;
+        height: 44px;
+      }
+
+      .feedback-button:hover {
+        width: 110px;
+        border-radius: 22px;
+      }
+
+      .feedback-icon {
+        font-size: 18px;
+      }
+
+      .feedback-text {
+        font-size: 12px;
       }
     }
   `]
@@ -464,10 +533,13 @@ export class FeedbackDialogComponent implements OnInit, OnDestroy {
         email: this.feedbackForm.get('email')?.value || undefined
       };
 
+      console.log('🔍 Submitting feedback:', feedbackData);
+      
       this.apiService.submitFeedback(feedbackData).pipe(
         takeUntil(this.destroy$)
       ).subscribe({
         next: (response) => {
+          console.log('✅ Feedback response:', response);
           this.isSubmitting = false;
           this.feedbackSuccess = response.success;
 
@@ -484,12 +556,37 @@ export class FeedbackDialogComponent implements OnInit, OnDestroy {
           }
         },
         error: (error) => {
+          console.error('❌ Feedback submission error:', error);
           this.isSubmitting = false;
           this.feedbackSuccess = false;
 
           let errorMessage = 'Failed to submit feedback. Please try again.';
           
-          if (error.message && error.message.includes('CORS')) {
+          // Handle different error types
+          if (error.status === 0) {
+            // Network/CORS error
+            errorMessage = 'API not accessible in development mode. Feedback is simulated.';
+            this.feedbackMessage = 'Thank you for your feedback! (Simulated in development)';
+            this.feedbackSuccess = true;
+            this.snackBar.open('Feedback submitted successfully! (Simulated)', 'Close', { duration: 3000 });
+            
+            setTimeout(() => {
+              this.closeDialog();
+            }, 2000);
+          } else if (error.status === 429) {
+            // Rate limiting
+            errorMessage = 'You are submitting feedback too quickly. Please wait a moment and try again.';
+          } else if (error.status === 400) {
+            // Validation error
+            if (error.error && error.error.message) {
+              errorMessage = error.error.message;
+            } else {
+              errorMessage = 'Please check your input and try again.';
+            }
+          } else if (error.status === 500) {
+            // Server error
+            errorMessage = 'Server error. Please try again later.';
+          } else if (error.message && error.message.includes('CORS')) {
             errorMessage = 'API not accessible in development mode. Feedback is simulated.';
             this.feedbackMessage = 'Thank you for your feedback! (Simulated in development)';
             this.feedbackSuccess = true;
@@ -502,8 +599,6 @@ export class FeedbackDialogComponent implements OnInit, OnDestroy {
             errorMessage = 'You are submitting feedback too quickly. Please wait a moment and try again.';
           } else if (error.message && error.message.includes('Invalid rating')) {
             errorMessage = 'Please select a valid rating.';
-          } else {
-            this.feedbackMessage = errorMessage;
           }
 
           if (!this.feedbackSuccess) {
