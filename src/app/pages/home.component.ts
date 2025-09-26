@@ -825,15 +825,16 @@ export class HomeComponent implements OnInit {
 
   ngOnInit() {
     // Version identifier to verify deployment
-    console.log('🚀 HomeComponent loaded - Version: 2025-09-25-09:00');
+    console.log('🚀 HomeComponent loaded - Version: 2025-09-25-09:15');
     console.log('🔧 Slug-to-ID mapping workaround active');
+    console.log('🔧 Fixed like count loading on page load');
   }
 
   private loadPostsWithStats(): Observable<any> {
     return this.posts.getIndex().pipe(
-      map(indexData => {
-        // Get all post IDs for fetching like counts
-        const postIds = indexData.posts.map((post: any) => post.id || post.slug);
+      switchMap(indexData => {
+        // Get all post IDs using PostIdMapperService
+        const postIds = indexData.posts.map((post: any) => this.postIdMapper.getPostId(post));
         
         // Create observables for each post's like count
         const likeObservables = postIds.map((postId: string) => 
@@ -865,6 +866,7 @@ export class HomeComponent implements OnInit {
               console.log('🔍 DEBUG: Processing post:', post);
               console.log('🔍 DEBUG: Post ID from service:', postId);
               console.log('🔍 DEBUG: Post with ID:', postWithId);
+              console.log('🔍 DEBUG: Like count from API:', likesMap[postId]);
               
               return {
                 ...postWithId,
@@ -883,9 +885,9 @@ export class HomeComponent implements OnInit {
             console.error('Error fetching like counts:', error);
             // Fallback: return posts with default like counts and state
             const postsWithLikes = indexData.posts.map((post: any) => {
-              const postId = post.id; // Use database ID for API calls
+              const postId = this.postIdMapper.getPostId(post);
               return {
-                ...post,
+                ...this.postIdMapper.ensurePostId(post),
                 likeCount: 0,
                 hasLiked: this.loadLikeState(postId),
                 isLoadingLike: false
@@ -898,18 +900,14 @@ export class HomeComponent implements OnInit {
           })
         );
       }),
-      // Flatten the nested observable
-      map(observable => observable),
-      // Use switchMap to handle the nested observable
-      switchMap(observable => observable),
       catchError(error => {
         console.error('Error in loadPostsWithStats:', error);
         return this.posts.getIndex().pipe(
           map(indexData => {
             const postsWithLikes = indexData.posts.map((post: any) => {
-              const postId = post.id; // Use database ID for API calls
+              const postId = this.postIdMapper.getPostId(post);
               return {
-                ...post,
+                ...this.postIdMapper.ensurePostId(post),
                 likeCount: 0,
                 hasLiked: this.loadLikeState(postId),
                 isLoadingLike: false
