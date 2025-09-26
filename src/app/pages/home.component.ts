@@ -178,6 +178,8 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
     .home-container {
       min-height: 100vh;
       background-color: #f4f4f4;
+      max-width: 1600px;
+      margin: 0 auto;
     }
     
     .hero-section {
