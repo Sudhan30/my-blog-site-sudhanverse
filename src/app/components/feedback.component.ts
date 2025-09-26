@@ -41,26 +41,27 @@ import { Subject, takeUntil } from 'rxjs';
       bottom: 20px;
       right: 20px;
       z-index: 1000;
-      width: 56px;
-      height: 56px;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #0f62fe 0%, #0043ce 100%);
-      border: none;
-      box-shadow: 0 4px 12px rgba(15, 98, 254, 0.3);
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      width: 48px;
+      height: 48px;
+      border-radius: 0;
+      background: #161616;
+      border: 1px solid #393939;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+      transition: all 0.2s cubic-bezier(0.2, 0, 0.38, 0.9);
       display: flex;
       align-items: center;
       justify-content: center;
       overflow: hidden;
       cursor: pointer;
-      font-family: 'Roboto', sans-serif;
+      font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
 
     .feedback-button:hover {
-      width: 140px;
-      border-radius: 28px;
-      box-shadow: 0 8px 24px rgba(15, 98, 254, 0.4);
-      transform: translateY(-2px);
+      width: 120px;
+      background: #262626;
+      border-color: #525252;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+      transform: translateY(-1px);
     }
 
     .feedback-button:hover .feedback-text {
@@ -69,42 +70,47 @@ import { Subject, takeUntil } from 'rxjs';
     }
 
     .feedback-button:hover .feedback-icon {
-      transform: translateX(-8px);
+      transform: translateX(-6px);
+    }
+
+    .feedback-button:active {
+      transform: translateY(0);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
     }
 
     .feedback-icon {
-      font-size: 24px;
-      color: white;
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      font-size: 20px;
+      color: #f4f4f4;
+      transition: all 0.2s cubic-bezier(0.2, 0, 0.38, 0.9);
       position: absolute;
     }
 
     .feedback-text {
       opacity: 0;
-      transform: translateX(20px);
-      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      color: white;
-      font-weight: 500;
+      transform: translateX(16px);
+      transition: all 0.2s cubic-bezier(0.2, 0, 0.38, 0.9);
+      color: #f4f4f4;
+      font-weight: 400;
       font-size: 14px;
       white-space: nowrap;
-      margin-left: 8px;
+      margin-left: 6px;
+      letter-spacing: 0.01em;
     }
 
     @media (max-width: 768px) {
       .feedback-button {
-        bottom: 15px;
-        right: 15px;
-        width: 48px;
-        height: 48px;
+        bottom: 16px;
+        right: 16px;
+        width: 44px;
+        height: 44px;
       }
 
       .feedback-button:hover {
-        width: 120px;
-        border-radius: 24px;
+        width: 100px;
       }
 
       .feedback-icon {
-        font-size: 20px;
+        font-size: 18px;
       }
 
       .feedback-text {
@@ -116,17 +122,16 @@ import { Subject, takeUntil } from 'rxjs';
       .feedback-button {
         bottom: 12px;
         right: 12px;
-        width: 44px;
-        height: 44px;
+        width: 40px;
+        height: 40px;
       }
 
       .feedback-button:hover {
-        width: 110px;
-        border-radius: 22px;
+        width: 90px;
       }
 
       .feedback-icon {
-        font-size: 18px;
+        font-size: 16px;
       }
 
       .feedback-text {
@@ -309,7 +314,8 @@ export class FeedbackButtonComponent implements OnInit, OnDestroy {
       justify-content: space-between;
       align-items: center;
       padding: 20px 24px 0 24px;
-      border-bottom: 1px solid #e0e0e0;
+      border-bottom: 1px solid #393939;
+      background: #161616;
     }
 
     .dialog-header h2 {
@@ -318,24 +324,31 @@ export class FeedbackButtonComponent implements OnInit, OnDestroy {
       gap: 8px;
       margin: 0;
       font-size: 1.5rem;
-      font-weight: 600;
-      color: #1a1a1a;
+      font-weight: 400;
+      color: #f4f4f4;
+      font-family: 'IBM Plex Sans', sans-serif;
     }
 
     .close-button {
-      color: #666;
+      color: #a8a8a8;
+    }
+
+    .close-button:hover {
+      color: #f4f4f4;
     }
 
     .dialog-content {
       padding: 24px;
       max-height: 70vh;
       overflow-y: auto;
+      background: #262626;
     }
 
     .dialog-description {
-      color: #666;
+      color: #a8a8a8;
       margin-bottom: 24px;
       line-height: 1.5;
+      font-family: 'IBM Plex Sans', sans-serif;
     }
 
     .feedback-form {
@@ -350,9 +363,10 @@ export class FeedbackButtonComponent implements OnInit, OnDestroy {
 
     .rating-label {
       display: block;
-      font-weight: 500;
+      font-weight: 400;
       margin-bottom: 16px;
-      color: #1a1a1a;
+      color: #f4f4f4;
+      font-family: 'IBM Plex Sans', sans-serif;
     }
 
     .star-rating {
@@ -367,28 +381,29 @@ export class FeedbackButtonComponent implements OnInit, OnDestroy {
       border: none;
       cursor: pointer;
       padding: 4px;
-      border-radius: 4px;
+      border-radius: 2px;
       transition: all 0.2s ease;
-      color: #ddd;
+      color: #525252;
     }
 
     .star-button:hover {
-      background-color: #f5f5f5;
+      background-color: #393939;
     }
 
     .star-button.active {
-      color: #ffc107;
+      color: #0f62fe;
     }
 
     .star-button.hover {
-      color: #ffc107;
+      color: #0f62fe;
       transform: scale(1.1);
     }
 
     .rating-text {
       font-size: 0.9rem;
-      color: #666;
+      color: #a8a8a8;
       font-style: italic;
+      font-family: 'IBM Plex Sans', sans-serif;
     }
 
     .form-group {
@@ -400,30 +415,33 @@ export class FeedbackButtonComponent implements OnInit, OnDestroy {
     }
 
     .optional-fields {
-      border-top: 1px solid #e0e0e0;
+      border-top: 1px solid #393939;
       padding-top: 20px;
       margin-top: 20px;
     }
 
     .optional-fields h4 {
       margin: 0 0 16px 0;
-      color: #1a1a1a;
+      color: #f4f4f4;
       font-size: 1.1rem;
-      font-weight: 500;
+      font-weight: 400;
+      font-family: 'IBM Plex Sans', sans-serif;
     }
 
     .error-message {
-      color: #d32f2f;
+      color: #ff6b6b;
       font-size: 0.75rem;
       margin-top: 4px;
+      font-family: 'IBM Plex Sans', sans-serif;
     }
 
     .dialog-actions {
       padding: 16px 24px;
-      border-top: 1px solid #e0e0e0;
+      border-top: 1px solid #393939;
       display: flex;
       justify-content: flex-end;
       gap: 12px;
+      background: #161616;
     }
 
     .submit-button {
@@ -447,15 +465,15 @@ export class FeedbackButtonComponent implements OnInit, OnDestroy {
     }
 
     .feedback-message.success {
-      background-color: #e8f5e8;
-      color: #2e7d32;
-      border: 1px solid #c8e6c9;
+      background-color: #0f2e0f;
+      color: #42be65;
+      border: 1px solid #198038;
     }
 
     .feedback-message.error {
-      background-color: #ffebee;
-      color: #c62828;
-      border: 1px solid #ffcdd2;
+      background-color: #2d1b1b;
+      color: #ff6b6b;
+      border: 1px solid #da1e28;
     }
 
     @media (max-width: 768px) {
