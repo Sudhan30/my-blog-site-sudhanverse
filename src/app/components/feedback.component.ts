@@ -28,9 +28,7 @@ import { Subject, takeUntil } from 'rxjs';
   template: `
     <button 
       class="feedback-button"
-      (click)="openFeedbackDialog()"
-      mat-fab
-      color="primary">
+      (click)="openFeedbackDialog()">
       <mat-icon class="feedback-icon">feedback</mat-icon>
       <span class="feedback-text">Feedback</span>
     </button>
@@ -55,6 +53,9 @@ import { Subject, takeUntil } from 'rxjs';
       font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       overflow: hidden;
       gap: 8px;
+      /* Ensure button is visible */
+      opacity: 1;
+      visibility: visible;
     }
 
     .feedback-button:hover {
@@ -78,6 +79,8 @@ import { Subject, takeUntil } from 'rxjs';
       display: flex;
       align-items: center;
       justify-content: center;
+      opacity: 1;
+      visibility: visible;
     }
 
     .feedback-button:hover .feedback-icon {
