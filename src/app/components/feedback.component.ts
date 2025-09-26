@@ -39,7 +39,8 @@ import { Subject, takeUntil } from 'rxjs';
     .feedback-button {
       position: fixed;
       bottom: 20px;
-      right: 20px;
+      left: 50%;
+      transform: translateX(-50%);
       z-index: 1000;
       width: 56px;
       height: 56px;
@@ -63,11 +64,11 @@ import { Subject, takeUntil } from 'rxjs';
       background: #262626;
       border-color: #525252;
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
-      transform: translateY(-2px);
+      transform: translateX(-50%) translateY(-2px);
     }
 
     .feedback-button:active {
-      transform: translateY(0);
+      transform: translateX(-50%) translateY(0);
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     }
 
@@ -106,7 +107,6 @@ import { Subject, takeUntil } from 'rxjs';
     @media (max-width: 768px) {
       .feedback-button {
         bottom: 16px;
-        right: 16px;
         width: 48px;
         height: 48px;
       }
@@ -114,6 +114,11 @@ import { Subject, takeUntil } from 'rxjs';
       .feedback-button:hover {
         width: 110px;
         border-radius: 24px;
+        transform: translateX(-50%) translateY(-2px);
+      }
+
+      .feedback-button:active {
+        transform: translateX(-50%) translateY(0);
       }
 
       .feedback-icon {
@@ -128,7 +133,6 @@ import { Subject, takeUntil } from 'rxjs';
     @media (max-width: 480px) {
       .feedback-button {
         bottom: 12px;
-        right: 12px;
         width: 44px;
         height: 44px;
       }
@@ -136,6 +140,11 @@ import { Subject, takeUntil } from 'rxjs';
       .feedback-button:hover {
         width: 100px;
         border-radius: 22px;
+        transform: translateX(-50%) translateY(-2px);
+      }
+
+      .feedback-button:active {
+        transform: translateX(-50%) translateY(0);
       }
 
       .feedback-icon {
