@@ -120,6 +120,16 @@ import { Subject, takeUntil } from 'rxjs';
         transform: translateY(-2px);
       }
 
+      .feedback-button:hover .feedback-icon {
+        color: #0f62fe;
+        transform: translateX(-8px);
+      }
+
+      .feedback-button:hover .feedback-text {
+        opacity: 1;
+        transform: translateX(0);
+      }
+
       .feedback-button:active {
         transform: translateY(0);
       }
@@ -145,6 +155,16 @@ import { Subject, takeUntil } from 'rxjs';
         width: 100px;
         border-radius: 22px;
         transform: translateY(-2px);
+      }
+
+      .feedback-button:hover .feedback-icon {
+        color: #0f62fe;
+        transform: translateX(-6px);
+      }
+
+      .feedback-button:hover .feedback-text {
+        opacity: 1;
+        transform: translateX(0);
       }
 
       .feedback-button:active {
