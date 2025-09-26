@@ -1,7 +1,7 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
-import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { MatDialog, MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatButtonModule } from '@angular/material/button';
 import { MatIconModule } from '@angular/material/icon';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -28,9 +28,11 @@ import { Subject, takeUntil } from 'rxjs';
   template: `
     <button 
       class="feedback-button"
-      (click)="openFeedbackDialog()">
+      (click)="openFeedbackDialog()"
+      (mouseenter)="onMouseEnter()"
+      (mouseleave)="onMouseLeave()">
       <mat-icon class="feedback-icon">feedback</mat-icon>
-      <span class="feedback-text">Feedback</span>
+      <span class="feedback-text" *ngIf="isHovered">Feedback</span>
     </button>
   `,
   styles: [`
@@ -183,20 +185,19 @@ import { Subject, takeUntil } from 'rxjs';
     }
   `]
 })
-export class FeedbackButtonComponent implements OnInit, OnDestroy {
-  private destroy$ = new Subject<void>();
+export class FeedbackButtonComponent {
+  isHovered = false;
 
   constructor(
-    private dialog: MatDialog,
-    private apiService: ApiService,
-    private snackBar: MatSnackBar
+    private dialog: MatDialog
   ) {}
 
-  ngOnInit() {}
+  onMouseEnter() {
+    this.isHovered = true;
+  }
 
-  ngOnDestroy() {
-    this.destroy$.next();
-    this.destroy$.complete();
+  onMouseLeave() {
+    this.isHovered = false;
   }
 
   openFeedbackDialog() {
@@ -626,10 +627,10 @@ export class FeedbackDialogComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
   constructor(
+    public dialogRef: MatDialogRef<FeedbackDialogComponent>,
     private fb: FormBuilder,
     private apiService: ApiService,
-    private snackBar: MatSnackBar,
-    private dialog: MatDialog
+    private snackBar: MatSnackBar
   ) {
     this.feedbackForm = this.fb.group({
       rating: [0, [Validators.required, Validators.min(1), Validators.max(5)]],
@@ -770,6 +771,6 @@ export class FeedbackDialogComponent implements OnInit, OnDestroy {
   }
 
   closeDialog() {
-    this.dialog.closeAll();
+    this.dialogRef.close();
   }
 }

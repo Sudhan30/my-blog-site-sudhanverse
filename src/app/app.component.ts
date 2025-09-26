@@ -36,8 +36,6 @@ import { FeedbackButtonComponent } from './components/feedback.component';
     
     .main-content {
       flex: 1;
-      max-width: 100%;
-      margin: 0;
       width: 100%;
     }
     
@@ -71,17 +69,8 @@ import { FeedbackButtonComponent } from './components/feedback.component';
     
     /* Mobile responsive styles */
     @media (max-width: 768px) {
-      .app-footer {
-        width: 100vw;
-        margin-left: calc(-50vw + 50%);
-        margin-right: calc(-50vw + 50%);
-      }
-      
       .footer-content {
-        padding: 3rem 3rem;
-        width: 100%;
-        max-width: none;
-        margin: 0;
+        padding: 2rem 1.5rem;
       }
       
       .footer-content p {
@@ -93,17 +82,8 @@ import { FeedbackButtonComponent } from './components/feedback.component';
     }
     
     @media (max-width: 480px) {
-      .app-footer {
-        width: 100vw;
-        margin-left: calc(-50vw + 50%);
-        margin-right: calc(-50vw + 50%);
-      }
-      
       .footer-content {
-        padding: 2rem 2rem;
-        width: 100%;
-        max-width: none;
-        margin: 0;
+        padding: 1.5rem 1rem;
       }
       
       .footer-content p {
