@@ -595,8 +595,17 @@ export class ApiService implements OnDestroy {
     console.log('🚀 Submitting feedback to:', `${this.API_BASE_URL}/feedback`);
     console.log('📝 Feedback data:', feedback);
     
+    // Get client ID for the request
+    const clientId = this.getClientId();
+    const requestBody = {
+      ...feedback,
+      clientId: clientId
+    };
+    
+    console.log('📝 Request body with clientId:', requestBody);
+    
     return this.createSafeObservable(() => 
-      this.http.post<FeedbackResponse>(`${this.API_BASE_URL}/feedback`, feedback).pipe(
+      this.http.post<FeedbackResponse>(`${this.API_BASE_URL}/feedback`, requestBody).pipe(
         retry(3),
         catchError(error => {
           console.error('❌ Feedback API error:', error);

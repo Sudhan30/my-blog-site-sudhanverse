@@ -102,6 +102,7 @@ import { Subject, takeUntil } from 'rxjs';
       transform: translateX(0);
     }
 
+    /* Mobile responsiveness */
     @media (max-width: 768px) {
       .feedback-button {
         bottom: 16px;
@@ -120,7 +121,7 @@ import { Subject, takeUntil } from 'rxjs';
       }
 
       .feedback-text {
-        font-size: 13px;
+        font-size: 12px;
       }
     }
 
@@ -142,7 +143,7 @@ import { Subject, takeUntil } from 'rxjs';
       }
 
       .feedback-text {
-        font-size: 12px;
+        font-size: 11px;
       }
     }
   `]
@@ -152,7 +153,8 @@ export class FeedbackButtonComponent implements OnInit, OnDestroy {
 
   constructor(
     private dialog: MatDialog,
-    private apiService: ApiService
+    private apiService: ApiService,
+    private snackBar: MatSnackBar
   ) {}
 
   ngOnInit() {}
@@ -164,15 +166,18 @@ export class FeedbackButtonComponent implements OnInit, OnDestroy {
 
   openFeedbackDialog() {
     const dialogRef = this.dialog.open(FeedbackDialogComponent, {
-      width: '500px',
-      maxWidth: '90vw',
+      width: '90vw',
+      maxWidth: '600px',
+      maxHeight: '90vh',
       disableClose: false,
       panelClass: 'feedback-dialog'
     });
 
-    dialogRef.afterClosed().pipe(
-      takeUntil(this.destroy$)
-    ).subscribe();
+    dialogRef.afterClosed().subscribe(result => {
+      if (result) {
+        console.log('Feedback dialog closed with result:', result);
+      }
+    });
   }
 }
 
@@ -191,60 +196,62 @@ export class FeedbackButtonComponent implements OnInit, OnDestroy {
     MatProgressSpinnerModule
   ],
   template: `
-    <div class="feedback-dialog-content">
+    <div class="dialog-container">
+      <!-- Header -->
       <div class="dialog-header">
-        <h2 mat-dialog-title>
-          <mat-icon>feedback</mat-icon>
-          Share Your Feedback
-        </h2>
-        <button mat-icon-button (click)="closeDialog()" class="close-button">
+        <h2 class="dialog-title">Share Your Feedback</h2>
+        <button 
+          class="close-button" 
+          (click)="closeDialog()"
+          mat-icon-button
+          aria-label="Close dialog">
           <mat-icon>close</mat-icon>
         </button>
       </div>
 
-      <div mat-dialog-content class="dialog-content">
+      <!-- Content -->
+      <div class="dialog-content">
         <p class="dialog-description">
-          Help us improve by sharing your thoughts and suggestions.
+          We'd love to hear your thoughts! Your feedback helps us improve our content and user experience.
         </p>
 
-        <form [formGroup]="feedbackForm" (ngSubmit)="onSubmit()" class="feedback-form">
+        <form [formGroup]="feedbackForm" (ngSubmit)="onFeedbackSubmit()" class="feedback-form">
           <!-- Rating Section -->
           <div class="rating-section">
             <label class="rating-label">How would you rate your experience? *</label>
             <div class="star-rating">
               <button 
-                *ngFor="let star of stars" 
+                *ngFor="let star of [1,2,3,4,5]; let i = index"
                 type="button"
                 class="star-button"
-                [class.active]="star <= selectedRating"
-                [class.hover]="star <= hoverRating"
-                (click)="selectRating(star)"
-                (mouseenter)="hoverRating = star"
-                (mouseleave)="hoverRating = 0">
-                <mat-icon>{{ star <= selectedRating ? 'star' : 'star_border' }}</mat-icon>
+                [class.active]="currentRating >= star"
+                [class.hover]="hoverRating >= star"
+                (click)="setRating(star)"
+                (mouseenter)="onStarHover(star)"
+                (mouseleave)="onStarLeave()">
+                <mat-icon>star</mat-icon>
               </button>
             </div>
-            <div class="rating-text">
-              {{ getRatingText(selectedRating) }}
-            </div>
+            <p class="rating-text">{{ getRatingText() }}</p>
           </div>
 
           <!-- Feedback Text -->
           <div class="form-group">
-            <mat-form-field appearance="outline" class="full-width">
-              <mat-label>Your feedback *</mat-label>
-              <textarea 
-                matInput 
-                formControlName="feedback_text"
-                placeholder="Tell us what you think..."
-                rows="4"
-                maxlength="1000">
-              </textarea>
-              <mat-hint align="end">{{ feedbackForm.get('feedback_text')?.value?.length || 0 }}/1000</mat-hint>
-            </mat-form-field>
-            <div *ngIf="feedbackForm.get('feedback_text')?.invalid && feedbackForm.get('feedback_text')?.touched" class="error-message">
+            <label class="form-label">Your Feedback *</label>
+            <textarea
+              formControlName="feedback_text"
+              class="form-textarea"
+              placeholder="Tell us what you think..."
+              rows="4"
+              maxlength="1000">
+            </textarea>
+            <div class="character-count">
+              {{ characterCount }}/1000 characters
+            </div>
+            <div *ngIf="feedbackForm.get('feedback_text')?.invalid && feedbackForm.get('feedback_text')?.touched" 
+                 class="error-message">
               <span *ngIf="feedbackForm.get('feedback_text')?.errors?.['required']">Feedback is required</span>
-              <span *ngIf="feedbackForm.get('feedback_text')?.errors?.['minlength']">Please provide more detailed feedback</span>
+              <span *ngIf="feedbackForm.get('feedback_text')?.errors?.['minlength']">Please provide at least 10 characters</span>
             </div>
           </div>
 
@@ -253,106 +260,105 @@ export class FeedbackButtonComponent implements OnInit, OnDestroy {
             <h4>Optional Information</h4>
             
             <div class="form-group">
-              <mat-form-field appearance="outline" class="full-width">
-                <mat-label>Your name (optional)</mat-label>
-                <input 
-                  matInput 
-                  formControlName="name"
-                  placeholder="Enter your name"
-                  maxlength="100">
-                <mat-hint>We'll generate a fun name if you don't provide one</mat-hint>
-              </mat-form-field>
+              <label class="form-label">Name (Optional)</label>
+              <input
+                formControlName="name"
+                class="form-input"
+                placeholder="Your name"
+                type="text">
             </div>
 
             <div class="form-group">
-              <mat-form-field appearance="outline" class="full-width">
-                <mat-label>Your email (optional)</mat-label>
-                <input 
-                  matInput 
-                  type="email"
-                  formControlName="email"
-                  placeholder="Enter your email"
-                  maxlength="255">
-                <mat-hint>Only if you'd like a response</mat-hint>
-              </mat-form-field>
-              <div *ngIf="feedbackForm.get('email')?.invalid && feedbackForm.get('email')?.touched" class="error-message">
+              <label class="form-label">Email (Optional)</label>
+              <input
+                formControlName="email"
+                class="form-input"
+                placeholder="your.email@example.com"
+                type="email">
+              <div *ngIf="feedbackForm.get('email')?.invalid && feedbackForm.get('email')?.touched" 
+                   class="error-message">
                 <span *ngIf="feedbackForm.get('email')?.errors?.['email']">Please enter a valid email address</span>
               </div>
             </div>
           </div>
+
+          <!-- Feedback Message -->
+          <div *ngIf="feedbackMessage" 
+               class="feedback-message"
+               [class.success]="feedbackSuccess"
+               [class.error]="!feedbackSuccess">
+            <mat-icon>{{ feedbackSuccess ? 'check_circle' : 'error' }}</mat-icon>
+            <span>{{ feedbackMessage }}</span>
+          </div>
+
+          <!-- Actions -->
+          <div class="dialog-actions">
+            <button 
+              type="button" 
+              class="cancel-button"
+              (click)="closeDialog()"
+              mat-button>
+              Cancel
+            </button>
+            <button 
+              type="submit" 
+              class="submit-button"
+              [disabled]="!feedbackForm.valid || isSubmitting"
+              mat-raised-button
+              color="primary">
+              <mat-spinner *ngIf="isSubmitting" diameter="20"></mat-spinner>
+              <span *ngIf="!isSubmitting">Submit Feedback</span>
+              <span *ngIf="isSubmitting" class="loading-text">Submitting...</span>
+            </button>
+          </div>
         </form>
-      </div>
-
-      <div mat-dialog-actions class="dialog-actions">
-        <button 
-          mat-button 
-          (click)="closeDialog()"
-          [disabled]="isSubmitting">
-          Cancel
-        </button>
-        <button 
-          mat-raised-button 
-          color="primary"
-          (click)="onSubmit()"
-          [disabled]="feedbackForm.invalid || isSubmitting"
-          class="submit-button">
-          <span *ngIf="!isSubmitting">Submit Feedback</span>
-          <span *ngIf="isSubmitting" class="loading-content">
-            <mat-spinner diameter="20"></mat-spinner>
-            Submitting...
-          </span>
-        </button>
-      </div>
-
-      <!-- Success/Error Message -->
-      <div *ngIf="feedbackMessage" class="feedback-message" [class.success]="feedbackSuccess" [class.error]="!feedbackSuccess">
-        <mat-icon>{{ feedbackSuccess ? 'check_circle' : 'error' }}</mat-icon>
-        <span>{{ feedbackMessage }}</span>
       </div>
     </div>
   `,
   styles: [`
-    .feedback-dialog-content {
-      padding: 0;
+    .dialog-container {
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      background: #ffffff;
+      border-radius: 8px;
+      overflow: hidden;
     }
 
     .dialog-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 20px 24px 0 24px;
-      border-bottom: 1px solid #393939;
-      background: #161616;
+      padding: 20px 24px;
+      background: #f8f9fa;
+      border-bottom: 1px solid #e9ecef;
     }
 
-    .dialog-header h2 {
-      display: flex;
-      align-items: center;
-      gap: 8px;
+    .dialog-title {
       margin: 0;
       font-size: 1.5rem;
-      font-weight: 400;
-      color: #f4f4f4;
+      font-weight: 600;
+      color: #161616;
       font-family: 'IBM Plex Sans', sans-serif;
     }
 
     .close-button {
-      color: #a8a8a8;
+      color: #6c757d;
     }
 
     .close-button:hover {
-      color: #f4f4f4;
+      color: #495057;
     }
 
     .dialog-content {
       padding: 24px;
-      max-height: 70vh;
+      flex: 1;
       overflow-y: auto;
       background: #ffffff;
     }
 
     .dialog-description {
-      color: #525252;
+      color: #6c757d;
       margin-bottom: 24px;
       line-height: 1.5;
       font-family: 'IBM Plex Sans', sans-serif;
@@ -361,7 +367,7 @@ export class FeedbackButtonComponent implements OnInit, OnDestroy {
     .feedback-form {
       display: flex;
       flex-direction: column;
-      gap: 20px;
+      gap: 24px;
     }
 
     .rating-section {
@@ -370,7 +376,7 @@ export class FeedbackButtonComponent implements OnInit, OnDestroy {
 
     .rating-label {
       display: block;
-      font-weight: 400;
+      font-weight: 500;
       margin-bottom: 16px;
       color: #161616;
       font-family: 'IBM Plex Sans', sans-serif;
@@ -387,28 +393,28 @@ export class FeedbackButtonComponent implements OnInit, OnDestroy {
       background: none;
       border: none;
       cursor: pointer;
-      padding: 4px;
-      border-radius: 2px;
+      padding: 8px;
+      border-radius: 4px;
       transition: all 0.2s ease;
-      color: #ddd;
+      color: #dee2e6;
     }
 
     .star-button:hover {
-      background-color: #f5f5f5;
+      background-color: #f8f9fa;
     }
 
     .star-button.active {
-      color: #0f62fe;
+      color: #ffc107;
     }
 
     .star-button.hover {
-      color: #0f62fe;
+      color: #ffc107;
       transform: scale(1.1);
     }
 
     .rating-text {
       font-size: 0.9rem;
-      color: #666;
+      color: #6c757d;
       font-style: italic;
       font-family: 'IBM Plex Sans', sans-serif;
     }
@@ -417,12 +423,44 @@ export class FeedbackButtonComponent implements OnInit, OnDestroy {
       margin-bottom: 16px;
     }
 
-    .full-width {
+    .form-label {
+      display: block;
+      font-weight: 500;
+      margin-bottom: 8px;
+      color: #161616;
+      font-family: 'IBM Plex Sans', sans-serif;
+    }
+
+    .form-input, .form-textarea {
       width: 100%;
+      padding: 12px 16px;
+      border: 1px solid #ced4da;
+      border-radius: 6px;
+      font-size: 14px;
+      font-family: 'IBM Plex Sans', sans-serif;
+      transition: border-color 0.2s ease;
+    }
+
+    .form-input:focus, .form-textarea:focus {
+      outline: none;
+      border-color: #0f62fe;
+      box-shadow: 0 0 0 2px rgba(15, 98, 254, 0.1);
+    }
+
+    .form-textarea {
+      resize: vertical;
+      min-height: 100px;
+    }
+
+    .character-count {
+      text-align: right;
+      font-size: 0.75rem;
+      color: #6c757d;
+      margin-top: 4px;
     }
 
     .optional-fields {
-      border-top: 1px solid #e0e0e0;
+      border-top: 1px solid #e9ecef;
       padding-top: 20px;
       margin-top: 20px;
     }
@@ -431,12 +469,12 @@ export class FeedbackButtonComponent implements OnInit, OnDestroy {
       margin: 0 0 16px 0;
       color: #161616;
       font-size: 1.1rem;
-      font-weight: 400;
+      font-weight: 500;
       font-family: 'IBM Plex Sans', sans-serif;
     }
 
     .error-message {
-      color: #d32f2f;
+      color: #dc3545;
       font-size: 0.75rem;
       margin-top: 4px;
       font-family: 'IBM Plex Sans', sans-serif;
@@ -444,69 +482,112 @@ export class FeedbackButtonComponent implements OnInit, OnDestroy {
 
     .dialog-actions {
       padding: 16px 24px;
-      border-top: 1px solid #e0e0e0;
+      border-top: 1px solid #e9ecef;
       display: flex;
       justify-content: flex-end;
       gap: 12px;
-      background: #ffffff;
+      background: #f8f9fa;
+    }
+
+    .cancel-button {
+      color: #6c757d;
     }
 
     .submit-button {
       min-width: 140px;
+      position: relative;
     }
 
-    .loading-content {
-      display: flex;
-      align-items: center;
-      gap: 8px;
+    .loading-text {
+      margin-left: 8px;
     }
 
     .feedback-message {
-      margin: 16px 24px;
       padding: 12px 16px;
-      border-radius: 4px;
+      border-radius: 6px;
       display: flex;
       align-items: center;
       gap: 8px;
       font-size: 0.9rem;
+      margin-bottom: 16px;
     }
 
     .feedback-message.success {
-      background-color: #e8f5e8;
-      color: #2e7d32;
-      border: 1px solid #c8e6c9;
+      background-color: #d4edda;
+      color: #155724;
+      border: 1px solid #c3e6cb;
     }
 
     .feedback-message.error {
-      background-color: #ffebee;
-      color: #c62828;
-      border: 1px solid #ffcdd2;
+      background-color: #f8d7da;
+      color: #721c24;
+      border: 1px solid #f5c6cb;
     }
 
+    /* Mobile responsiveness */
     @media (max-width: 768px) {
       .dialog-content {
         padding: 16px;
       }
 
+      .dialog-header {
+        padding: 16px;
+      }
+
+      .dialog-title {
+        font-size: 1.25rem;
+      }
+
       .dialog-actions {
         padding: 12px 16px;
         flex-direction: column;
+        gap: 8px;
       }
 
-      .submit-button {
+      .submit-button, .cancel-button {
         width: 100%;
+      }
+
+      .star-rating {
+        gap: 4px;
+      }
+
+      .star-button {
+        padding: 6px;
+      }
+    }
+
+    @media (max-width: 480px) {
+      .dialog-content {
+        padding: 12px;
+      }
+
+      .dialog-header {
+        padding: 12px;
+      }
+
+      .dialog-title {
+        font-size: 1.1rem;
+      }
+
+      .form-input, .form-textarea {
+        padding: 10px 12px;
+        font-size: 16px; /* Prevent zoom on iOS */
       }
     }
   `]
 })
 export class FeedbackDialogComponent implements OnInit, OnDestroy {
   feedbackForm: FormGroup;
+  currentRating = 0;
+  hoverRating = 0;
+  ratingTexts = [
+    '', 'Poor', 'Fair', 'Good', 'Very Good', 'Excellent'
+  ];
   isSubmitting = false;
   feedbackMessage = '';
   feedbackSuccess = false;
-  selectedRating = 0;
-  hoverRating = 0;
-  stars = [1, 2, 3, 4, 5];
+  characterCount = 0;
   private destroy$ = new Subject<void>();
 
   constructor(
@@ -516,9 +597,15 @@ export class FeedbackDialogComponent implements OnInit, OnDestroy {
     private dialog: MatDialog
   ) {
     this.feedbackForm = this.fb.group({
-      feedback_text: ['', [Validators.required, Validators.minLength(10)]],
+      rating: [0, [Validators.required, Validators.min(1), Validators.max(5)]],
+      feedback_text: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(1000)]],
       name: [''],
       email: ['', [Validators.email]]
+    });
+
+    // Update character count
+    this.feedbackForm.get('feedback_text')?.valueChanges.subscribe(value => {
+      this.characterCount = value ? value.length : 0;
     });
   }
 
@@ -529,50 +616,49 @@ export class FeedbackDialogComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  selectRating(rating: number) {
-    this.selectedRating = rating;
+  onStarHover(rating: number) {
+    this.hoverRating = rating;
+  }
+
+  onStarLeave() {
+    this.hoverRating = 0;
+  }
+
+  setRating(rating: number) {
+    this.currentRating = rating;
     this.feedbackForm.patchValue({ rating });
   }
 
-  getRatingText(rating: number): string {
-    const texts = {
-      0: 'Select a rating',
-      1: 'Poor - Needs significant improvement',
-      2: 'Fair - Some issues to address',
-      3: 'Good - Meets expectations',
-      4: 'Very Good - Exceeds expectations',
-      5: 'Excellent - Outstanding experience'
-    };
-    return texts[rating as keyof typeof texts] || 'Select a rating';
+  getRatingText(): string {
+    return this.ratingTexts[this.currentRating] || '';
   }
 
-  onSubmit() {
-    if (this.feedbackForm.valid && this.selectedRating > 0 && !this.isSubmitting) {
+  onFeedbackSubmit() {
+    if (this.feedbackForm.valid && !this.isSubmitting) {
       this.isSubmitting = true;
       this.feedbackMessage = '';
 
       const feedbackData: FeedbackSubmission = {
-        rating: this.selectedRating,
-        feedback_text: this.feedbackForm.get('feedback_text')?.value,
-        name: this.feedbackForm.get('name')?.value || undefined,
-        email: this.feedbackForm.get('email')?.value || undefined
+        rating: this.feedbackForm.value.rating,
+        feedback_text: this.feedbackForm.value.feedback_text,
+        name: this.feedbackForm.value.name || undefined,
+        email: this.feedbackForm.value.email || undefined
       };
 
-      console.log('🔍 Submitting feedback:', feedbackData);
-      
+      console.log('🚀 Submitting feedback:', feedbackData);
+
       this.apiService.submitFeedback(feedbackData).pipe(
         takeUntil(this.destroy$)
       ).subscribe({
         next: (response) => {
-          console.log('✅ Feedback response:', response);
+          console.log('✅ Feedback submitted successfully:', response);
           this.isSubmitting = false;
           this.feedbackSuccess = response.success;
-
+          
           if (response.success) {
             this.feedbackMessage = response.message || 'Thank you for your feedback!';
             this.snackBar.open('Feedback submitted successfully!', 'Close', { duration: 3000 });
             
-            // Reset form and close dialog after a delay
             setTimeout(() => {
               this.closeDialog();
             }, 2000);
@@ -608,9 +694,6 @@ export class FeedbackDialogComponent implements OnInit, OnDestroy {
             setTimeout(() => {
               this.closeDialog();
             }, 2000);
-          } else if (error.status === 429) {
-            // Rate limiting
-            errorMessage = 'You are submitting feedback too quickly. Please wait a moment and try again.';
           } else if (error.status === 400) {
             // Validation error
             if (error.error && error.error.message) {
