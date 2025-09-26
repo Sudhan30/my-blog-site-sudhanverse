@@ -32,7 +32,6 @@ import { Subject, takeUntil } from 'rxjs';
       mat-fab
       color="primary">
       <mat-icon class="feedback-icon">feedback</mat-icon>
-      <span class="feedback-text">Feedback</span>
     </button>
   `,
   styles: [`
@@ -41,80 +40,53 @@ import { Subject, takeUntil } from 'rxjs';
       bottom: 20px;
       right: 20px;
       z-index: 1000;
-      width: 48px;
-      height: 48px;
-      border-radius: 0;
+      width: 56px;
+      height: 56px;
+      border-radius: 50%;
       background: #161616;
       border: 1px solid #393939;
-      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.3);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
       transition: all 0.2s cubic-bezier(0.2, 0, 0.38, 0.9);
       display: flex;
       align-items: center;
       justify-content: center;
-      overflow: hidden;
       cursor: pointer;
       font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     }
 
     .feedback-button:hover {
-      width: 120px;
       background: #262626;
       border-color: #525252;
-      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
-      transform: translateY(-1px);
-    }
-
-    .feedback-button:hover .feedback-text {
-      opacity: 1;
-      transform: translateX(0);
-    }
-
-    .feedback-button:hover .feedback-icon {
-      transform: translateX(-6px);
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
+      transform: translateY(-2px) scale(1.05);
     }
 
     .feedback-button:active {
-      transform: translateY(0);
-      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+      transform: translateY(0) scale(1);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     }
 
     .feedback-icon {
-      font-size: 20px;
+      font-size: 24px;
       color: #f4f4f4;
       transition: all 0.2s cubic-bezier(0.2, 0, 0.38, 0.9);
-      position: absolute;
     }
 
-    .feedback-text {
-      opacity: 0;
-      transform: translateX(16px);
-      transition: all 0.2s cubic-bezier(0.2, 0, 0.38, 0.9);
-      color: #f4f4f4;
-      font-weight: 400;
-      font-size: 14px;
-      white-space: nowrap;
-      margin-left: 6px;
-      letter-spacing: 0.01em;
+    .feedback-button:hover .feedback-icon {
+      color: #0f62fe;
+      transform: scale(1.1);
     }
 
     @media (max-width: 768px) {
       .feedback-button {
         bottom: 16px;
         right: 16px;
-        width: 44px;
-        height: 44px;
-      }
-
-      .feedback-button:hover {
-        width: 100px;
+        width: 48px;
+        height: 48px;
       }
 
       .feedback-icon {
-        font-size: 18px;
-      }
-
-      .feedback-text {
-        font-size: 13px;
+        font-size: 20px;
       }
     }
 
@@ -122,20 +94,12 @@ import { Subject, takeUntil } from 'rxjs';
       .feedback-button {
         bottom: 12px;
         right: 12px;
-        width: 40px;
-        height: 40px;
-      }
-
-      .feedback-button:hover {
-        width: 90px;
+        width: 44px;
+        height: 44px;
       }
 
       .feedback-icon {
-        font-size: 16px;
-      }
-
-      .feedback-text {
-        font-size: 12px;
+        font-size: 18px;
       }
     }
   `]
