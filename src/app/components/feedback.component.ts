@@ -32,6 +32,7 @@ import { Subject, takeUntil } from 'rxjs';
       mat-fab
       color="primary">
       <mat-icon class="feedback-icon">feedback</mat-icon>
+      <span class="feedback-text">Feedback</span>
     </button>
   `,
   styles: [`
@@ -46,35 +47,56 @@ import { Subject, takeUntil } from 'rxjs';
       background: #161616;
       border: 1px solid #393939;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
-      transition: all 0.2s cubic-bezier(0.2, 0, 0.38, 0.9);
+      transition: all 0.3s cubic-bezier(0.2, 0, 0.38, 0.9);
       display: flex;
       align-items: center;
       justify-content: center;
       cursor: pointer;
       font-family: 'IBM Plex Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      overflow: hidden;
     }
 
     .feedback-button:hover {
+      width: 120px;
+      border-radius: 28px;
       background: #262626;
       border-color: #525252;
       box-shadow: 0 4px 16px rgba(0, 0, 0, 0.4);
-      transform: translateY(-2px) scale(1.05);
+      transform: translateY(-2px);
     }
 
     .feedback-button:active {
-      transform: translateY(0) scale(1);
+      transform: translateY(0);
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     }
 
     .feedback-icon {
       font-size: 24px;
       color: #f4f4f4;
-      transition: all 0.2s cubic-bezier(0.2, 0, 0.38, 0.9);
+      transition: all 0.3s cubic-bezier(0.2, 0, 0.38, 0.9);
+      position: absolute;
     }
 
     .feedback-button:hover .feedback-icon {
       color: #0f62fe;
-      transform: scale(1.1);
+      transform: translateX(-8px);
+    }
+
+    .feedback-text {
+      opacity: 0;
+      transform: translateX(20px);
+      transition: all 0.3s cubic-bezier(0.2, 0, 0.38, 0.9);
+      color: #f4f4f4;
+      font-weight: 400;
+      font-size: 14px;
+      white-space: nowrap;
+      margin-left: 8px;
+      letter-spacing: 0.01em;
+    }
+
+    .feedback-button:hover .feedback-text {
+      opacity: 1;
+      transform: translateX(0);
     }
 
     @media (max-width: 768px) {
@@ -85,8 +107,17 @@ import { Subject, takeUntil } from 'rxjs';
         height: 48px;
       }
 
+      .feedback-button:hover {
+        width: 100px;
+        border-radius: 24px;
+      }
+
       .feedback-icon {
         font-size: 20px;
+      }
+
+      .feedback-text {
+        font-size: 13px;
       }
     }
 
@@ -98,8 +129,17 @@ import { Subject, takeUntil } from 'rxjs';
         height: 44px;
       }
 
+      .feedback-button:hover {
+        width: 90px;
+        border-radius: 22px;
+      }
+
       .feedback-icon {
         font-size: 18px;
+      }
+
+      .feedback-text {
+        font-size: 12px;
       }
     }
   `]
