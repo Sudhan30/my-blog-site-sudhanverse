@@ -234,8 +234,11 @@ export class AnalyticsConsentComponent implements OnInit {
       localStorage.setItem('analytics_consent', 'accepted');
       this.showBanner = false;
       
+      console.log('Analytics consent accepted, initializing tracking...');
+      
       // The UnifiedAnalyticsService will automatically initialize when consent is accepted
       // It handles both the backend API calls and Prometheus metrics
+      this.unifiedAnalytics.initialize();
     }
   }
 
@@ -247,8 +250,10 @@ export class AnalyticsConsentComponent implements OnInit {
   }
 
   private loadAnalytics() {
+    console.log('Loading analytics for existing consent...');
     // The UnifiedAnalyticsService will automatically initialize when consent is accepted
     // It handles both the backend API calls and Prometheus metrics
+    this.unifiedAnalytics.initialize();
   }
 
   private initializePrometheus() {

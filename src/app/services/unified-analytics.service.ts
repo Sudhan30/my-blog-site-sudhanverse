@@ -65,8 +65,31 @@ export class UnifiedAnalyticsService {
 
   constructor() {
     if (isPlatformBrowser(this.platformId)) {
-      this.initializeAnalytics();
+      // Check if analytics consent is accepted
+      const consent = localStorage.getItem('analytics_consent');
+      if (consent === 'accepted') {
+        this.initializeAnalytics();
+      }
     }
+  }
+
+  initialize() {
+    if (!isPlatformBrowser(this.platformId)) return;
+
+    console.log('🔧 UnifiedAnalyticsService: Initializing analytics tracking...');
+    console.log('🔧 API Base URL:', this.apiBaseUrl);
+
+    this.initializeAnalytics();
+    
+    // Initialize Prometheus metrics as well
+    this.prometheusMetrics.initialize({
+      endpoint: 'https://prometheus.sudharsana.dev',
+      job: 'blog-frontend',
+      instance: window.location.hostname
+    });
+    this.prometheusMetrics.trackAnalyticsConsent(true);
+    
+    console.log('🔧 UnifiedAnalyticsService: Analytics tracking initialized successfully');
   }
 
   private initializeAnalytics() {
@@ -114,18 +137,16 @@ export class UnifiedAnalyticsService {
     };
 
     try {
-      await this.http.post(`${this.apiBaseUrl}/session`, sessionData).toPromise();
-      this.sessionSubject.next(sessionData);
+      console.log('🔧 Sending session data to:', `${this.apiBaseUrl}/session`);
+      console.log('🔧 Session data:', sessionData);
       
-      // Also track in Prometheus using your existing infrastructure
-      this.prometheusMetrics.trackAnalyticsConsent(true);
-      this.prometheusMetrics.initialize({
-        endpoint: 'https://prometheus.sudharsana.dev', // Your existing Prometheus endpoint
-        job: 'blog-frontend',
-        instance: window.location.hostname
-      });
+      const response = await this.http.post(`${this.apiBaseUrl}/session`, sessionData).toPromise();
+      console.log('✅ Session created successfully:', response);
+      
+      this.sessionSubject.next(sessionData);
     } catch (error) {
-      console.error('Failed to start analytics session:', error);
+      console.error('❌ Failed to start analytics session:', error);
+      console.error('❌ Error details:', error);
     }
   }
 
@@ -180,7 +201,11 @@ export class UnifiedAnalyticsService {
     this.eventBuffer = [];
 
     try {
-      await this.http.post(`${this.apiBaseUrl}/track`, { events }).toPromise();
+      console.log('🔧 Sending analytics events to:', `${this.apiBaseUrl}/track`);
+      console.log('🔧 Events being sent:', events);
+      
+      const response = await this.http.post(`${this.apiBaseUrl}/track`, { events }).toPromise();
+      console.log('✅ Analytics events sent successfully:', response);
       
       // Also send to Prometheus for each event
       events.forEach(event => {
@@ -200,7 +225,8 @@ export class UnifiedAnalyticsService {
         }
       });
     } catch (error) {
-      console.error('Failed to flush analytics events:', error);
+      console.error('❌ Failed to flush analytics events:', error);
+      console.error('❌ Error details:', error);
       // Re-add events to buffer if failed
       this.eventBuffer.unshift(...events);
     }
