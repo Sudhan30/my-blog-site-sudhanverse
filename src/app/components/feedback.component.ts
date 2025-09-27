@@ -202,9 +202,9 @@ export class FeedbackButtonComponent {
 
   openFeedbackDialog() {
     const dialogRef = this.dialog.open(FeedbackDialogComponent, {
-      width: '90vw',
-      maxWidth: '600px',
-      maxHeight: '90vh',
+      width: '500px',
+      maxWidth: '90vw',
+      maxHeight: '80vh',
       disableClose: false,
       panelClass: 'feedback-dialog'
     });
@@ -365,7 +365,7 @@ export class FeedbackButtonComponent {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      padding: 20px 24px;
+      padding: 16px 20px;
       background: #f8f9fa;
       border-bottom: 1px solid #e9ecef;
     }
@@ -387,7 +387,7 @@ export class FeedbackButtonComponent {
     }
 
     .dialog-content {
-      padding: 24px;
+      padding: 20px;
       flex: 1;
       overflow-y: auto;
       background: #ffffff;
@@ -395,7 +395,7 @@ export class FeedbackButtonComponent {
 
     .dialog-description {
       color: #6c757d;
-      margin-bottom: 24px;
+      margin-bottom: 20px;
       line-height: 1.5;
       font-family: 'IBM Plex Sans', sans-serif;
     }
@@ -403,7 +403,7 @@ export class FeedbackButtonComponent {
     .feedback-form {
       display: flex;
       flex-direction: column;
-      gap: 24px;
+      gap: 20px;
     }
 
     .rating-section {
@@ -517,7 +517,7 @@ export class FeedbackButtonComponent {
     }
 
     .dialog-actions {
-      padding: 16px 24px;
+      padding: 14px 20px;
       border-top: 1px solid #e9ecef;
       display: flex;
       justify-content: flex-end;
