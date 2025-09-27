@@ -2,7 +2,6 @@
   "posts": [
     {
       "slug": "my-cloud-site",
-      "id": "post-002",
       "title": "Deploying to the Cloud: My Infrastructure Journey",
       "date": "2024-02-20T00:00:00.000Z",
       "tags": [
@@ -15,7 +14,6 @@
     },
     {
       "slug": "my-first-site",
-      "id": "post-001",
       "title": "Building My First Website",
       "date": "2024-01-15T00:00:00.000Z",
       "tags": [

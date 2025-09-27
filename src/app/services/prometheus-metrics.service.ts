@@ -37,8 +37,8 @@ export class PrometheusMetricsService {
     // Track page load
     this.trackPageLoad();
     
-    // Track user engagement
-    this.trackUserEngagement();
+    // Track user engagement - initialize basic engagement metrics
+    this.incrementCounter('blog_user_engagement_total');
   }
 
   private getOrCreateUserId(): string {

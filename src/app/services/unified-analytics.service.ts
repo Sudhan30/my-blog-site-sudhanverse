@@ -186,7 +186,7 @@ export class UnifiedAnalyticsService {
       events.forEach(event => {
         switch (event.type) {
           case 'pageview':
-            this.prometheusMetrics.trackPageView(event.data.url);
+            this.prometheusMetrics.trackPageLoad(event.data.url);
             break;
           case 'click':
             this.prometheusMetrics.trackClick(event.data.element || 'unknown', event.data.url);
@@ -218,7 +218,7 @@ export class UnifiedAnalyticsService {
     };
     
     this.eventBuffer.push(event);
-    this.prometheusMetrics.trackPageView(url);
+    this.prometheusMetrics.trackPageLoad(url);
   }
 
   trackClick(element: HTMLElement, customData?: Record<string, any>) {
