@@ -98,11 +98,7 @@ export class ApiService implements OnDestroy {
   constructor() {
     // Initialize client ID only on the browser
     if (isPlatformBrowser(this.platformId)) {
-      try {
-        this.getOrCreateClientId();
-      } catch (error) {
-        console.warn('Error initializing client ID:', error);
-      }
+      this.getOrCreateClientId();
     }
     
     // Ensure destroy$ is always initialized
@@ -114,22 +110,15 @@ export class ApiService implements OnDestroy {
   private getOrCreateClientId(): string {
     if (isPlatformBrowser(this.platformId)) {
       let clientId = localStorage.getItem('blog_client_id');
-      console.log('🔍 Retrieved clientId from localStorage:', clientId);
       
-      // Validate UUID format and regenerate if invalid
       if (!clientId || !this.isValidUUID(clientId)) {
-        console.log('🔄 Invalid or missing clientId, generating new UUID');
         clientId = this.generateClientId();
-        console.log('🔄 Generated new clientId:', clientId);
         localStorage.setItem('blog_client_id', clientId);
-        console.log('🔄 Stored clientId in localStorage');
       }
       
       this.clientIdSubject.next(clientId);
-      console.log('🔄 Updated clientIdSubject with:', clientId);
       return clientId;
     }
-    console.log('🔄 Not in browser, returning empty string');
     return '';
   }
 
@@ -149,12 +138,7 @@ export class ApiService implements OnDestroy {
   }
 
   getClientId(): string {
-    try {
-      return this.clientIdSubject?.value || '';
-    } catch (error) {
-      console.warn('Error getting client ID:', error);
-      return '';
-    }
+    return this.clientIdSubject?.value || '';
   }
 
   // Generate a catchy anonymous name based on UUID
@@ -253,7 +237,6 @@ export class ApiService implements OnDestroy {
         delay: (error, retryCount) => {
           // Only retry on server errors (5xx) and specific client errors
           if (error.status >= 500 || error.status === 429 || error.status === 408) {
-            console.log(`Retrying getLikes (attempt ${retryCount}/${this.retryConfig.retries}) in ${this.retryConfig.delay}ms...`);
             return of(null).pipe(delay(this.retryConfig.delay + (retryCount * this.retryConfig.backoff)));
           }
           // Don't retry for other errors
@@ -263,7 +246,6 @@ export class ApiService implements OnDestroy {
       catchError(error => {
         // Handle CORS errors and network failures gracefully
         if (error.status === 0 || (error.name === 'HttpErrorResponse' && error.status === 0)) {
-          console.warn('API not accessible (likely CORS issue in development). Using fallback data.');
           return of({
             postId: postId,
             likes: 0,
@@ -291,7 +273,6 @@ export class ApiService implements OnDestroy {
         delay: (error, retryCount) => {
           // Only retry on server errors (5xx) and specific client errors
           if (error.status >= 500 || error.status === 429 || error.status === 408) {
-            console.log(`Retrying likePost (attempt ${retryCount}/${this.retryConfig.retries}) in ${this.retryConfig.delay}ms...`);
             return of(null).pipe(delay(this.retryConfig.delay + (retryCount * this.retryConfig.backoff)));
           }
           // Don't retry for other errors (like 400 "Already liked")
@@ -308,7 +289,6 @@ export class ApiService implements OnDestroy {
       catchError(error => {
         // Handle CORS errors and network failures gracefully
         if (error.status === 0 || (error.name === 'HttpErrorResponse' && error.status === 0)) {
-          console.warn('API not accessible (likely CORS issue in development). Using fallback response.');
           return of({
             success: true,
             likes: 1, // Simulate a successful like
@@ -338,7 +318,6 @@ export class ApiService implements OnDestroy {
         delay: (error, retryCount) => {
           // Only retry on server errors (5xx) and specific client errors
           if (error.status >= 500 || error.status === 429 || error.status === 408) {
-            console.log(`Retrying unlikePost (attempt ${retryCount}/${this.retryConfig.retries}) in ${this.retryConfig.delay}ms...`);
             return of(null).pipe(delay(this.retryConfig.delay + (retryCount * this.retryConfig.backoff)));
           }
           // Don't retry for other errors (like 400 "Already unliked" or 404)
@@ -355,7 +334,6 @@ export class ApiService implements OnDestroy {
       catchError(error => {
         // Handle CORS errors and network failures gracefully
         if (error.status === 0 || (error.name === 'HttpErrorResponse' && error.status === 0)) {
-          console.warn('API not accessible (likely CORS issue in development). Using fallback response.');
           return of({
             success: true,
             likes: Math.max(0, 0), // Simulate a successful unlike
@@ -383,7 +361,6 @@ export class ApiService implements OnDestroy {
         delay: (error, retryCount) => {
           // Only retry on server errors (5xx) and specific client errors
           if (error.status >= 500 || error.status === 429 || error.status === 408) {
-            console.log(`Retrying getComments (attempt ${retryCount}/${this.retryConfig.retries}) in ${this.retryConfig.delay}ms...`);
             return of(null).pipe(delay(this.retryConfig.delay + (retryCount * this.retryConfig.backoff)));
           }
           // Don't retry for other errors
@@ -393,7 +370,6 @@ export class ApiService implements OnDestroy {
       catchError(error => {
         // Handle CORS errors and network failures gracefully
         if (error.status === 0 || (error.name === 'HttpErrorResponse' && error.status === 0)) {
-          console.warn('API not accessible (likely CORS issue in development). Using fallback data.');
           return of({
             postId: postId,
             comments: [],
@@ -424,7 +400,6 @@ export class ApiService implements OnDestroy {
         count: this.retryConfig.retries,
         delay: (error, retryCount) => {
           if (error.status >= 500 || error.status === 429 || error.status === 408) {
-            console.log(`Retrying getAllComments (attempt ${retryCount}/${this.retryConfig.retries}) in ${this.retryConfig.delay}ms...`);
             return of(null).pipe(delay(this.retryConfig.delay + (retryCount * this.retryConfig.backoff)));
           }
           throw error;
@@ -432,7 +407,6 @@ export class ApiService implements OnDestroy {
       }),
       catchError(error => {
         if (error.status === 0 || (error.name === 'HttpErrorResponse' && error.status === 0)) {
-          console.warn('API not accessible (likely CORS issue in development). Using fallback data.');
           return of({
             postId: postId,
             comments: [],
@@ -467,7 +441,6 @@ export class ApiService implements OnDestroy {
         delay: (error, retryCount) => {
           // Only retry on server errors (5xx) and specific client errors
           if (error.status >= 500 || error.status === 429 || error.status === 408) {
-            console.log(`Retrying addComment (attempt ${retryCount}/${this.retryConfig.retries}) in ${this.retryConfig.delay}ms...`);
             return of(null).pipe(delay(this.retryConfig.delay + (retryCount * this.retryConfig.backoff)));
           }
           // Don't retry for other errors (like 400 validation errors)
@@ -484,7 +457,6 @@ export class ApiService implements OnDestroy {
       catchError(error => {
         // Handle CORS errors and network failures gracefully
         if (error.status === 0 || (error.name === 'HttpErrorResponse' && error.status === 0)) {
-          console.warn('API not accessible (likely CORS issue in development). Simulating successful comment.');
           return of({
             success: true,
             message: 'Comment added successfully (offline mode)',
@@ -516,8 +488,6 @@ export class ApiService implements OnDestroy {
   }
 
   private handleError(error: any): Observable<never> {
-    console.error('API Error:', error);
-    
     let errorMessage = 'An error occurred';
     
     if (error.error && error.error.error) {
@@ -527,17 +497,7 @@ export class ApiService implements OnDestroy {
     } else if (error.status === 0) {
       errorMessage = 'Unable to connect to the server. This may be due to CORS restrictions in development mode.';
     } else if (error.status === 400) {
-      // Handle client ID validation errors
-      if (error.error && error.error.includes('clientId')) {
-        errorMessage = 'Invalid session. Please refresh the page.';
-        // Clear invalid client ID and generate new one
-        if (isPlatformBrowser(this.platformId)) {
-          localStorage.removeItem('blog_client_id');
-          this.getOrCreateClientId();
-        }
-      } else {
-        errorMessage = 'Bad request. Please try again.';
-      }
+      errorMessage = 'Bad request. Please try again.';
     } else if (error.status === 404) {
       errorMessage = 'The requested resource was not found.';
     } else if (error.status === 500) {
@@ -560,7 +520,6 @@ export class ApiService implements OnDestroy {
         this.clientIdSubject.complete();
       }
     } catch (error) {
-      console.warn('Error during service cleanup:', error);
     }
   }
 
@@ -607,49 +566,19 @@ export class ApiService implements OnDestroy {
 
   // Feedback collection methods
   submitFeedback(feedback: FeedbackSubmission): Observable<FeedbackResponse> {
-    console.log('🚀 Submitting feedback to:', `${this.API_BASE_URL}/feedback`);
-    console.log('📝 Feedback data:', feedback);
+    const clientId = this.getOrCreateClientId();
     
-    // Ensure client ID is generated
-    this.getOrCreateClientId();
-    
-    // Get client ID for the request
-    const clientId = this.getClientId();
-    console.log('🔑 Generated clientId:', clientId);
-    console.log('🔍 Client ID from localStorage:', isPlatformBrowser(this.platformId) ? localStorage.getItem('blog_client_id') : 'N/A (SSR)');
-    console.log('🔍 Client ID subject value:', this.clientIdSubject?.value);
-    
-    if (!clientId || clientId === '') {
-      console.error('❌ No clientId available, generating new one');
-      const newClientId = this.generateClientId();
-      this.clientIdSubject.next(newClientId);
-      if (isPlatformBrowser(this.platformId)) {
-        localStorage.setItem('blog_client_id', newClientId);
-      }
-    }
-    
-    const finalClientId = this.getClientId();
     const requestBody = {
       ...feedback,
-      UUID: finalClientId
+      UUID: clientId
     };
-    
-    console.log('📝 Request body with UUID:', requestBody);
     
     return this.createSafeObservable(() => 
       this.http.post<FeedbackResponse>(`${this.API_BASE_URL}/feedback`, requestBody).pipe(
         retry(3),
         catchError(error => {
-          console.error('❌ Feedback API error:', error);
-          console.error('❌ Error status:', error.status);
-          console.error('❌ Error message:', error.message);
-          console.error('❌ Error URL:', error.url);
-          console.error('❌ Error body:', error.error);
-          console.error('❌ Full error object:', JSON.stringify(error, null, 2));
-          
           // If it's a network/CORS error, return a simulated success response
           if (error.status === 0 || error.message?.includes('CORS') || error.message?.includes('Failed to fetch')) {
-            console.log('🔄 Using fallback for feedback submission (Network/CORS error)');
             return of({
               success: true,
               message: 'Thank you for your feedback! (Simulated in development)',
@@ -660,7 +589,6 @@ export class ApiService implements OnDestroy {
           
           // If it's a 404, the endpoint doesn't exist yet
           if (error.status === 404) {
-            console.log('🔄 Using fallback for feedback submission (Endpoint not found)');
             return of({
               success: true,
               message: 'Thank you for your feedback! (Backend endpoint not yet deployed)',
@@ -669,46 +597,8 @@ export class ApiService implements OnDestroy {
             });
           }
           
-          // If it's a 400 with UUID error, try to regenerate clientId
-          const errorText = error.error?.error || error.error?.message || error.message || JSON.stringify(error.error) || '';
-          console.log('🔍 Error text for UUID detection:', errorText);
-          const isUuidError = errorText.includes('UUID') || 
-                              errorText.includes('UUID is required') || 
-                              errorText.includes('Invalid UUID') ||
-                              errorText.includes('clientId') ||
-                              (error.status === 400 && errorText.includes('required'));
-          console.log('🔍 Is UUID error detected:', isUuidError);
-          
-          if (error.status === 400 && isUuidError) {
-            console.log('🔄 UUID error detected, regenerating clientId and retrying');
-            const newClientId = this.generateClientId();
-            this.clientIdSubject.next(newClientId);
-            if (isPlatformBrowser(this.platformId)) {
-              localStorage.setItem('blog_client_id', newClientId);
-            }
-            
-            // Retry with new UUID
-            const retryRequestBody = {
-              ...feedback,
-              UUID: newClientId
-            };
-            
-            return this.http.post<FeedbackResponse>(`${this.API_BASE_URL}/feedback`, retryRequestBody).pipe(
-              catchError(retryError => {
-                console.log('🔄 Retry failed, using fallback for feedback submission (UUID error)');
-                return of({
-                  success: true,
-                  message: 'Thank you for your feedback! (UUID validation issue)',
-                  feedback_id: 'simulated-' + Date.now(),
-                  anonymous_name: 'Happy Reader'
-                });
-              })
-            );
-          }
-          
           // If it's a 500, server error
           if (error.status === 500) {
-            console.log('🔄 Using fallback for feedback submission (Server error)');
             return of({
               success: true,
               message: 'Thank you for your feedback! (Server temporarily unavailable)',
