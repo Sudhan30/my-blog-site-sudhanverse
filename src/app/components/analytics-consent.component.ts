@@ -52,7 +52,7 @@ import { UnifiedAnalyticsService } from '../services/unified-analytics.service';
       z-index: 10000;
       background: rgba(255, 255, 255, 0.98);
       backdrop-filter: blur(10px);
-      border-top: 1px solid #e5e7eb;
+      border-top: 3px solid #ff0000; /* Temporary red border for debugging */
       box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.1);
       padding: 20px;
       animation: slideUp 0.3s ease-out;
@@ -207,6 +207,7 @@ export class AnalyticsConsentComponent implements OnInit {
   private unifiedAnalytics = inject(UnifiedAnalyticsService);
 
   ngOnInit() {
+    console.log('AnalyticsConsentComponent initialized');
     if (isPlatformBrowser(this.platformId)) {
       this.checkAnalyticsConsent();
     }
@@ -214,11 +215,14 @@ export class AnalyticsConsentComponent implements OnInit {
 
   private checkAnalyticsConsent() {
     const consent = localStorage.getItem('analytics_consent');
+    console.log('Analytics consent check:', consent);
     if (consent === null) {
       // No decision made yet, show banner
+      console.log('No consent found, showing banner');
       this.showBanner = true;
     } else {
       // Decision already made, load analytics if accepted
+      console.log('Consent found:', consent);
       if (consent === 'accepted') {
         this.loadAnalytics();
       }
@@ -240,6 +244,11 @@ export class AnalyticsConsentComponent implements OnInit {
       localStorage.setItem('analytics_consent', 'declined');
       this.showBanner = false;
     }
+  }
+
+  private loadAnalytics() {
+    // The UnifiedAnalyticsService will automatically initialize when consent is accepted
+    // It handles both the backend API calls and Prometheus metrics
   }
 
   private initializePrometheus() {
