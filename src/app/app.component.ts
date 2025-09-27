@@ -6,11 +6,12 @@ import { MatCardModule } from '@angular/material/card';
 import { MatIconModule } from '@angular/material/icon';
 import { MatDialogModule } from '@angular/material/dialog';
 import { FeedbackButtonComponent } from './components/feedback.component';
+import { AnalyticsConsentComponent } from './components/analytics-consent.component';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, RouterLink, MatToolbarModule, MatButtonModule, MatCardModule, MatIconModule, MatDialogModule, FeedbackButtonComponent],
+  imports: [RouterOutlet, RouterLink, MatToolbarModule, MatButtonModule, MatCardModule, MatIconModule, MatDialogModule, FeedbackButtonComponent, AnalyticsConsentComponent],
   template: `
     <div class="app-container">
       <main class="main-content page-transition">
@@ -24,6 +25,7 @@ import { FeedbackButtonComponent } from './components/feedback.component';
       </footer>
       
       <app-feedback-button></app-feedback-button>
+      <app-analytics-consent></app-analytics-consent>
     </div>
   `,
   styles: [`
