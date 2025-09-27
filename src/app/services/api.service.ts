@@ -598,11 +598,23 @@ export class ApiService implements OnDestroy {
     
     // Populate name from localStorage if not provided
     let finalName = feedback.name;
+    console.log('🔍 Original feedback.name:', finalName);
+    console.log('🔍 finalClientId:', finalClientId);
+    
     if (!finalName && isPlatformBrowser(this.platformId)) {
       const storedName = localStorage.getItem(`anonymous_name_${finalClientId}`);
+      console.log('🔍 Stored name from localStorage:', storedName);
+      console.log('🔍 Looking for key:', `anonymous_name_${finalClientId}`);
+      
       if (storedName) {
         finalName = storedName;
         console.log('🔍 Using stored name from comments:', finalName);
+      } else {
+        console.log('🔍 No stored name found, generating new one');
+        // Generate and store a new anonymous name
+        const newName = this.generateAnonymousName();
+        finalName = newName;
+        console.log('🔍 Generated new name:', finalName);
       }
     }
     
@@ -667,11 +679,26 @@ export class ApiService implements OnDestroy {
             
             // Retry with new UUID and populate name if not provided
             let retryName = feedback.name;
+            console.log('🔍 Retry - Original feedback.name:', retryName);
+            console.log('🔍 Retry - newClientId:', newClientId);
+            
             if (!retryName && isPlatformBrowser(this.platformId)) {
               const storedName = localStorage.getItem(`anonymous_name_${newClientId}`);
+              console.log('🔍 Retry - Stored name from localStorage:', storedName);
+              console.log('🔍 Retry - Looking for key:', `anonymous_name_${newClientId}`);
+              
               if (storedName) {
                 retryName = storedName;
                 console.log('🔍 Using stored name for retry:', retryName);
+              } else {
+                console.log('🔍 Retry - No stored name found, generating new one');
+                // Generate and store a new anonymous name for the new client ID
+                const newName = this.createCatchyAnonymousName(newClientId);
+                if (isPlatformBrowser(this.platformId)) {
+                  localStorage.setItem(`anonymous_name_${newClientId}`, newName);
+                }
+                retryName = newName;
+                console.log('🔍 Retry - Generated new name:', retryName);
               }
             }
             
