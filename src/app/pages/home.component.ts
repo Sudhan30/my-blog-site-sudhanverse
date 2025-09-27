@@ -955,9 +955,6 @@ export class HomeComponent implements OnInit {
 
   ngOnInit() {
     // Version identifier to verify deployment
-    console.log('🚀 HomeComponent loaded - Version: 2025-09-25-09:15');
-    console.log('🔧 Slug-to-ID mapping workaround active');
-    console.log('🔧 Fixed like count loading on page load');
   }
 
   private loadPostsWithStats(): Observable<any> {
@@ -992,11 +989,6 @@ export class HomeComponent implements OnInit {
               const postId = this.postIdMapper.getPostId(post);
               const postWithId = this.postIdMapper.ensurePostId(post);
               
-              // Debug logging
-              console.log('🔍 DEBUG: Processing post:', post);
-              console.log('🔍 DEBUG: Post ID from service:', postId);
-              console.log('🔍 DEBUG: Post with ID:', postWithId);
-              console.log('🔍 DEBUG: Like count from API:', likesMap[postId]);
               
               return {
                 ...postWithId,
@@ -1064,10 +1056,6 @@ export class HomeComponent implements OnInit {
     // Use the PostIdMapperService to get the correct ID
     const postId = this.postIdMapper.getPostId(post);
     
-    // Debug logging
-    console.log('🔍 DEBUG: Post object:', post);
-    console.log('🔍 DEBUG: Post ID from service:', postId);
-    console.log('🔍 DEBUG: Service validation:', this.postIdMapper.isValidPostId(postId));
     
     if (!postId || !this.postIdMapper.isValidPostId(postId)) {
       console.error('❌ Invalid Post ID:', postId, 'for post:', post);

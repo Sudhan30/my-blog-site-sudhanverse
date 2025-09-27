@@ -211,7 +211,6 @@ export class FeedbackButtonComponent {
 
     dialogRef.afterClosed().subscribe(result => {
       if (result) {
-        console.log('Feedback dialog closed with result:', result);
       }
     });
   }
@@ -681,13 +680,11 @@ export class FeedbackDialogComponent implements OnInit, OnDestroy {
         email: this.feedbackForm.value.email || undefined
       };
 
-      console.log('🚀 Submitting feedback:', feedbackData);
 
       this.apiService.submitFeedback(feedbackData).pipe(
         takeUntil(this.destroy$)
       ).subscribe({
         next: (response) => {
-          console.log('✅ Feedback submitted successfully:', response);
           this.isSubmitting = false;
           this.feedbackSuccess = response.success;
           
