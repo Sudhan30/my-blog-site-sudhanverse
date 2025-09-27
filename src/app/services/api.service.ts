@@ -595,8 +595,20 @@ export class ApiService implements OnDestroy {
     }
     
     const finalClientId = this.getClientId();
+    
+    // Populate name from localStorage if not provided
+    let finalName = feedback.name;
+    if (!finalName && isPlatformBrowser(this.platformId)) {
+      const storedName = localStorage.getItem(`anonymous_name_${finalClientId}`);
+      if (storedName) {
+        finalName = storedName;
+        console.log('🔍 Using stored name from comments:', finalName);
+      }
+    }
+    
     const requestBody = {
       ...feedback,
+      name: finalName,
       uuid: finalClientId
     };
     
@@ -653,9 +665,19 @@ export class ApiService implements OnDestroy {
               localStorage.setItem('blog_client_id', newClientId);
             }
             
-            // Retry with new UUID
+            // Retry with new UUID and populate name if not provided
+            let retryName = feedback.name;
+            if (!retryName && isPlatformBrowser(this.platformId)) {
+              const storedName = localStorage.getItem(`anonymous_name_${newClientId}`);
+              if (storedName) {
+                retryName = storedName;
+                console.log('🔍 Using stored name for retry:', retryName);
+              }
+            }
+            
             const retryRequestBody = {
               ...feedback,
+              name: retryName,
               uuid: newClientId
             };
             
