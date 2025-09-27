@@ -597,10 +597,10 @@ export class ApiService implements OnDestroy {
     const finalClientId = this.getClientId();
     const requestBody = {
       ...feedback,
-      UUID: finalClientId
+      uuid: finalClientId
     };
     
-    console.log('📝 Request body with UUID:', requestBody);
+    console.log('📝 Request body with uuid:', requestBody);
     
     return this.createSafeObservable(() => 
       this.http.post<FeedbackResponse>(`${this.API_BASE_URL}/feedback`, requestBody).pipe(
@@ -656,7 +656,7 @@ export class ApiService implements OnDestroy {
             // Retry with new UUID
             const retryRequestBody = {
               ...feedback,
-              UUID: newClientId
+              uuid: newClientId
             };
             
             return this.http.post<FeedbackResponse>(`${this.API_BASE_URL}/feedback`, retryRequestBody).pipe(
