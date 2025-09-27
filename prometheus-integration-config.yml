@@ -1,0 +1,136 @@
+# Prometheus configuration for integrating with your existing blog analytics
+# Add these jobs to your existing prometheus.yml
+
+global:
+  scrape_interval: 15s
+  evaluation_interval: 15s
+
+scrape_configs:
+  # Your existing jobs (keep these)...
+  
+  # Blog Frontend Analytics (via Pushgateway)
+  - job_name: 'blog-frontend-analytics'
+    static_configs:
+      - targets: ['localhost:9091']  # Your Pushgateway instance
+    scrape_interval: 15s
+    metrics_path: '/metrics'
+    honor_labels: true  # Important for Pushgateway
+
+  # Blog API Analytics (your existing backend)
+  - job_name: 'blog-api-analytics'
+    static_configs:
+      - targets: ['api.sudharsana.dev']  # Your existing API
+    scrape_interval: 15s
+    metrics_path: '/metrics'
+    scheme: 'https'
+    basic_auth:
+      username: 'prometheus'
+      password: 'your-password'
+
+  # Blog Frontend Metrics (direct from browser)
+  - job_name: 'blog-frontend-direct'
+    static_configs:
+      - targets: ['localhost:9091']  # Pushgateway for frontend metrics
+    scrape_interval: 30s
+    metrics_path: '/metrics'
+    honor_labels: true
+
+# Alerting rules for your blog analytics
+rule_files:
+  - "blog-analytics-alerts.yml"
+
+# Alertmanager configuration (your existing setup)
+alerting:
+  alertmanagers:
+    - static_configs:
+        - targets:
+          - alertmanager:9093
+
+# Example alerting rules for blog analytics
+---
+# blog-analytics-alerts.yml
+groups:
+  - name: blog.analytics.rules
+    rules:
+      # High bounce rate alert
+      - alert: HighBounceRate
+        expr: blog_bounce_rate > 0.8
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High bounce rate detected"
+          description: "Blog bounce rate is {{ $value | humanizePercentage }} which is above the threshold of 80%"
+
+      # Low page views alert
+      - alert: LowPageViews
+        expr: sum(rate(page_views_total[10m])) < 0.01
+        for: 15m
+        labels:
+          severity: info
+        annotations:
+          summary: "Low page view activity"
+          description: "Blog page views are unusually low: {{ $value }} views per second"
+
+      # High error rate alert
+      - alert: HighErrorRate
+        expr: sum(rate(blog_errors_total[5m])) > 0.1
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "High error rate detected"
+          description: "Blog error rate is {{ $value }} errors per second"
+
+      # Slow page load times
+      - alert: SlowPageLoad
+        expr: histogram_quantile(0.95, sum(rate(http_request_duration_seconds_bucket{job="blog-api-analytics"}[5m])) by (le)) > 3
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Slow page load times"
+          description: "95th percentile page load time is {{ $value }} seconds"
+
+      # High comment submission rate (potential spam)
+      - alert: HighCommentRate
+        expr: sum(rate(blog_comments_total[1m])) > 10
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Unusually high comment submission rate"
+          description: "Comment submission rate is {{ $value }} comments per second"
+
+      # Low engagement metrics
+      - alert: LowEngagement
+        expr: sum(rate(blog_likes_total[1h])) < 0.1
+        for: 30m
+        labels:
+          severity: info
+        annotations:
+          summary: "Low user engagement"
+          description: "Like rate is very low: {{ $value }} likes per second"
+
+# Recording rules for complex queries
+  - name: blog.recording.rules
+    rules:
+      # Daily page views
+      - record: blog:daily_page_views
+        expr: sum(increase(page_views_total[1d]))
+
+      # Weekly unique sessions
+      - record: blog:weekly_sessions
+        expr: sum(increase(user_sessions_total[7d]))
+
+      # Average session duration in minutes
+      - record: blog:avg_session_duration_minutes
+        expr: blog_average_session_duration_seconds / 60
+
+      # Engagement rate (likes + comments + feedback)
+      - record: blog:engagement_rate
+        expr: (sum(rate(blog_likes_total[1h])) + sum(rate(blog_comments_total[1h])) + sum(rate(feedback_submissions_total[1h]))) / sum(rate(page_views_total[1h]))
+
+      # Content performance score
+      - record: blog:content_performance_score
+        expr: (sum(rate(blog_likes_total[1h])) * 2 + sum(rate(blog_comments_total[1h])) * 3 + sum(rate(feedback_submissions_total[1h])) * 5) / sum(rate(page_views_total[1h]))

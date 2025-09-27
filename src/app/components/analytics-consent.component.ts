@@ -5,7 +5,7 @@ import { MatIconModule } from '@angular/material/icon';
 import { MatCardModule } from '@angular/material/card';
 import { isPlatformBrowser } from '@angular/common';
 import { PLATFORM_ID, inject } from '@angular/core';
-import { PrometheusMetricsService } from '../services/prometheus-metrics.service';
+import { UnifiedAnalyticsService } from '../services/unified-analytics.service';
 
 @Component({
   selector: 'app-analytics-consent',
@@ -204,7 +204,7 @@ import { PrometheusMetricsService } from '../services/prometheus-metrics.service
 export class AnalyticsConsentComponent implements OnInit {
   showBanner = false;
   private platformId = inject(PLATFORM_ID);
-  private prometheusMetrics = inject(PrometheusMetricsService);
+  private unifiedAnalytics = inject(UnifiedAnalyticsService);
 
   ngOnInit() {
     if (isPlatformBrowser(this.platformId)) {
@@ -229,8 +229,10 @@ export class AnalyticsConsentComponent implements OnInit {
     if (isPlatformBrowser(this.platformId)) {
       localStorage.setItem('analytics_consent', 'accepted');
       this.showBanner = false;
-      this.prometheusMetrics.trackAnalyticsConsent(true);
-      this.initializePrometheus();
+      
+      // The UnifiedAnalyticsService will automatically initialize when consent is accepted
+      // It handles both the backend API calls and Prometheus metrics
+      console.log('📊 Analytics consent accepted - comprehensive tracking enabled');
     }
   }
 
@@ -238,21 +240,13 @@ export class AnalyticsConsentComponent implements OnInit {
     if (isPlatformBrowser(this.platformId)) {
       localStorage.setItem('analytics_consent', 'declined');
       this.showBanner = false;
-      this.prometheusMetrics.trackAnalyticsConsent(false);
+      console.log('📊 Analytics consent declined - no tracking enabled');
     }
   }
 
   private initializePrometheus() {
-    // Initialize Prometheus metrics with your configuration
-    this.prometheusMetrics.initialize({
-      endpoint: 'https://your-prometheus-pushgateway.com', // Replace with your Pushgateway URL
-      job: 'blog-frontend',
-      instance: window.location.hostname
-    });
-    
-    // Track initial page load
-    this.prometheusMetrics.trackPageLoad();
-    
-    console.log('📊 Prometheus metrics initialized');
+    // This method is now handled by UnifiedAnalyticsService
+    // It automatically initializes both backend API tracking and Prometheus metrics
+    console.log('📊 Analytics system initialized via UnifiedAnalyticsService');
   }
 }
