@@ -217,6 +217,10 @@ export class UnifiedAnalyticsService {
       console.log('🔧 Events being sent:', events);
       
       // Transform events to match your API format
+      console.log('🔧 Current userId:', this.userId);
+      console.log('🔧 Current sessionId:', this.sessionId);
+      console.log('🔧 Events to send:', events);
+      
       const apiEvents = events.map(event => ({
         uuid: this.userId,
         session_id: this.sessionId,
@@ -238,7 +242,10 @@ export class UnifiedAnalyticsService {
         metadata: JSON.stringify(event.data.metadata || {})
       }));
       
-      const response = await this.http.post(`${this.apiBaseUrl}/track`, { events: apiEvents }).toPromise();
+      console.log('🔧 Sending analytics events to API:', apiEvents);
+      console.log('🔧 API URL:', `${this.apiBaseUrl}/track`);
+      
+      const response = await this.http.post(`${this.apiBaseUrl}/track`, apiEvents).toPromise();
       console.log('✅ Analytics events sent successfully:', response);
       
       // Send metrics to Prometheus via backend API
