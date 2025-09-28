@@ -62,8 +62,16 @@ function writeIndex(posts) {
 function writePosts(posts) {
   ensureDir(OUT_POSTS);
   for (const p of posts) {
+    // Check if custom HTML already exists
+    const customHtmlPath = path.join(OUT_POSTS, `${p.slug}.html`);
+    if (fs.existsSync(customHtmlPath)) {
+      console.log(`Skipping ${p.slug}.html - custom HTML already exists`);
+      continue;
+    }
+    
+    // Only generate basic HTML if no custom version exists
     const htmlDoc = `<!doctype html><html><head><meta charset="utf-8"><title>${p.title}</title></head><body>${p.html}</body></html>`;
-    fs.writeFileSync(path.join(OUT_POSTS, `${p.slug}.html`), htmlDoc, 'utf8');
+    fs.writeFileSync(customHtmlPath, htmlDoc, 'utf8');
   }
 }
 
