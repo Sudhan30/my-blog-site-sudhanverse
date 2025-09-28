@@ -6,73 +6,64 @@
   <title>From Idea to Live: How I Built My Site(s) and What I Learned</title>
   <meta name="description" content="A no‑fluff story about building my portfolio in the cloud and a self‑hosted blog in my homelab—what worked, what didn't, costs, and what I'd do next." />
   <style>
-  :root{
-    --bg: #f5f7fb;
-    --ink: #2d3642;
-    --muted: #5b6777;
-    --link: #1f6feb;
-    --accent: #0f172a;
-    --chip: #e9edf5;
-    --card-bg: #ffffff;
-    --card-br: #e6eaf2;
-    --shadow: 0 6px 18px rgba(17, 24, 39, .06);
-    --radius: 14px;
-  }
-  *{box-sizing:border-box}
-  body{
-    margin:0; background:var(--bg); color:var(--ink);
-    font: 17px/1.7 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
-  }
-  a{color:var(--link); text-decoration:none}
-  a:hover{text-decoration:underline}
+    :root{
+      --bg: #0b0f14; /* deep slate */
+      --card: #111825;
+      --ink: #e7eef7;
+      --muted: #a9b5c4;
+      --brand: #4cc9f0;
+      --brand-2: #b5179e;
+      --ok: #22c55e;
+      --warn: #f59e0b;
+      --bad: #ef4444;
+      --ring: rgba(76,201,240,.35);
+      --shadow: 0 10px 30px rgba(0,0,0,.35);
+      --radius: 18px;
+    }
+    *{box-sizing:border-box}
+    html,body{height:100%}
+    body{
+      margin:0; background:radial-gradient(1200px 800px at 110% -10%, rgba(181,23,158,.12), transparent 60%),
+      radial-gradient(900px 600px at -10% -10%, rgba(76,201,240,.15), transparent 60%), var(--bg);
+      color:var(--ink); font: 16px/1.6 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, Noto Sans, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      letter-spacing:.1px;
+    }
+    a{color:var(--brand)}
+    .container{max-width:1100px; margin:0 auto; padding:32px 20px 60px}
+    header.hero{position:relative; border-radius:calc(var(--radius) * 1.2); overflow:hidden; padding:48px; background: linear-gradient(135deg, rgba(76,201,240,.18), rgba(181,23,158,.18)); backdrop-filter: blur(6px); box-shadow: var(--shadow);}
+    .hero h1{font-size: clamp(1.9rem, 3.2vw, 3rem); margin:0 0 10px; letter-spacing:.3px}
+    .hero p{margin:10px 0 22px; color:var(--muted)}
+    .badges{display:flex; flex-wrap:wrap; gap:10px}
+    .badge{display:inline-flex; align-items:center; gap:8px; padding:8px 12px; border-radius:999px; background:rgba(255,255,255,.06); border:1px solid rgba(255,255,255,.08)}
+    .badge svg{width:16px; height:16px}
 
-  /* Navbar */
-  nav{background:linear-gradient(135deg, #fafbfc 0%, #f4f6f8 100%); border:none; box-shadow:0 2px 8px rgba(17, 24, 39, .02); padding:14px 20px; position:sticky; top:0; z-index:1000}
-  nav .nav-container{max-width:1000px; margin:0 auto; display:flex; align-items:center; justify-content:space-between}
-  nav .brand{font-weight:400; font-size:1.2rem; color:var(--accent)}
-  nav ul{list-style:none; margin:0; padding:0; display:flex; gap:20px}
-  nav li{margin:0}
-  nav a{font-size:.95rem; color:var(--ink); font-weight:200}
+    .grid{display:grid; grid-template-columns: repeat(12, 1fr); gap:18px; margin-top:26px}
+    .card{grid-column: span 12; background:var(--card); border:1px solid rgba(255,255,255,.08); border-radius:var(--radius); padding:24px; box-shadow:var(--shadow)}
+    @media(min-width: 900px){ .card.split{grid-column: span 7} .card.side{grid-column: span 5} }
 
-  /* Layout */
-  .container{max-width: 1000px; margin:0 auto; padding:48px 20px 80px}
+    h2{font-size: clamp(1.3rem, 2.2vw, 1.8rem); margin:0 0 14px}
+    h3{font-size:1.1rem; margin:18px 0 10px; color:var(--muted)}
+    .lead{font-size:1.05rem; color:var(--muted)}
 
-  /* Hero */
-  header.hero{padding:28px; border:1px solid var(--card-br); background:var(--card-bg); border-radius:var(--radius); box-shadow:var(--shadow)}
-  .hero h1{font-size: clamp(2.2rem, 5vw, 3.2rem); margin:0 0 14px; color:var(--accent)}
-  .hero p{margin:0 0 16px; color:var(--muted)}
+    .list{display:grid; gap:10px}
+    .list li{background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.06); padding:12px 14px; border-radius:12px}
 
-  /* Badges */
-  .badges{display:flex; flex-wrap:wrap; gap:10px; margin-top:8px}
-  .badge{background:var(--chip); color:var(--ink); border:1px solid #dde3ee; padding:6px 10px; border-radius:999px; font-size:.9rem}
+    .kpis{display:grid; grid-template-columns: repeat(2, 1fr); gap:12px}
+    .kpi{background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.06); border-radius:14px; padding:16px}
+    .kpi b{font-size:1.4rem}
 
-  /* Grid */
-  .grid{display:grid; grid-template-columns: repeat(12, 1fr); gap:18px; margin-top:28px}
-  .card{grid-column: span 12; background:var(--card-bg); border:1px solid var(--card-br); padding:24px; border-radius:var(--radius); box-shadow:var(--shadow)}
-  @media (min-width: 900px){.card.split{grid-column: span 7} .card.side{grid-column: span 5}}
+    .timeline{position:relative; padding-left:20px}
+    .timeline::before{content:""; position:absolute; left:6px; top:0; bottom:0; width:2px; background:linear-gradient(var(--brand), transparent)}
+    .titem{position:relative; margin:18px 0 0; padding:8px 12px 8px 24px; background:rgba(255,255,255,.04); border:1px solid rgba(255,255,255,.06); border-radius:12px}
+    .titem::before{content:""; position:absolute; left:-7px; top:14px; width:14px; height:14px; border-radius:50%; background:var(--brand); box-shadow:0 0 0 4px var(--ring)}
 
-  h2{font-size: clamp(1.5rem, 3vw, 2rem); margin:0 0 10px; color:var(--accent)}
-  h3{font-size:1.1rem; margin:18px 0 8px; color:var(--muted)}
-  .lead{font-size:1.05rem; color:var(--muted)}
+    blockquote{margin:0; padding:14px 16px; border-left:3px solid var(--brand); background:rgba(255,255,255,.04); color:var(--muted); border-radius:12px}
 
-  .list{display:grid; gap:10px; padding-left:0; list-style:disc; margin-left:20px}
-  .kpis{display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-top:8px}
-  .kpi{background:#f8fafc; border:1px solid var(--card-br); padding:12px 14px; border-radius:10px}
-  .pill{display:inline-block; padding:.15rem .5rem; border:1px solid #dbe1ee; border-radius:999px; font-size:.8rem; color:var(--muted); background:#f6f8fc}
+    .cta{display:flex; flex-wrap:wrap; gap:12px; margin-top:10px}
+    .btn{display:inline-flex; align-items:center; gap:8px; padding:12px 16px; border-radius:12px; border:1px solid rgba(255,255,255,.12); text-decoration:none; background:linear-gradient(135deg, rgba(76,201,240,.15), rgba(181,23,158,.15)); box-shadow: var(--shadow)}
 
-  .timeline{position:relative; padding-left:18px}
-  .timeline::before{content:""; position:absolute; left:6px; top:2px; bottom:2px; width:2px; background:#dbe1ee}
-  .titem{position:relative; margin:14px 0 0; padding:8px 10px 8px 12px; background:#f8fafc; border:1px solid var(--card-br); border-radius:10px}
-
-  blockquote{margin:12px 0; padding:12px 14px; border-left:4px solid #9fb5ff; background:#f6f8fc; color:var(--ink); border-radius:10px}
-
-  .cta{display:flex; flex-wrap:wrap; gap:10px; margin-top:10px}
-  .btn{display:inline-flex; align-items:center; gap:8px; padding:10px 14px; border-radius:10px; border:1px solid var(--card-br); background:#ffffff; box-shadow:var(--shadow)}
-
-  input[type=email]{width:100%; max-width:420px}
-  .note{font-size:.92rem; color:var(--muted)}
-
-  footer{margin-top:28px; padding:20px 0; color:var(--muted); font-size:.92rem; border-top:none}
+    .note{font-size:.92rem; color:var(--muted)}
+    footer{margin-top:28px; padding:20px 0; color:var(--muted); font-size:.92rem; border-top:none}
   </style>
 </head>
 <body>
@@ -179,7 +170,7 @@
         <h2>Get the next post</h2>
         <p class="lead">I write about practical building: cloud speed, homelab reality, AI workflows, and checklists you can reuse.</p>
         <form class="list" onsubmit="alert('Thank you!'); return false;">
-          <input aria-label="Email" required placeholder="you@example.com" type="email" style="padding:12px 14px;border-radius:12px;border:1px solid rgba(0,0,0,.2);background:#ffffff;color:var(--ink)">
+          <input aria-label="Email" required placeholder="you@example.com" type="email" style="padding:12px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:var(--ink)">
           <button class="btn" type="submit">Subscribe</button>
           <span class="note">No spam. Unsubscribe any time.</span>
         </form>
