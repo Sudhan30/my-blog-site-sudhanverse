@@ -16,6 +16,8 @@ export class PrometheusMetricsService {
   private metricsBuffer: Map<string, number> = new Map();
   private sessionId: string = '';
   private userId: string = '';
+  private batchTimer: any;
+  private readonly BATCH_INTERVAL = 60000; // 1 minute
 
   constructor() {
     if (isPlatformBrowser(this.platformId)) {
@@ -26,6 +28,49 @@ export class PrometheusMetricsService {
   initialize(config: PrometheusConfig) {
     this.config = config;
     this.userId = this.getOrCreateUserId();
+    this.startBatchProcessing();
+    this.setupPageUnloadHandler();
+  }
+
+  private setupPageUnloadHandler() {
+    if (!isPlatformBrowser(this.platformId)) return;
+    
+    // Flush metrics on page unload
+    window.addEventListener('beforeunload', () => {
+      this.flushMetrics();
+    });
+  }
+
+  private startBatchProcessing() {
+    // Send batched metrics every minute
+    this.batchTimer = setInterval(() => {
+      this.flushMetrics();
+    }, this.BATCH_INTERVAL);
+  }
+
+  private async flushMetrics() {
+    if (this.metricsBuffer.size === 0) return;
+
+    const metrics = Array.from(this.metricsBuffer.entries()).map(([name, value]) => ({
+      name,
+      type: 'counter',
+      value,
+      labels: {
+        job: this.config?.job || 'blog-frontend',
+        instance: this.config?.instance || window.location.hostname,
+        session_id: this.sessionId,
+        user_id: this.userId
+      }
+    }));
+
+    try {
+      console.log('🔧 Sending batched Prometheus metrics:', metrics.length);
+      await this.sendToPrometheus(metrics);
+      this.metricsBuffer.clear();
+      console.log('✅ Prometheus metrics sent successfully');
+    } catch (error) {
+      console.error('❌ Failed to send Prometheus metrics:', error);
+    }
   }
 
   private initializeSession() {
@@ -154,16 +199,16 @@ export class PrometheusMetricsService {
     const current = this.metricsBuffer.get(key) || 0;
     this.metricsBuffer.set(key, current + 1);
     
-    // Send immediately for counters
-    this.sendMetric(name, 'counter', current + 1, labels);
+    // Don't send immediately - let batch processing handle it
+    console.log('🔧 Buffered metric:', name, 'value:', current + 1);
   }
 
   private setGauge(name: string, value: number, labels: Record<string, string> = {}) {
     const key = this.createMetricKey(name, labels);
     this.metricsBuffer.set(key, value);
     
-    // Send immediately for gauges
-    this.sendMetric(name, 'gauge', value, labels);
+    // Don't send immediately - let batch processing handle it
+    console.log('🔧 Buffered gauge:', name, 'value:', value);
   }
 
   private createMetricKey(name: string, labels: Record<string, string>): string {
