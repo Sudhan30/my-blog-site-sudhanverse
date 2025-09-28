@@ -1,8 +1,8 @@
 ---
-title: Two Sites, Two Paths: Cloud Portfolio + Self‑Hosted Blog
+title: "Two Sites, Two Paths: Cloud Portfolio + Self-Hosted Blog"
 date: 2024-01-15
 tags: [web-development, cloud, homelab, architecture]
-excerpt: Why I built two versions of my blog—one in the cloud, one self-hosted. The lessons, the costs, and what I'd do differently.
+excerpt: "Why I built two versions of my blog—one in the cloud, one self-hosted. The lessons, the costs, and what I'd do differently."
 slug: my-first-site
 ---
 
