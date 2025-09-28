@@ -56,6 +56,16 @@
   .timeline::before{content:""; position:absolute; left:6px; top:2px; bottom:2px; width:2px; background:#dbe1ee}
   .titem{position:relative; margin:14px 0 0; padding:8px 10px 8px 12px; background:#f8fafc; border:1px solid var(--card-br); border-radius:10px}
 
+  /* Journey Roadmap */
+  .journey-roadmap{position:relative; margin:24px 0}
+  .roadmap-step{display:flex; align-items:flex-start; margin-bottom:24px; position:relative}
+  .roadmap-step:not(:last-child)::after{content:''; position:absolute; left:20px; top:40px; bottom:-24px; width:2px; background:linear-gradient(to bottom, var(--accent), transparent)}
+  .step-number{flex-shrink:0; width:40px; height:40px; background:var(--accent); color:white; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:600; font-size:1.1rem; margin-right:16px}
+  .step-content{flex:1; padding-top:4px}
+  .step-title{font-size:1.2rem; font-weight:600; color:var(--accent); margin-bottom:6px}
+  .step-quote{font-style:italic; color:var(--muted); font-size:1rem; margin-bottom:4px; background:#f8fafc; padding:8px 12px; border-radius:8px; border-left:3px solid var(--accent)}
+  .step-desc{font-size:0.9rem; color:var(--muted); line-height:1.4}
+
   /* Challenges Grid */
   .challenges-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:16px; margin:20px 0}
   .challenge-card{background:var(--card-bg); border:1px solid var(--card-br); border-radius:var(--radius); padding:20px; text-align:center; transition:transform 0.2s ease, box-shadow 0.2s ease}
@@ -148,26 +158,38 @@
 
       <article class="card">
         <h2>The Journey</h2>
-        <div class="challenges-grid">
-          <div class="challenge-card">
-            <div class="challenge-icon">💡</div>
-            <h4>Week 1: The Spark</h4>
-            <p>"I should build something real" - The initial spark and overwhelming choice paralysis</p>
+        <div class="journey-roadmap">
+          <div class="roadmap-step">
+            <div class="step-number">1</div>
+            <div class="step-content">
+              <div class="step-title">💡 The Spark</div>
+              <div class="step-quote">"I should build something real"</div>
+              <div class="step-desc">The initial spark and overwhelming choice paralysis</div>
+            </div>
           </div>
-          <div class="challenge-card">
-            <div class="challenge-icon">☁️</div>
-            <h4>Week 2: Cloud First</h4>
-            <p>"Let's just start with the cloud" - GCP setup, domain purchase, first deployment</p>
+          <div class="roadmap-step">
+            <div class="step-number">2</div>
+            <div class="step-content">
+              <div class="step-title">☁️ Cloud First</div>
+              <div class="step-quote">"Let's just start with the cloud"</div>
+              <div class="step-desc">GCP setup, domain purchase, first deployment</div>
+            </div>
           </div>
-          <div class="challenge-card">
-            <div class="challenge-icon">🤔</div>
-            <h4>Week 3: The Realization</h4>
-            <p>"Wait, what about my homelab?" - The realization that two paths could teach different lessons</p>
+          <div class="roadmap-step">
+            <div class="step-number">3</div>
+            <div class="step-content">
+              <div class="step-title">🤔 The Realization</div>
+              <div class="step-quote">"Wait, what about my homelab?"</div>
+              <div class="step-desc">The realization that two paths could teach different lessons</div>
+            </div>
           </div>
-          <div class="challenge-card">
-            <div class="challenge-icon">🎉</div>
-            <h4>Week 4: Success</h4>
-            <p>"This is actually working" - First real visitors, feedback, and the confidence boost</p>
+          <div class="roadmap-step">
+            <div class="step-number">4</div>
+            <div class="step-content">
+              <div class="step-title">🎉 Success</div>
+              <div class="step-quote">"This is actually working"</div>
+              <div class="step-desc">First real visitors, feedback, and the confidence boost</div>
+            </div>
           </div>
         </div>
       </article>
