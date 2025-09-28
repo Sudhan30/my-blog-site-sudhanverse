@@ -245,8 +245,18 @@ export class UnifiedAnalyticsService {
       console.log('🔧 Sending analytics events to API:', apiEvents);
       console.log('🔧 API URL:', `${this.apiBaseUrl}/track`);
       
-      const response = await this.http.post(`${this.apiBaseUrl}/track`, apiEvents).toPromise();
-      console.log('✅ Analytics events sent successfully:', response);
+      // Send events one by one instead of as an array
+      for (const event of apiEvents) {
+        try {
+          console.log('🔧 Sending individual event:', event);
+          const response = await this.http.post(`${this.apiBaseUrl}/track`, event).toPromise();
+          console.log('✅ Event sent successfully:', response);
+        } catch (error) {
+          console.error('❌ Failed to send individual event:', error);
+          console.error('❌ Event data:', event);
+        }
+      }
+      console.log('✅ All analytics events processed');
       
       // Send metrics to Prometheus via backend API
       events.forEach(event => {
