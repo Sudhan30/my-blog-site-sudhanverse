@@ -277,13 +277,16 @@ export class UnifiedAnalyticsService {
       }
     });
 
-    // Track scroll depth
-    let maxScrollDepth = 0;
+    // Track scroll depth - only fire when user reaches 100% scroll
+    let hasReached100Percent = false;
     window.addEventListener('scroll', () => {
       const scrollDepth = Math.round((window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100);
-      if (scrollDepth > maxScrollDepth) {
-        maxScrollDepth = scrollDepth;
-        this.trackScrollDepth(scrollDepth);
+      
+      // Only fire scroll beacon when user reaches 100% scroll depth
+      if (scrollDepth >= 100 && !hasReached100Percent) {
+        hasReached100Percent = true;
+        this.trackScrollDepth(100);
+        console.log('🔧 User reached 100% scroll depth - firing scroll beacon');
       }
     });
 
