@@ -244,6 +244,15 @@ export class ApiService implements OnDestroy {
         }
       }),
       catchError(error => {
+        // Handle rate limiting (429) gracefully with fallback
+        if (error.status === 429) {
+          console.log('Rate limited for likes, using fallback');
+          return of({
+            postId: postId,
+            likes: 0,
+            cached: false
+          });
+        }
         // Handle CORS errors and network failures gracefully
         if (error.status === 0 || (error.name === 'HttpErrorResponse' && error.status === 0)) {
           return of({
@@ -368,6 +377,20 @@ export class ApiService implements OnDestroy {
         }
       }),
       catchError(error => {
+        // Handle rate limiting (429) gracefully with fallback
+        if (error.status === 429) {
+          console.log('Rate limited for comments, using fallback');
+          return of({
+            postId: postId,
+            comments: [],
+            pagination: {
+              page: page,
+              limit: limit,
+              total: 0,
+              pages: 0
+            }
+          });
+        }
         // Handle CORS errors and network failures gracefully
         if (error.status === 0 || (error.name === 'HttpErrorResponse' && error.status === 0)) {
           return of({
