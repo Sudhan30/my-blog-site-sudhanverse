@@ -164,6 +164,11 @@ export class UnifiedAnalyticsService {
       console.log('🔧 Ending session:', sessionData);
       await this.http.post(`${this.apiBaseUrl}/session/end`, sessionData).toPromise();
       console.log('✅ Session ended successfully');
+      
+      // Clear localStorage to allow new session creation
+      if (isPlatformBrowser(this.platformId)) {
+        localStorage.removeItem('analytics_session_data');
+      }
     } catch (error) {
       console.error('❌ Failed to end session:', error);
     }
@@ -210,6 +215,19 @@ export class UnifiedAnalyticsService {
   }
 
   private async startSession() {
+    // Check if this session already exists in localStorage
+    const existingSession = localStorage.getItem('analytics_session_data');
+    const currentSessionId = this.sessionId;
+    
+    if (existingSession) {
+      const parsedSession = JSON.parse(existingSession);
+      if (parsedSession.session_id === currentSessionId) {
+        console.log('🔧 Session already exists, skipping creation:', currentSessionId);
+        this.sessionSubject.next(parsedSession);
+        return;
+      }
+    }
+    
     const sessionData = {
       session_id: this.sessionId,
       uuid: this.userId, // Changed from user_id to uuid to match API
@@ -220,13 +238,18 @@ export class UnifiedAnalyticsService {
     };
 
     try {
-      console.log('🔧 Sending session data to:', `${this.apiBaseUrl}/session`);
+      console.log('🔧 Creating new session:', `${this.apiBaseUrl}/session`);
       console.log('🔧 Session data:', sessionData);
       
       const response = await this.http.post(`${this.apiBaseUrl}/session`, sessionData).toPromise();
       console.log('✅ Session created successfully:', response);
       
       this.sessionSubject.next(sessionData);
+      
+      // Store session data locally to prevent duplicate creation
+      if (isPlatformBrowser(this.platformId)) {
+        localStorage.setItem('analytics_session_data', JSON.stringify(sessionData));
+      }
     } catch (error) {
       console.error('❌ Failed to start analytics session:', error);
       console.error('❌ Error details:', error);
