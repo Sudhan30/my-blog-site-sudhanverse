@@ -89,6 +89,15 @@ export class UnifiedAnalyticsService {
     });
     this.prometheusMetrics.trackAnalyticsConsent(true);
     
+    // Test Pushgateway connection
+    this.prometheusMetrics.testPushgatewayConnection().then(success => {
+      if (success) {
+        console.log('✅ Prometheus Pushgateway connection successful');
+      } else {
+        console.log('❌ Prometheus Pushgateway connection failed - metrics will be stored locally');
+      }
+    });
+    
     console.log('🔧 UnifiedAnalyticsService: Analytics tracking initialized successfully');
   }
 

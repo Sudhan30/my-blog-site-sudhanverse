@@ -207,7 +207,12 @@ export class PrometheusMetricsService {
 
     const payload = this.formatPrometheusMetric(metricData);
     
-    const response = await fetch(`${this.config.endpoint}/metrics/job/${this.config.job}`, {
+    // Prometheus Pushgateway uses /metrics/job/{job_name} endpoint
+    const pushgatewayUrl = `${this.config.endpoint}/metrics/job/${this.config.job}`;
+    console.log('🔧 Sending to Prometheus Pushgateway:', pushgatewayUrl);
+    console.log('🔧 Payload:', payload);
+    
+    const response = await fetch(pushgatewayUrl, {
       method: 'POST',
       headers: {
         'Content-Type': 'text/plain',
@@ -216,8 +221,13 @@ export class PrometheusMetricsService {
     });
 
     if (!response.ok) {
-      throw new Error(`Prometheus push failed: ${response.status}`);
+      const errorText = await response.text();
+      console.error('❌ Prometheus push failed:', response.status, response.statusText);
+      console.error('❌ Error response:', errorText);
+      throw new Error(`Prometheus push failed: ${response.status} - ${errorText}`);
     }
+    
+    console.log('✅ Prometheus metric sent successfully');
   }
 
   private formatPrometheusMetric(data: any): string {
@@ -277,5 +287,40 @@ export class PrometheusMetricsService {
       userId: this.userId,
       bufferedMetrics: Object.fromEntries(this.metricsBuffer)
     };
+  }
+
+  // Test Pushgateway connection
+  async testPushgatewayConnection() {
+    if (!this.config) {
+      console.error('❌ Prometheus config not initialized');
+      return false;
+    }
+
+    try {
+      const testUrl = `${this.config.endpoint}/metrics/job/${this.config.job}`;
+      console.log('🔧 Testing Pushgateway connection to:', testUrl);
+      
+      // Test with a simple metric
+      const testMetric = 'blog_test_connection 1';
+      
+      const response = await fetch(testUrl, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'text/plain',
+        },
+        body: testMetric
+      });
+
+      if (response.ok) {
+        console.log('✅ Pushgateway connection successful');
+        return true;
+      } else {
+        console.error('❌ Pushgateway connection failed:', response.status, response.statusText);
+        return false;
+      }
+    } catch (error) {
+      console.error('❌ Pushgateway connection error:', error);
+      return false;
+    }
   }
 }
