@@ -109,6 +109,19 @@
   .treasure-title{font-size:1.3rem; font-weight:700; color:#0c4a6e; margin-bottom:8px; text-shadow:0 1px 2px rgba(0,0,0,0.1)}
   .treasure-lesson{font-size:1rem; color:#075985; line-height:1.5; font-weight:500}
 
+  /* Retrospective Insights */
+  .retrospective-insights{display:flex; flex-direction:column; gap:24px; margin:20px 0}
+  .insight-section{background:linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border:1px solid #e2e8f0; border-radius:12px; padding:20px; transition:all 0.3s ease}
+  .insight-section:hover{transform:translateY(-2px); box-shadow:0 8px 25px rgba(0,0,0,0.08); border-color:#cbd5e1}
+  .section-header{display:flex; align-items:center; margin-bottom:16px; padding-bottom:12px; border-bottom:2px solid #e2e8f0}
+  .section-icon{font-size:1.8rem; margin-right:12px; filter:drop-shadow(0 1px 2px rgba(0,0,0,0.1))}
+  .section-title{font-size:1.4rem; font-weight:700; color:#1e293b; text-transform:uppercase; letter-spacing:0.5px}
+  .insight-items{display:flex; flex-direction:column; gap:12px}
+  .insight-item{display:flex; align-items:flex-start; padding:12px 16px; background:white; border-radius:8px; border-left:4px solid #6366f1; transition:all 0.2s ease}
+  .insight-item:hover{transform:translateX(4px); box-shadow:0 4px 12px rgba(99, 102, 241, 0.1); border-left-color:#4f46e5}
+  .insight-bullet{font-size:1.2rem; color:#6366f1; font-weight:bold; margin-right:12px; margin-top:2px; flex-shrink:0}
+  .insight-text{font-size:1rem; color:#374151; line-height:1.5; flex:1}
+
   /* Advice Wisdom */
   .advice-wisdom{display:flex; flex-direction:column; gap:12px; margin:20px 0}
   .wisdom-item{display:flex; align-items:center; padding:16px 20px; background:linear-gradient(135deg, #fff8f0 0%, #fef7ed 100%); border:1px solid #fed7aa; border-radius:12px; transition:all 0.3s ease; position:relative}
@@ -447,17 +460,48 @@
 
       <article class="card">
         <h2>What I'd Do Differently</h2>
-        <ul class="list">
-          <li>Define an error‑budget early; alerts only when user experience is at risk.</li>
-          <li>Lock in access‑log schemas for faster analytics iteration.</li>
-          <li>Write a tiny "new‑service" generator to scaffold DNS, certs, and ingress in one go.</li>
-</ul>
-        <h3>What's Next</h3>
-        <ul class="list">
-          <li>Publish the <span class="pill">architecture deep‑dive</span> as a separate post.</li>
-          <li>Harden CI for blue/green previews and smoke tests.</li>
-          <li>Ship a weekly newsletter and lightweight release notes.</li>
-</ul>
+        <div class="retrospective-insights">
+          <div class="insight-section">
+            <div class="section-header">
+              <div class="section-icon">🔄</div>
+              <div class="section-title">Retrospective</div>
+            </div>
+            <div class="insight-items">
+              <div class="insight-item">
+                <div class="insight-bullet">•</div>
+                <div class="insight-text">Define an error‑budget early; alerts only when user experience is at risk</div>
+              </div>
+              <div class="insight-item">
+                <div class="insight-bullet">•</div>
+                <div class="insight-text">Lock in access‑log schemas for faster analytics iteration</div>
+              </div>
+              <div class="insight-item">
+                <div class="insight-bullet">•</div>
+                <div class="insight-text">Write a tiny "new‑service" generator to scaffold DNS, certs, and ingress in one go</div>
+              </div>
+            </div>
+          </div>
+          <div class="insight-section">
+            <div class="section-header">
+              <div class="section-icon">🚀</div>
+              <div class="section-title">What's Next</div>
+            </div>
+            <div class="insight-items">
+              <div class="insight-item">
+                <div class="insight-bullet">•</div>
+                <div class="insight-text">Publish the <span class="pill">architecture deep‑dive</span> as a separate post</div>
+              </div>
+              <div class="insight-item">
+                <div class="insight-bullet">•</div>
+                <div class="insight-text">Harden CI for blue/green previews and smoke tests</div>
+              </div>
+              <div class="insight-item">
+                <div class="insight-bullet">•</div>
+                <div class="insight-text">Ship a weekly newsletter and lightweight release notes</div>
+              </div>
+            </div>
+          </div>
+        </div>
       </article>
 
       <article class="card">
