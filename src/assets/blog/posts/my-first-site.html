@@ -157,6 +157,58 @@
       </article>
 
       <article class="card">
+        <h2>Costs & Capacity (Homelab)</h2>
+        <p class="lead">I wanted near‑zero hosting cost. The homelab server runs multiple apps, so the effective cost per app goes down as I add more.</p>
+        <div class="kpis">
+          <div class="kpi">
+            <div class="pill">Power</div>
+            <div><b>~$2/mo</b></div>
+            <div class="note">Varies by usage; amortized across apps</div>
+          </div>
+          <div class="kpi">
+            <div class="pill">Capacity</div>
+            <div><b>~20 services</b></div>
+            <div class="note">Comfortably hosts ~20 production‑grade apps</div>
+          </div>
+        </div>
+      </article>
+
+      <article class="card">
+        <h2>Things That Broke (and How I Fixed Them)</h2>
+        <ul class="list">
+          <li><b>Dynamic DNS got flagged by VPNs.</b> Solution: move records and TLS to Cloudflare; reputation + caches improved reachability.</li>
+          <li><b>Bot noise & crawlers.</b> Solution: basic WAF rules, rate limiting, and a stricter robots policy for non‑content paths.</li>
+          <li><b>Complex routing brain‑twisters.</b> Solution: drew the traffic flow (client → CDN → ingress → service) and validated each hop with logs.</li>
+        </ul>
+      </article>
+
+      <article class="card">
+        <h2>Lessons You Can Steal</h2>
+        <ul class="list">
+          <li><b>Pick two constraints</b> (money & learning) and let them drive your stack.</li>
+          <li><b>Own your DNS/SSL/CDN</b> early—it's where reliability and speed are won.</li>
+          <li><b>Automate deploys</b> even for a personal site; it keeps you fearless.</li>
+          <li><b>Measure, don't track.</b> Favor UX metrics over invasive analytics.</li>
+          <li><b>Write the playbook as you go.</b> Your future self will reuse it in minutes.</li>
+        </ul>
+      </article>
+
+      <article class="card">
+        <h2>What I'd Do Differently</h2>
+        <ul class="list">
+          <li>Define an error‑budget early; alerts only when user experience is at risk.</li>
+          <li>Lock in access‑log schemas for faster analytics iteration.</li>
+          <li>Write a tiny "new‑service" generator to scaffold DNS, certs, and ingress in one go.</li>
+        </ul>
+        <h3>What's Next</h3>
+        <ul class="list">
+          <li>Publish the <span class="pill">architecture deep‑dive</span> as a separate post.</li>
+          <li>Harden CI for blue/green previews and smoke tests.</li>
+          <li>Ship a weekly newsletter and lightweight release notes.</li>
+        </ul>
+      </article>
+
+      <article class="card">
         <h2>Future Horizons</h2>
         <ul class="list">
           <li>📰 Weekly blog + newsletter cadence.</li>
