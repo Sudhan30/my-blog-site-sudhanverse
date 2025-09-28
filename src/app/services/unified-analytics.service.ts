@@ -79,8 +79,13 @@ export class UnifiedAnalyticsService {
     if (isPlatformBrowser(this.platformId)) {
       // Check if analytics consent is accepted
       const consent = localStorage.getItem('analytics_consent');
+      console.log('🔧 Analytics consent status:', consent);
+      
       if (consent === 'accepted') {
+        console.log('✅ Analytics consent accepted, initializing...');
         this.initializeAnalytics();
+      } else {
+        console.log('⚠️ Analytics consent not accepted, skipping initialization');
       }
     }
   }
@@ -107,6 +112,7 @@ export class UnifiedAnalyticsService {
   }
 
   private initializeAnalytics() {
+    console.log('🔧 initializeAnalytics called');
     this.userId = this.getOrCreateUserId();
     this.sessionId = this.getOrCreateSessionId();
     this.startSession();
@@ -417,17 +423,24 @@ export class UnifiedAnalyticsService {
 
   // Public tracking methods
   trackPageView(url?: string, title?: string) {
+    const currentUrl = url || window.location.href;
+    const currentTitle = title || document.title;
+    
+    console.log('🔧 trackPageView called for:', currentUrl);
+    console.log('🔧 Page title:', currentTitle);
+    
     const event: AnalyticsEvent = {
       type: 'pageview',
       data: {
-        url: url || window.location.href,
-        title: title || document.title,
+        url: currentUrl,
+        title: currentTitle,
         referrer: document.referrer
       }
     };
     
     this.eventBuffer.push(event);
-    this.prometheusMetrics.trackPageLoad(url);
+    console.log('✅ Pageview event added to buffer');
+    this.prometheusMetrics.trackPageLoad(currentUrl);
   }
 
   trackClick(element: HTMLElement, customData?: Record<string, any>) {
