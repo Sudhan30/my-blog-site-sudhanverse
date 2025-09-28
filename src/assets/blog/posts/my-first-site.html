@@ -56,6 +56,14 @@
   .timeline::before{content:""; position:absolute; left:6px; top:2px; bottom:2px; width:2px; background:#dbe1ee}
   .titem{position:relative; margin:14px 0 0; padding:8px 10px 8px 12px; background:#f8fafc; border:1px solid var(--card-br); border-radius:10px}
 
+  /* Challenges Grid */
+  .challenges-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:16px; margin:20px 0}
+  .challenge-card{background:var(--card-bg); border:1px solid var(--card-br); border-radius:var(--radius); padding:20px; text-align:center; transition:transform 0.2s ease, box-shadow 0.2s ease}
+  .challenge-card:hover{transform:translateY(-2px); box-shadow:0 4px 12px rgba(0,0,0,0.1)}
+  .challenge-icon{font-size:2rem; margin-bottom:12px; display:block}
+  .challenge-card h4{font-size:1.1rem; margin:0 0 8px; color:var(--accent); font-weight:600}
+  .challenge-card p{font-size:0.9rem; color:var(--muted); margin:0; line-height:1.5}
+
   blockquote{margin:12px 0; padding:12px 14px; border-left:4px solid #9fb5ff; background:#f6f8fc; color:var(--ink); border-radius:10px}
 
   .cta{display:flex; flex-wrap:wrap; gap:10px; margin-top:10px}
@@ -158,33 +166,51 @@
 
       <article class="card">
         <h3>Technical Challenges & Solutions</h3>
-        <div class="timeline">
-          <div class="titem">
-            <strong>🔧 Infrastructure as Code:</strong> Learned Kubernetes manifests, Helm charts, and GitOps workflows the hard way.
+        <div class="challenges-grid">
+          <div class="challenge-card">
+            <div class="challenge-icon">🔧</div>
+            <h4>Infrastructure as Code</h4>
+            <p>Learned Kubernetes manifests, Helm charts, and GitOps workflows the hard way.</p>
           </div>
-          <div class="titem">
-            <strong>🌐 DNS Mastery:</strong> From basic A records to CNAME chains, SPF/DKIM setup, and subdomain routing.
+          <div class="challenge-card">
+            <div class="challenge-icon">🌐</div>
+            <h4>DNS Mastery</h4>
+            <p>From basic A records to CNAME chains, SPF/DKIM setup, and subdomain routing.</p>
           </div>
-          <div class="titem">
-            <strong>🔒 Security Hardening:</strong> Rate limiting, WAF rules, bot detection, and SSL certificate automation.
+          <div class="challenge-card">
+            <div class="challenge-icon">🔒</div>
+            <h4>Security Hardening</h4>
+            <p>Rate limiting, WAF rules, bot detection, and SSL certificate automation.</p>
           </div>
-          <div class="titem">
-            <strong>📈 Performance Optimization:</strong> CDN configuration, image optimization, and caching strategies.
+          <div class="challenge-card">
+            <div class="challenge-icon">📈</div>
+            <h4>Performance Optimization</h4>
+            <p>CDN configuration, image optimization, and caching strategies.</p>
           </div>
-          <div class="titem">
-            <strong>🔄 CI/CD Pipeline:</strong> Automated builds, testing, and deployments across multiple environments.
+          <div class="challenge-card">
+            <div class="challenge-icon">🔄</div>
+            <h4>CI/CD Pipeline</h4>
+            <p>Automated builds, testing, and deployments across multiple environments.</p>
           </div>
-          <div class="titem">
-            <strong>Dynamic DNS issues:</strong> Some VPNs blocked DuckDNS; migrating to Cloudflare solved it completely.
+          <div class="challenge-card">
+            <div class="challenge-icon">🌍</div>
+            <h4>Dynamic DNS Issues</h4>
+            <p>Some VPNs blocked DuckDNS; migrating to Cloudflare solved it completely.</p>
           </div>
-          <div class="titem">
-            <strong>SEO optimization:</strong> Added meta tags, structured data, and clean URLs for better discoverability.
+          <div class="challenge-card">
+            <div class="challenge-icon">🔍</div>
+            <h4>SEO Optimization</h4>
+            <p>Added meta tags, structured data, and clean URLs for better discoverability.</p>
           </div>
-          <div class="titem">
-            <strong>Security mindset:</strong> Coming from Walmart, I realized preventing bad actors is as important as building features.
+          <div class="challenge-card">
+            <div class="challenge-icon">🛡️</div>
+            <h4>Security Mindset</h4>
+            <p>Coming from Walmart, I realized preventing bad actors is as important as building features.</p>
           </div>
-          <div class="titem">
-            <strong>Newsletter funnel:</strong> Owning my own newsletter pipeline gives me freedom beyond Medium or Substack.
+          <div class="challenge-card">
+            <div class="challenge-icon">📧</div>
+            <h4>Newsletter Funnel</h4>
+            <p>Owning my own newsletter pipeline gives me freedom beyond Medium or Substack.</p>
           </div>
         </div>
       </article>
