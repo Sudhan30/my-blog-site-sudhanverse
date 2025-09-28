@@ -438,10 +438,10 @@ export class UnifiedAnalyticsService {
         element_class: element.className || null,
         element_text: element.textContent?.substring(0, 100) || null,
         element_type: element.tagName.toLowerCase(),
-        click_x: rect.left,
-        click_y: rect.top,
-        viewport_width: window.innerWidth,
-        viewport_height: window.innerHeight,
+        click_x: Math.round(rect.left),
+        click_y: Math.round(rect.top),
+        viewport_width: Math.round(window.innerWidth),
+        viewport_height: Math.round(window.innerHeight),
         referrer: document.referrer,
         metadata: customData
       }
@@ -460,9 +460,9 @@ export class UnifiedAnalyticsService {
       data: {
         url: window.location.href,
         title: document.title,
-        scroll_depth: depth,
-        viewport_width: window.innerWidth,
-        viewport_height: window.innerHeight,
+        scroll_depth: Math.round(depth),
+        viewport_width: Math.round(window.innerWidth),
+        viewport_height: Math.round(window.innerHeight),
         referrer: document.referrer
       }
     };
@@ -477,9 +477,9 @@ export class UnifiedAnalyticsService {
       data: {
         url: window.location.href,
         title: document.title,
-        time_on_page: duration,
-        viewport_width: window.innerWidth,
-        viewport_height: window.innerHeight,
+        time_on_page: Math.round(duration),
+        viewport_width: Math.round(window.innerWidth),
+        viewport_height: Math.round(window.innerHeight),
         referrer: document.referrer
       }
     };
