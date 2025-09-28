@@ -552,25 +552,6 @@ export class UnifiedAnalyticsService {
     }
   }
 
-  async endSession() {
-    try {
-      await this.http.post(`${this.apiBaseUrl}/session/end`, {
-        session_id: this.sessionId,
-        exit_page: window.location.pathname,
-        duration: Math.round((Date.now() - this.sessionStartTime.getTime()) / 1000)
-      }).toPromise();
-      
-      // Flush remaining events
-      await this.flushEvents();
-      
-      // Clear timer
-      if (this.flushTimer) {
-        clearInterval(this.flushTimer);
-      }
-    } catch (error) {
-      console.error('Failed to end session:', error);
-    }
-  }
 
   // Dashboard data
   async getDashboardData(): Promise<DashboardData> {

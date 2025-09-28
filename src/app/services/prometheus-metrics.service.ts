@@ -293,28 +293,6 @@ export class PrometheusMetricsService {
     return `${name}${labelsFormatted} ${value} ${timestamp}`;
   }
 
-  // Batch send all buffered metrics
-  async flushMetrics() {
-    if (this.metricsBuffer.size === 0) return;
-
-    const metrics = Array.from(this.metricsBuffer.entries()).map(([key, value]) => {
-      // Parse the key back to name and labels
-      const [name, labelsString] = key.includes('{') ? key.split('{') : [key, ''];
-      const labels = this.parseLabels(labelsString);
-      return { name, value, labels };
-    });
-
-    try {
-      await Promise.all(
-        metrics.map(metric => 
-          this.sendMetric(metric.name, 'gauge', metric.value, metric.labels)
-        )
-      );
-      this.metricsBuffer.clear();
-    } catch (error) {
-      console.error('Failed to flush metrics:', error);
-    }
-  }
 
   private parseLabels(labelsString: string): Record<string, string> {
     if (!labelsString) return {};
