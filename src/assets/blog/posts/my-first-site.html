@@ -27,12 +27,12 @@
   a:hover{text-decoration:underline}
 
   /* Navbar */
-  nav{background:#ffffff; border-bottom:1px solid var(--card-br); box-shadow:var(--shadow); padding:14px 20px; position:sticky; top:0; z-index:1000}
+  nav{background:linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border:none; box-shadow:0 2px 8px rgba(17, 24, 39, .03); padding:14px 20px; position:sticky; top:0; z-index:1000}
   nav .nav-container{max-width:1000px; margin:0 auto; display:flex; align-items:center; justify-content:space-between}
-  nav .brand{font-weight:700; font-size:1.2rem; color:var(--accent)}
+  nav .brand{font-weight:500; font-size:1.2rem; color:var(--accent)}
   nav ul{list-style:none; margin:0; padding:0; display:flex; gap:20px}
   nav li{margin:0}
-  nav a{font-size:.95rem; color:var(--ink)}
+  nav a{font-size:.95rem; color:var(--ink); font-weight:300}
 
   /* Layout */
   .container{max-width: 1000px; margin:0 auto; padding:48px 20px 80px}
@@ -76,6 +76,16 @@
   </style>
 </head>
 <body>
+  <nav>
+    <div class="nav-container">
+      <div class="brand">SudharVerse</div>
+      <ul>
+        <li><a href="#">Home</a></li>
+        <li><a href="#newsletter">Contact</a></li>
+      </ul>
+    </div>
+  </nav>
+
   <div class="container">
     <header class="hero">
       <h1>Two Sites, Two Paths: Cloud Portfolio + Self‑Hosted Blog</h1>
