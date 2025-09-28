@@ -87,9 +87,15 @@ export class UnifiedAnalyticsService {
 
     this.initializeAnalytics();
     
-    // Prometheus is disabled due to CORS issues
-    console.log('🔧 Prometheus metrics disabled due to CORS policy');
-    console.log('🔧 Analytics will be sent to backend API only');
+    // Initialize Prometheus metrics via backend API
+    this.prometheusMetrics.initialize({
+      endpoint: this.apiBaseUrl, // Use backend API instead of direct Prometheus
+      job: 'blog-frontend',
+      instance: window.location.hostname
+    });
+    this.prometheusMetrics.trackAnalyticsConsent(true);
+    
+    console.log('🔧 Prometheus metrics will be sent via backend API');
     
     console.log('🔧 UnifiedAnalyticsService: Analytics tracking initialized successfully');
   }
@@ -235,8 +241,23 @@ export class UnifiedAnalyticsService {
       const response = await this.http.post(`${this.apiBaseUrl}/track`, { events: apiEvents }).toPromise();
       console.log('✅ Analytics events sent successfully:', response);
       
-      // Prometheus metrics disabled due to CORS issues
-      console.log('🔧 Prometheus metrics skipped due to CORS policy');
+      // Send metrics to Prometheus via backend API
+      events.forEach(event => {
+        switch (event.type) {
+          case 'pageview':
+            this.prometheusMetrics.trackPageLoad(event.data.url);
+            break;
+          case 'click':
+            this.prometheusMetrics.trackClick(event.data.element_type || 'unknown', event.data.url);
+            break;
+          case 'scroll':
+            this.prometheusMetrics.trackScroll(event.data.scroll_depth || 0, event.data.url);
+            break;
+          case 'time_on_page':
+            this.prometheusMetrics.trackTimeOnPage(event.data.time_on_page || 0, event.data.url);
+            break;
+        }
+      });
     } catch (error) {
       console.error('❌ Failed to flush analytics events:', error);
       console.error('❌ Error details:', error);
@@ -265,7 +286,7 @@ export class UnifiedAnalyticsService {
     };
     
     this.eventBuffer.push(event);
-    // Prometheus metrics disabled due to CORS issues
+    this.prometheusMetrics.trackPageLoad(url);
   }
 
   trackClick(element: HTMLElement, customData?: Record<string, any>) {
@@ -289,7 +310,10 @@ export class UnifiedAnalyticsService {
     };
     
     this.eventBuffer.push(event);
-    // Prometheus metrics disabled due to CORS issues
+    this.prometheusMetrics.trackClick(
+      event.data.element_type || 'unknown',
+      window.location.pathname
+    );
   }
 
   trackScrollDepth(depth: number) {
@@ -306,7 +330,7 @@ export class UnifiedAnalyticsService {
     };
     
     this.eventBuffer.push(event);
-    // Prometheus metrics disabled due to CORS issues
+    this.prometheusMetrics.trackScroll(depth, window.location.pathname);
   }
 
   trackTimeOnPage(duration: number) {
@@ -323,7 +347,7 @@ export class UnifiedAnalyticsService {
     };
     
     this.eventBuffer.push(event);
-    // Prometheus metrics disabled due to CORS issues
+    this.prometheusMetrics.trackTimeOnPage(duration, window.location.pathname);
   }
 
   trackCustomEvent(eventName: string, data?: Record<string, any>) {

@@ -205,29 +205,31 @@ export class PrometheusMetricsService {
   private async sendToPrometheus(metricData: any) {
     if (!this.config) return;
 
-    const payload = this.formatPrometheusMetric(metricData);
+    // Send metrics to backend API instead of direct Prometheus
+    const backendUrl = `${this.config.endpoint}/prometheus`;
+    console.log('🔧 Sending metrics to backend API:', backendUrl);
+    console.log('🔧 Metric data:', metricData);
     
-    // Prometheus Pushgateway uses /metrics/job/{job_name} endpoint
-    const pushgatewayUrl = `${this.config.endpoint}/metrics/job/${this.config.job}`;
-    console.log('🔧 Sending to Prometheus Pushgateway:', pushgatewayUrl);
-    console.log('🔧 Payload:', payload);
-    
-    const response = await fetch(pushgatewayUrl, {
+    const response = await fetch(backendUrl, {
       method: 'POST',
       headers: {
-        'Content-Type': 'text/plain',
+        'Content-Type': 'application/json',
       },
-      body: payload
+      body: JSON.stringify({
+        job: this.config.job,
+        instance: this.config.instance,
+        metrics: [metricData]
+      })
     });
 
     if (!response.ok) {
       const errorText = await response.text();
-      console.error('❌ Prometheus push failed:', response.status, response.statusText);
+      console.error('❌ Backend metrics API failed:', response.status, response.statusText);
       console.error('❌ Error response:', errorText);
-      throw new Error(`Prometheus push failed: ${response.status} - ${errorText}`);
+      throw new Error(`Backend metrics API failed: ${response.status} - ${errorText}`);
     }
     
-    console.log('✅ Prometheus metric sent successfully');
+    console.log('✅ Metrics sent to backend API successfully');
   }
 
   private formatPrometheusMetric(data: any): string {
@@ -297,29 +299,35 @@ export class PrometheusMetricsService {
     }
 
     try {
-      const testUrl = `${this.config.endpoint}/metrics/job/${this.config.job}`;
-      console.log('🔧 Testing Pushgateway connection to:', testUrl);
-      
-      // Test with a simple metric
-      const testMetric = 'blog_test_connection 1';
+      const testUrl = `${this.config.endpoint}/prometheus`;
+      console.log('🔧 Testing backend metrics API connection to:', testUrl);
       
       const response = await fetch(testUrl, {
         method: 'POST',
         headers: {
-          'Content-Type': 'text/plain',
+          'Content-Type': 'application/json',
         },
-        body: testMetric
+        body: JSON.stringify({
+          job: this.config.job,
+          instance: this.config.instance,
+          metrics: [{
+            name: 'blog_test_connection',
+            type: 'counter',
+            value: 1,
+            labels: { test: 'connection' }
+          }]
+        })
       });
 
       if (response.ok) {
-        console.log('✅ Pushgateway connection successful');
+        console.log('✅ Backend metrics API connection successful');
         return true;
       } else {
-        console.error('❌ Pushgateway connection failed:', response.status, response.statusText);
+        console.error('❌ Backend metrics API connection failed:', response.status, response.statusText);
         return false;
       }
     } catch (error) {
-      console.error('❌ Pushgateway connection error:', error);
+      console.error('❌ Backend metrics API connection error:', error);
       return false;
     }
   }
