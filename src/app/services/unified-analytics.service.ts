@@ -11,12 +11,22 @@ export interface AnalyticsEvent {
     title?: string;
     referrer?: string;
     element?: string;
+    element_id?: string | null;
+    element_class?: string | null;
+    element_text?: string | null;
+    element_type?: string | null;
     coordinates?: { x: number; y: number };
+    click_x?: number;
+    click_y?: number;
     text?: string;
     scroll_depth?: number;
+    time_on_page?: number;
     duration?: number;
+    viewport_width?: number;
+    viewport_height?: number;
     custom_event?: string;
     custom_data?: Record<string, any>;
+    metadata?: Record<string, any>;
   };
 }
 
