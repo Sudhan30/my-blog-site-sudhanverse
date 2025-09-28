@@ -87,22 +87,9 @@ export class UnifiedAnalyticsService {
 
     this.initializeAnalytics();
     
-    // Initialize Prometheus metrics as well
-    this.prometheusMetrics.initialize({
-      endpoint: 'https://prometheus.sudharsana.dev',
-      job: 'blog-frontend',
-      instance: window.location.hostname
-    });
-    this.prometheusMetrics.trackAnalyticsConsent(true);
-    
-    // Test Pushgateway connection
-    this.prometheusMetrics.testPushgatewayConnection().then(success => {
-      if (success) {
-        console.log('✅ Prometheus Pushgateway connection successful');
-      } else {
-        console.log('❌ Prometheus Pushgateway connection failed - metrics will be stored locally');
-      }
-    });
+    // Prometheus is disabled due to CORS issues
+    console.log('🔧 Prometheus metrics disabled due to CORS policy');
+    console.log('🔧 Analytics will be sent to backend API only');
     
     console.log('🔧 UnifiedAnalyticsService: Analytics tracking initialized successfully');
   }
@@ -248,23 +235,8 @@ export class UnifiedAnalyticsService {
       const response = await this.http.post(`${this.apiBaseUrl}/track`, { events: apiEvents }).toPromise();
       console.log('✅ Analytics events sent successfully:', response);
       
-      // Also send to Prometheus for each event
-      events.forEach(event => {
-        switch (event.type) {
-          case 'pageview':
-            this.prometheusMetrics.trackPageLoad(event.data.url);
-            break;
-          case 'click':
-            this.prometheusMetrics.trackClick(event.data.element || 'unknown', event.data.url);
-            break;
-          case 'scroll':
-            this.prometheusMetrics.trackScroll(event.data.scroll_depth || 0, event.data.url);
-            break;
-          case 'time_on_page':
-            this.prometheusMetrics.trackTimeOnPage(event.data.duration || 0, event.data.url);
-            break;
-        }
-      });
+      // Prometheus metrics disabled due to CORS issues
+      console.log('🔧 Prometheus metrics skipped due to CORS policy');
     } catch (error) {
       console.error('❌ Failed to flush analytics events:', error);
       console.error('❌ Error details:', error);
@@ -293,7 +265,7 @@ export class UnifiedAnalyticsService {
     };
     
     this.eventBuffer.push(event);
-    this.prometheusMetrics.trackPageLoad(url);
+    // Prometheus metrics disabled due to CORS issues
   }
 
   trackClick(element: HTMLElement, customData?: Record<string, any>) {
@@ -317,10 +289,7 @@ export class UnifiedAnalyticsService {
     };
     
     this.eventBuffer.push(event);
-    this.prometheusMetrics.trackClick(
-      event.data.element_type || 'unknown',
-      window.location.pathname
-    );
+    // Prometheus metrics disabled due to CORS issues
   }
 
   trackScrollDepth(depth: number) {
@@ -337,7 +306,7 @@ export class UnifiedAnalyticsService {
     };
     
     this.eventBuffer.push(event);
-    this.prometheusMetrics.trackScroll(depth, window.location.pathname);
+    // Prometheus metrics disabled due to CORS issues
   }
 
   trackTimeOnPage(duration: number) {
@@ -354,7 +323,7 @@ export class UnifiedAnalyticsService {
     };
     
     this.eventBuffer.push(event);
-    this.prometheusMetrics.trackTimeOnPage(duration, window.location.pathname);
+    // Prometheus metrics disabled due to CORS issues
   }
 
   trackCustomEvent(eventName: string, data?: Record<string, any>) {

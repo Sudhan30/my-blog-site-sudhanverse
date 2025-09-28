@@ -201,7 +201,7 @@ import { UnifiedAnalyticsService } from '../services/unified-analytics.service';
     }
   `]
 })
-export class AnalyticsConsentComponent implements OnInit {
+export class AnalyticsConsentComponent implements OnInit, OnDestroy {
   showBanner = false;
   private platformId = inject(PLATFORM_ID);
   private unifiedAnalytics = inject(UnifiedAnalyticsService);
@@ -254,6 +254,10 @@ export class AnalyticsConsentComponent implements OnInit {
     // The UnifiedAnalyticsService will automatically initialize when consent is accepted
     // It handles both the backend API calls and Prometheus metrics
     this.unifiedAnalytics.initialize();
+  }
+
+  ngOnDestroy() {
+    // Component cleanup if needed
   }
 
   private initializePrometheus() {
