@@ -87,6 +87,16 @@
   .ship-flow{font-size:0.9rem; color:var(--muted); margin-bottom:2px; font-family:monospace}
   .ship-note{font-size:0.8rem; color:var(--muted); font-style:italic}
 
+  /* Advice Wisdom */
+  .advice-wisdom{display:flex; flex-direction:column; gap:12px; margin:20px 0}
+  .wisdom-item{display:flex; align-items:center; padding:16px 20px; background:linear-gradient(135deg, #fff8f0 0%, #fef7ed 100%); border:1px solid #fed7aa; border-radius:12px; transition:all 0.3s ease; position:relative}
+  .wisdom-item::before{content:''; position:absolute; left:0; top:0; bottom:0; width:4px; background:linear-gradient(180deg, #f59e0b, #d97706); border-radius:0 2px 2px 0; opacity:0.8}
+  .wisdom-item:hover{transform:translateX(4px); box-shadow:0 4px 16px rgba(245, 158, 11, 0.15); border-color:#f59e0b}
+  .wisdom-icon{font-size:1.8rem; margin-right:16px; flex-shrink:0}
+  .wisdom-content{flex:1}
+  .wisdom-title{font-size:1.1rem; font-weight:600; color:#92400e; margin-bottom:4px}
+  .wisdom-advice{font-size:0.95rem; color:#a16207; line-height:1.4; font-style:italic}
+
   /* Challenges Grid */
   .challenges-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:16px; margin:20px 0}
   .challenge-card{background:var(--card-bg); border:1px solid var(--card-br); border-radius:var(--radius); padding:20px; text-align:center; transition:transform 0.2s ease, box-shadow 0.2s ease}
@@ -300,13 +310,43 @@
 
       <article class="card">
         <h2>What I'd Tell My Past Self</h2>
-        <ul class="list">
-          <li><b>Stop overthinking the tech stack.</b> Pick something and ship. You'll learn more from shipping than from researching.</li>
-          <li><b>Two paths isn't overkill—it's smart.</b> You need to experience both managed and self-hosted to make informed decisions.</li>
-          <li><b>Share early, share often.</b> The feedback loop from real users beats any tutorial or course.</li>
-          <li><b>AI isn't cheating—it's accelerating.</b> Use every tool available to move faster and learn more.</li>
-          <li><b>Document everything.</b> Your future self will thank you when you're debugging at 2 AM.</li>
-        </ul>
+        <div class="advice-wisdom">
+          <div class="wisdom-item">
+            <div class="wisdom-icon">⚡</div>
+            <div class="wisdom-content">
+              <div class="wisdom-title">Stop Overthinking</div>
+              <div class="wisdom-advice">Pick something and ship. You'll learn more from shipping than from researching.</div>
+            </div>
+          </div>
+          <div class="wisdom-item">
+            <div class="wisdom-icon">🛤️</div>
+            <div class="wisdom-content">
+              <div class="wisdom-title">Two Paths is Smart</div>
+              <div class="wisdom-advice">You need to experience both managed and self-hosted to make informed decisions.</div>
+            </div>
+          </div>
+          <div class="wisdom-item">
+            <div class="wisdom-icon">📢</div>
+            <div class="wisdom-content">
+              <div class="wisdom-title">Share Early & Often</div>
+              <div class="wisdom-advice">The feedback loop from real users beats any tutorial or course.</div>
+            </div>
+          </div>
+          <div class="wisdom-item">
+            <div class="wisdom-icon">🤖</div>
+            <div class="wisdom-content">
+              <div class="wisdom-title">AI is Accelerating</div>
+              <div class="wisdom-advice">Use every tool available to move faster and learn more.</div>
+            </div>
+          </div>
+          <div class="wisdom-item">
+            <div class="wisdom-icon">📝</div>
+            <div class="wisdom-content">
+              <div class="wisdom-title">Document Everything</div>
+              <div class="wisdom-advice">Your future self will thank you when you're debugging at 2 AM.</div>
+            </div>
+          </div>
+        </div>
       </article>
 
       <article class="card">
