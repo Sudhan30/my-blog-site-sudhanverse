@@ -302,7 +302,7 @@ export class UnifiedAnalyticsService {
     // Track page visibility changes
     document.addEventListener('visibilitychange', () => {
       if (document.hidden) {
-        this.endSession();
+        this.endSession(this.sessionId);
       }
     });
 
@@ -310,7 +310,7 @@ export class UnifiedAnalyticsService {
     window.addEventListener('beforeunload', () => {
       const timeOnPage = Math.round((Date.now() - this.sessionStartTime.getTime()) / 1000);
       this.trackTimeOnPage(timeOnPage);
-      this.endSession();
+      this.endSession(this.sessionId);
     });
     
     // Track time on page when navigating to other pages (SPA navigation)
