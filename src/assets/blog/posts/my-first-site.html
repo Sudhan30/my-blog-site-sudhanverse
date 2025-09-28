@@ -124,14 +124,12 @@
 
   /* Horizon Vision */
   .horizon-vision{display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:20px; margin:20px 0}
-  .vision-item{display:flex; align-items:center; padding:24px; background:linear-gradient(135deg, #fefce8 0%, #fef3c7 100%); border:2px solid #f59e0b; border-radius:20px; transition:all 0.4s ease; position:relative; overflow:hidden}
-  .vision-item::before{content:''; position:absolute; top:0; left:0; right:0; bottom:0; background:radial-gradient(circle at 50% 50%, rgba(245, 158, 11, 0.1) 0%, transparent 70%); opacity:0; transition:opacity 0.4s ease}
-  .vision-item:hover{transform:scale(1.05) rotate(-1deg); box-shadow:0 15px 35px rgba(245, 158, 11, 0.25); border-color:#d97706}
-  .vision-item:hover::before{opacity:1}
-  .vision-icon{font-size:2.8rem; margin-right:20px; flex-shrink:0; filter:drop-shadow(0 3px 6px rgba(0,0,0,0.15))}
+  .vision-item{display:flex; align-items:center; padding:24px; background:linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border:1px solid #e2e8f0; border-radius:16px; transition:all 0.3s ease; position:relative}
+  .vision-item:hover{transform:translateY(-3px); box-shadow:0 12px 28px rgba(0,0,0,0.12); border-color:#cbd5e1}
+  .vision-icon{font-size:2.2rem; margin-right:20px; flex-shrink:0; opacity:0.8}
   .vision-content{flex:1}
-  .vision-title{font-size:1.4rem; font-weight:700; color:#92400e; margin-bottom:8px; text-shadow:0 1px 3px rgba(0,0,0,0.1)}
-  .vision-desc{font-size:1.1rem; color:#a16207; line-height:1.4; font-weight:500}
+  .vision-title{font-size:1.3rem; font-weight:600; color:#374151; margin-bottom:6px}
+  .vision-desc{font-size:1rem; color:#6b7280; line-height:1.5}
 
   /* Advice Wisdom */
   .advice-wisdom{display:flex; flex-direction:column; gap:12px; margin:20px 0}
