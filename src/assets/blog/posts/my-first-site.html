@@ -98,6 +98,17 @@
   .break-problem{font-size:0.9rem; color:#991b1b; margin-bottom:4px; font-style:italic; background:#fef2f2; padding:4px 8px; border-radius:6px; display:inline-block}
   .break-solution{font-size:0.95rem; color:#7f1d1d; line-height:1.4; background:#fef7f7; padding:8px 12px; border-radius:8px; border-left:3px solid #ef4444}
 
+  /* Lessons Treasure */
+  .lessons-treasure{display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:20px; margin:20px 0}
+  .treasure-item{display:flex; align-items:center; padding:20px; background:linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border:2px solid #0ea5e9; border-radius:16px; transition:all 0.4s ease; position:relative; overflow:hidden}
+  .treasure-item::before{content:''; position:absolute; top:0; left:0; right:0; bottom:0; background:linear-gradient(45deg, transparent 30%, rgba(14, 165, 233, 0.1) 50%, transparent 70%); transform:translateX(-100%); transition:transform 0.6s ease}
+  .treasure-item:hover{transform:scale(1.02) rotate(1deg); box-shadow:0 10px 30px rgba(14, 165, 233, 0.2); border-color:#0284c7}
+  .treasure-item:hover::before{transform:translateX(100%)}
+  .treasure-gem{font-size:2.5rem; margin-right:20px; flex-shrink:0; filter:drop-shadow(0 2px 4px rgba(0,0,0,0.1))}
+  .treasure-content{flex:1}
+  .treasure-title{font-size:1.3rem; font-weight:700; color:#0c4a6e; margin-bottom:8px; text-shadow:0 1px 2px rgba(0,0,0,0.1)}
+  .treasure-lesson{font-size:1rem; color:#075985; line-height:1.5; font-weight:500}
+
   /* Advice Wisdom */
   .advice-wisdom{display:flex; flex-direction:column; gap:12px; margin:20px 0}
   .wisdom-item{display:flex; align-items:center; padding:16px 20px; background:linear-gradient(135deg, #fff8f0 0%, #fef7ed 100%); border:1px solid #fed7aa; border-radius:12px; transition:all 0.3s ease; position:relative}
@@ -350,6 +361,47 @@
       </article>
 
       <article class="card">
+        <h2>Lessons You Can Steal</h2>
+        <div class="lessons-treasure">
+          <div class="treasure-item">
+            <div class="treasure-gem">💎</div>
+            <div class="treasure-content">
+              <div class="treasure-title">Pick Two Constraints</div>
+              <div class="treasure-lesson">Money & learning - let them drive your stack</div>
+            </div>
+          </div>
+          <div class="treasure-item">
+            <div class="treasure-gem">🔐</div>
+            <div class="treasure-content">
+              <div class="treasure-title">Own Your Infrastructure</div>
+              <div class="treasure-lesson">DNS/SSL/CDN early - where reliability and speed are won</div>
+            </div>
+          </div>
+          <div class="treasure-item">
+            <div class="treasure-gem">⚡</div>
+            <div class="treasure-content">
+              <div class="treasure-title">Automate Everything</div>
+              <div class="treasure-lesson">Even for personal sites - it keeps you fearless</div>
+            </div>
+          </div>
+          <div class="treasure-item">
+            <div class="treasure-gem">📊</div>
+            <div class="treasure-content">
+              <div class="treasure-title">Measure, Don't Track</div>
+              <div class="treasure-lesson">Favor UX metrics over invasive analytics</div>
+            </div>
+          </div>
+          <div class="treasure-item">
+            <div class="treasure-gem">📚</div>
+            <div class="treasure-content">
+              <div class="treasure-title">Write the Playbook</div>
+              <div class="treasure-lesson">As you go - your future self will reuse it in minutes</div>
+            </div>
+          </div>
+        </div>
+      </article>
+
+      <article class="card">
         <h2>What I'd Tell My Past Self</h2>
         <div class="advice-wisdom">
           <div class="wisdom-item">
@@ -392,16 +444,6 @@
 
 
 
-      <article class="card">
-        <h2>Lessons You Can Steal</h2>
-        <ul class="list">
-          <li><b>Pick two constraints</b> (money & learning) and let them drive your stack.</li>
-          <li><b>Own your DNS/SSL/CDN</b> early—it's where reliability and speed are won.</li>
-          <li><b>Automate deploys</b> even for a personal site; it keeps you fearless.</li>
-          <li><b>Measure, don't track.</b> Favor UX metrics over invasive analytics.</li>
-          <li><b>Write the playbook as you go.</b> Your future self will reuse it in minutes.</li>
-</ul>
-      </article>
 
       <article class="card">
         <h2>What I'd Do Differently</h2>
