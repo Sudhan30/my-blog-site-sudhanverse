@@ -65,6 +65,8 @@ export class UnifiedAnalyticsService {
   private batchSize = 10;
   private flushInterval = 30000; // 30 seconds
   private flushTimer: any;
+  private inactivityTimer: any;
+  private readonly INACTIVITY_TIMEOUT = 30 * 60 * 1000; // 30 minutes
   
   private sessionSubject = new BehaviorSubject<SessionData | null>(null);
   public session$ = this.sessionSubject.asObservable();
@@ -102,11 +104,12 @@ export class UnifiedAnalyticsService {
 
   private initializeAnalytics() {
     this.userId = this.getOrCreateUserId();
-    this.sessionId = this.generateSessionId();
+    this.sessionId = this.getOrCreateSessionId();
     this.startSession();
     this.startBatchProcessing();
     this.trackPageView();
     this.setupEventListeners();
+    this.setupInactivityDetection();
   }
 
   private getOrCreateUserId(): string {
@@ -118,8 +121,84 @@ export class UnifiedAnalyticsService {
     return userId;
   }
 
-  private generateSessionId(): string {
-    return this.generateUUID();
+  private getOrCreateSessionId(): string {
+    let sessionId = localStorage.getItem('blog_session_id');
+    let sessionStartTime = localStorage.getItem('blog_session_start_time');
+    
+    // Check if session exists and is still valid (within 30 minutes)
+    if (sessionId && sessionStartTime) {
+      const startTime = parseInt(sessionStartTime);
+      const currentTime = Date.now();
+      const thirtyMinutes = 30 * 60 * 1000; // 30 minutes in milliseconds
+      
+      if (currentTime - startTime < thirtyMinutes) {
+        // Session is still valid, return existing session ID
+        return sessionId;
+      } else {
+        // Session expired, end the old session and create new one
+        this.endSession(sessionId);
+        localStorage.removeItem('blog_session_id');
+        localStorage.removeItem('blog_session_start_time');
+      }
+    }
+    
+    // Create new session
+    sessionId = this.generateUUID();
+    const startTime = Date.now();
+    
+    localStorage.setItem('blog_session_id', sessionId);
+    localStorage.setItem('blog_session_start_time', startTime.toString());
+    
+    return sessionId;
+  }
+
+  private async endSession(sessionId: string) {
+    try {
+      const endTime = Date.now();
+      const sessionData = {
+        session_id: sessionId,
+        uuid: this.userId,
+        end_time: endTime
+      };
+      
+      console.log('🔧 Ending session:', sessionData);
+      await this.http.post(`${this.apiBaseUrl}/session/end`, sessionData).toPromise();
+      console.log('✅ Session ended successfully');
+    } catch (error) {
+      console.error('❌ Failed to end session:', error);
+    }
+  }
+
+  private setupInactivityDetection() {
+    if (!isPlatformBrowser(this.platformId)) return;
+    
+    // Reset inactivity timer on user activity
+    const resetInactivityTimer = () => {
+      if (this.inactivityTimer) {
+        clearTimeout(this.inactivityTimer);
+      }
+      
+      this.inactivityTimer = setTimeout(() => {
+        console.log('🔧 User inactive for 30 minutes, ending session');
+        this.endSession(this.sessionId);
+        localStorage.removeItem('blog_session_id');
+        localStorage.removeItem('blog_session_start_time');
+      }, this.INACTIVITY_TIMEOUT);
+    };
+    
+    // Listen for user activity
+    const events = ['mousedown', 'mousemove', 'keypress', 'scroll', 'touchstart', 'click'];
+    events.forEach(event => {
+      document.addEventListener(event, resetInactivityTimer, true);
+    });
+    
+    // Initialize timer
+    resetInactivityTimer();
+    
+    // Handle page unload
+    window.addEventListener('beforeunload', () => {
+      this.endSession(this.sessionId);
+    });
   }
 
   private generateUUID(): string {
