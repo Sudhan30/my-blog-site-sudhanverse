@@ -226,7 +226,10 @@ export class PrometheusMetricsService {
       const errorText = await response.text();
       console.error('❌ Backend metrics API failed:', response.status, response.statusText);
       console.error('❌ Error response:', errorText);
-      throw new Error(`Backend metrics API failed: ${response.status} - ${errorText}`);
+      
+      // Don't throw error, just log and continue
+      console.log('⚠️ Prometheus metrics disabled - continuing with analytics only');
+      return;
     }
     
     console.log('✅ Metrics sent to backend API successfully');
@@ -324,6 +327,9 @@ export class PrometheusMetricsService {
         return true;
       } else {
         console.error('❌ Backend metrics API connection failed:', response.status, response.statusText);
+        if (response.status === 503) {
+          console.log('⚠️ Prometheus endpoint not available - metrics will be disabled');
+        }
         return false;
       }
     } catch (error) {
