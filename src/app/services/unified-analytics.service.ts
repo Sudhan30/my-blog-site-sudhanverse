@@ -147,6 +147,14 @@ export class UnifiedAnalyticsService {
     } catch (error) {
       console.error('❌ Failed to start analytics session:', error);
       console.error('❌ Error details:', error);
+      
+      // Fallback: Store session data locally for now
+      console.log('🔄 Storing session data locally as fallback');
+      if (isPlatformBrowser(this.platformId)) {
+        localStorage.setItem('analytics_session_data', JSON.stringify(sessionData));
+      }
+      
+      this.sessionSubject.next(sessionData);
     }
   }
 
@@ -227,8 +235,16 @@ export class UnifiedAnalyticsService {
     } catch (error) {
       console.error('❌ Failed to flush analytics events:', error);
       console.error('❌ Error details:', error);
-      // Re-add events to buffer if failed
-      this.eventBuffer.unshift(...events);
+      
+      // Fallback: Store events locally for now
+      console.log('🔄 Storing analytics events locally as fallback');
+      if (isPlatformBrowser(this.platformId)) {
+        const existingEvents = JSON.parse(localStorage.getItem('analytics_events') || '[]');
+        const updatedEvents = [...existingEvents, ...events];
+        localStorage.setItem('analytics_events', JSON.stringify(updatedEvents));
+      }
+      
+      // Don't re-add to buffer since we're storing locally
     }
   }
 
@@ -424,5 +440,19 @@ export class UnifiedAnalyticsService {
   // Force flush for immediate sending
   async forceFlush() {
     await this.flushEvents();
+  }
+
+  // Debug method to check stored analytics data
+  getStoredAnalyticsData() {
+    if (!isPlatformBrowser(this.platformId)) return null;
+    
+    const sessionData = localStorage.getItem('analytics_session_data');
+    const eventsData = localStorage.getItem('analytics_events');
+    
+    return {
+      session: sessionData ? JSON.parse(sessionData) : null,
+      events: eventsData ? JSON.parse(eventsData) : null,
+      eventsCount: eventsData ? JSON.parse(eventsData).length : 0
+    };
   }
 }
