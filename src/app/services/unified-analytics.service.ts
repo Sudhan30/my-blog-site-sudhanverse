@@ -1,8 +1,10 @@
 import { Injectable, PLATFORM_ID, inject } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
+import { Router, NavigationEnd } from '@angular/router';
 import { PrometheusMetricsService } from './prometheus-metrics.service';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { filter } from 'rxjs/operators';
 
 export interface AnalyticsEvent {
   type: 'pageview' | 'click' | 'scroll' | 'time_on_page' | 'custom';
@@ -71,6 +73,8 @@ export class UnifiedAnalyticsService {
   private sessionSubject = new BehaviorSubject<SessionData | null>(null);
   public session$ = this.sessionSubject.asObservable();
 
+  private router = inject(Router);
+  
   constructor() {
     if (isPlatformBrowser(this.platformId)) {
       // Check if analytics consent is accepted
@@ -283,11 +287,8 @@ export class UnifiedAnalyticsService {
       }
     });
 
-    // Track time on page
-    setInterval(() => {
-      const timeOnPage = Math.round((Date.now() - this.sessionStartTime.getTime()) / 1000);
-      this.trackTimeOnPage(timeOnPage);
-    }, 30000); // Every 30 seconds
+    // Track time on page only on page unload/navigation
+    // No continuous tracking - only when leaving the page
 
     // Track page visibility changes
     document.addEventListener('visibilitychange', () => {
@@ -296,10 +297,28 @@ export class UnifiedAnalyticsService {
       }
     });
 
-    // Track before page unload
+    // Track time on page before leaving
     window.addEventListener('beforeunload', () => {
+      const timeOnPage = Math.round((Date.now() - this.sessionStartTime.getTime()) / 1000);
+      this.trackTimeOnPage(timeOnPage);
       this.endSession();
     });
+    
+    // Track time on page when navigating to other pages (SPA navigation)
+    window.addEventListener('popstate', () => {
+      const timeOnPage = Math.round((Date.now() - this.sessionStartTime.getTime()) / 1000);
+      this.trackTimeOnPage(timeOnPage);
+    });
+    
+    // Track time on page for Angular router navigation
+    this.router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe((event: NavigationEnd) => {
+        const timeOnPage = Math.round((Date.now() - this.sessionStartTime.getTime()) / 1000);
+        this.trackTimeOnPage(timeOnPage);
+        // Reset session start time for new page
+        this.sessionStartTime = new Date();
+      });
   }
 
   private startBatchProcessing() {
