@@ -22,12 +22,8 @@ export interface AnalyticsEvent {
 
 export interface SessionData {
   session_id: string;
-  user_id: string;
+  uuid: string; // Changed from user_id to uuid to match API
   entry_page: string;
-  entry_time: Date;
-  last_activity: Date;
-  page_views: number;
-  events_count: number;
   device_type: string;
   browser: string;
   os: string;
@@ -51,7 +47,7 @@ export class UnifiedAnalyticsService {
   private http = inject(HttpClient);
   private prometheusMetrics = inject(PrometheusMetricsService);
   
-  private apiBaseUrl = 'https://api.sudharsana.dev/api/analytics'; // Your existing API URL
+  private apiBaseUrl = 'https://blog.sudharsana.dev/api/analytics'; // Your existing API URL
   private sessionId: string = '';
   private userId: string = '';
   private sessionStartTime: Date = new Date();
@@ -132,14 +128,10 @@ export class UnifiedAnalyticsService {
   }
 
   private async startSession() {
-    const sessionData: SessionData = {
+    const sessionData = {
       session_id: this.sessionId,
-      user_id: this.userId,
+      uuid: this.userId, // Changed from user_id to uuid to match API
       entry_page: window.location.pathname,
-      entry_time: this.sessionStartTime,
-      last_activity: new Date(),
-      page_views: 1,
-      events_count: 0,
       device_type: this.getDeviceType(),
       browser: this.getBrowser(),
       os: this.getOS()
@@ -221,7 +213,29 @@ export class UnifiedAnalyticsService {
       console.log('🔧 Sending analytics events to:', `${this.apiBaseUrl}/track`);
       console.log('🔧 Events being sent:', events);
       
-      const response = await this.http.post(`${this.apiBaseUrl}/track`, { events }).toPromise();
+      // Transform events to match your API format
+      const apiEvents = events.map(event => ({
+        uuid: this.userId,
+        session_id: this.sessionId,
+        event_type: event.type,
+        page_url: event.data.url || window.location.href,
+        page_title: event.data.title || document.title,
+        element_id: event.data.element_id || null,
+        element_class: event.data.element_class || null,
+        element_text: event.data.element_text || null,
+        element_type: event.data.element_type || null,
+        click_x: event.data.click_x || null,
+        click_y: event.data.click_y || null,
+        viewport_width: event.data.viewport_width || window.innerWidth,
+        viewport_height: event.data.viewport_height || window.innerHeight,
+        scroll_depth: event.data.scroll_depth || null,
+        time_on_page: event.data.time_on_page || null,
+        referrer: event.data.referrer || document.referrer,
+        user_agent: navigator.userAgent,
+        metadata: JSON.stringify(event.data.metadata || {})
+      }));
+      
+      const response = await this.http.post(`${this.apiBaseUrl}/track`, { events: apiEvents }).toPromise();
       console.log('✅ Analytics events sent successfully:', response);
       
       // Also send to Prometheus for each event
@@ -277,16 +291,24 @@ export class UnifiedAnalyticsService {
     const event: AnalyticsEvent = {
       type: 'click',
       data: {
-        element: element.tagName.toLowerCase() + (element.className ? '.' + element.className.split(' ').join('.') : ''),
-        coordinates: { x: rect.left, y: rect.top },
-        text: element.textContent?.substring(0, 100) || '',
-        custom_data: customData
+        url: window.location.href,
+        title: document.title,
+        element_id: element.id || null,
+        element_class: element.className || null,
+        element_text: element.textContent?.substring(0, 100) || null,
+        element_type: element.tagName.toLowerCase(),
+        click_x: rect.left,
+        click_y: rect.top,
+        viewport_width: window.innerWidth,
+        viewport_height: window.innerHeight,
+        referrer: document.referrer,
+        metadata: customData
       }
     };
     
     this.eventBuffer.push(event);
     this.prometheusMetrics.trackClick(
-      event.data.element || 'unknown',
+      event.data.element_type || 'unknown',
       window.location.pathname
     );
   }
@@ -295,7 +317,12 @@ export class UnifiedAnalyticsService {
     const event: AnalyticsEvent = {
       type: 'scroll',
       data: {
-        scroll_depth: depth
+        url: window.location.href,
+        title: document.title,
+        scroll_depth: depth,
+        viewport_width: window.innerWidth,
+        viewport_height: window.innerHeight,
+        referrer: document.referrer
       }
     };
     
@@ -307,7 +334,12 @@ export class UnifiedAnalyticsService {
     const event: AnalyticsEvent = {
       type: 'time_on_page',
       data: {
-        duration
+        url: window.location.href,
+        title: document.title,
+        time_on_page: duration,
+        viewport_width: window.innerWidth,
+        viewport_height: window.innerHeight,
+        referrer: document.referrer
       }
     };
     
