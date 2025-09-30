@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { map, shareReplay } from 'rxjs/operators';
-import { Observable } from 'rxjs';
+import { HttpClient, HttpErrorResponse } from '@angular/common/http';
+import { map, shareReplay, catchError } from 'rxjs/operators';
+import { Observable, of, throwError } from 'rxjs';
 
 export interface PostIndexItem {
   slug: string; 
@@ -27,6 +27,12 @@ export class PostsService {
     );
   }
   getPostHtml(slug: string): Observable<string> {
-    return this.http.get(`/assets/blog/posts/${slug}.html`, { responseType: 'text' });
+    // Load HTML from the generated/custom file
+    return this.http.get(`/assets/blog/posts/${slug}.html`, { responseType: 'text' }).pipe(
+      catchError((error: HttpErrorResponse) => {
+        // If HTML file doesn't exist, return a not found message
+        return of(`<p>Post "${slug}" not found.</p>`);
+      })
+    );
   }
 }

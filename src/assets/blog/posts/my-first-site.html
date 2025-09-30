@@ -1,0 +1,567 @@
+<div class="container">
+  <header class="hero">
+    <h1>Two Sites, Two Paths: Cloud Portfolio + Self‑Hosted Blog</h1>
+    <p class="lead">This is the story—not the architecture—of how I took a learning project and shipped it live twice: once in the cloud (portfolio) and once in my homelab (blog). What I felt, what broke, what I fixed, how little it costs, and what you can reuse.</p>
+    <div class="badges">
+      <span class="badge">🚀 AI‑assisted</span>
+      <span class="badge">☁️ GCP Portfolio</span>
+      <span class="badge">🖥️ Homelab Blog</span>
+      <span class="badge">📊 Analytics</span>
+      <span class="badge">💸 <$2/mo Homelab</span>
+    </div>
+  </header>
+
+  <section class="grid">
+    <article class="card split">
+      <h2>Why Two Paths?</h2>
+      <p class="lead">I wanted the real thing—and two perspectives: the convenience of managed cloud and the control of on‑prem. So I launched my <b>portfolio</b> in the cloud and my <b>blog</b> in my homelab.</p>
+      <div class="kpis">
+        <div class="kpi"><div class="pill">Portfolio</div><div><b>~2 hours</b> domain → prod</div><div class="note">AI + defaults = speed</div></div>
+        <div class="kpi"><div class="pill">Blog</div><div><b>≈ $2/mo</b> amortized</div><div class="note">Multi‑service homelab</div></div>
+      </div>
+    </article>
+
+    <aside class="card side">
+      <h2>Stack at a Glance</h2>
+      <ul class="list">
+        <li>☁️ GCP hosting, CDN/SSL</li>
+        <li>🖥️ Linux + K3s/Kubernetes</li>
+        <li>🌐 Cloudflare for DNS & Edge</li>
+        <li>📧 Zoho Mail newsletters</li>
+        <li>🔍 SEO + performance tweaks</li>
+      </ul>
+      <blockquote>"If Medium is a freeway, I chose the scenic route—more work, way more control."</blockquote>
+    </aside>
+
+    <article class="card">
+      <h2>The Mindset</h2>
+      <div class="mindset-principles">
+        <div class="principle-item">
+          <div class="principle-icon">🧠</div>
+          <div class="principle-content">
+            <div class="principle-title">Build to Learn</div>
+            <div class="principle-desc">System design sticks better when you deploy it, not just read about it.</div>
+          </div>
+        </div>
+        <div class="principle-item">
+          <div class="principle-icon">🔧</div>
+          <div class="principle-content">
+            <div class="principle-title">Own the Layers</div>
+            <div class="principle-desc">From HTML <span class="pill">div</span> to DNS to CDN—ownership unlocks infinite customization.</div>
+          </div>
+        </div>
+        <div class="principle-item">
+          <div class="principle-icon">🤖</div>
+          <div class="principle-content">
+            <div class="principle-title">Use AI, Ruthlessly</div>
+            <div class="principle-desc">It makes me <b>5–10×</b> faster for scaffolding, docs, and first drafts.</div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="card">
+      <h2>What I Shipped (High‑level)</h2>
+      <div class="shipped-showcase">
+        <div class="ship-item">
+          <div class="ship-icon">☁️</div>
+          <div class="ship-content">
+            <div class="ship-title">Portfolio @ Cloud</div>
+            <div class="ship-flow">domain → SSL → hosting → CI</div>
+            <div class="ship-note">Free‑tier friendly</div>
+          </div>
+        </div>
+        <div class="ship-item">
+          <div class="ship-icon">🖥️</div>
+          <div class="ship-content">
+            <div class="ship-title">Blog @ Homelab</div>
+            <div class="ship-flow">self‑hosted on my mini‑PC</div>
+            <div class="ship-note">Kubernetes for repeatable deploys</div>
+          </div>
+        </div>
+        <div class="ship-item">
+          <div class="ship-icon">📊</div>
+          <div class="ship-content">
+            <div class="ship-title">Analytics</div>
+            <div class="ship-flow">lightweight, privacy‑aware signals</div>
+            <div class="ship-note">No creepy tracking</div>
+          </div>
+        </div>
+        <div class="ship-item">
+          <div class="ship-icon">🛡️</div>
+          <div class="ship-content">
+            <div class="ship-title">Hardening</div>
+            <div class="ship-flow">Cloudflare, DNS hygiene, bot rules</div>
+            <div class="ship-note">Reputation clean‑up</div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="card">
+      <h2>The Journey</h2>
+      <div class="journey-roadmap">
+        <div class="roadmap-step">
+          <div class="step-number">1</div>
+          <div class="step-content">
+            <div class="step-title">💡 The Spark</div>
+            <div class="step-quote">"I should build something real"</div>
+            <div class="step-desc">The initial spark and overwhelming choice paralysis</div>
+          </div>
+        </div>
+        <div class="roadmap-step">
+          <div class="step-number">2</div>
+          <div class="step-content">
+            <div class="step-title">☁️ Cloud First</div>
+            <div class="step-quote">"Let's just start with the cloud"</div>
+            <div class="step-desc">GCP setup, domain purchase, first deployment</div>
+          </div>
+        </div>
+        <div class="roadmap-step">
+          <div class="step-number">3</div>
+          <div class="step-content">
+            <div class="step-title">🤔 The Realization</div>
+            <div class="step-quote">"Wait, what about my homelab?"</div>
+            <div class="step-desc">The realization that two paths could teach different lessons</div>
+          </div>
+        </div>
+        <div class="roadmap-step">
+          <div class="step-number">4</div>
+          <div class="step-content">
+            <div class="step-title">🎉 Success</div>
+            <div class="step-quote">"This is actually working"</div>
+            <div class="step-desc">First real visitors, feedback, and the confidence boost</div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="card">
+      <h2>Technical Challenges & Solutions</h2>
+      <div class="challenges-grid">
+        <div class="challenge-card">
+          <div class="challenge-icon">🔧</div>
+          <h4>Infrastructure as Code</h4>
+          <p>Learned Kubernetes manifests, Helm charts, and GitOps workflows the hard way.</p>
+        </div>
+        <div class="challenge-card">
+          <div class="challenge-icon">🌐</div>
+          <h4>DNS Mastery</h4>
+          <p>From basic A records to CNAME chains, SPF/DKIM setup, and subdomain routing.</p>
+        </div>
+        <div class="challenge-card">
+          <div class="challenge-icon">🔒</div>
+          <h4>Security Hardening</h4>
+          <p>Rate limiting, WAF rules, bot detection, and SSL certificate automation.</p>
+        </div>
+        <div class="challenge-card">
+          <div class="challenge-icon">📈</div>
+          <h4>Performance Optimization</h4>
+          <p>CDN configuration, image optimization, and caching strategies.</p>
+        </div>
+        <div class="challenge-card">
+          <div class="challenge-icon">🔄</div>
+          <h4>CI/CD Pipeline</h4>
+          <p>Automated builds, testing, and deployments across multiple environments.</p>
+        </div>
+        <div class="challenge-card">
+          <div class="challenge-icon">🌍</div>
+          <h4>Dynamic DNS Issues</h4>
+          <p>Some VPNs blocked DuckDNS; migrating to Cloudflare solved it completely.</p>
+        </div>
+        <div class="challenge-card">
+          <div class="challenge-icon">🔍</div>
+          <h4>SEO Optimization</h4>
+          <p>Added meta tags, structured data, and clean URLs for better discoverability.</p>
+        </div>
+        <div class="challenge-card">
+          <div class="challenge-icon">🛡️</div>
+          <h4>Security Mindset</h4>
+          <p>Coming from Walmart, I realized preventing bad actors is as important as building features.</p>
+        </div>
+        <div class="challenge-card">
+          <div class="challenge-icon">📧</div>
+          <h4>Newsletter Funnel</h4>
+          <p>Owning my own newsletter pipeline gives me freedom beyond Medium or Substack.</p>
+        </div>
+      </div>
+    </article>
+
+    <article class="card">
+      <h2>Things That Broke (and How I Fixed Them)</h2>
+      <div class="break-fix-showcase">
+        <div class="break-item">
+          <div class="break-icon">🌐</div>
+          <div class="break-content">
+            <div class="break-title">Dynamic DNS Issues</div>
+            <div class="break-problem">Got flagged by VPNs</div>
+            <div class="break-solution">Moved records and TLS to Cloudflare; reputation + caches improved reachability</div>
+          </div>
+        </div>
+        <div class="break-item">
+          <div class="break-icon">🤖</div>
+          <div class="break-content">
+            <div class="break-title">Bot Noise & Crawlers</div>
+            <div class="break-problem">Unwanted traffic and noise</div>
+            <div class="break-solution">Basic WAF rules, rate limiting, and stricter robots policy for non-content paths</div>
+          </div>
+        </div>
+        <div class="break-item">
+          <div class="break-icon">🔄</div>
+          <div class="break-content">
+            <div class="break-title">Complex Routing</div>
+            <div class="break-problem">Brain-twisting traffic flow</div>
+            <div class="break-solution">Drew the traffic flow (client → CDN → ingress → service) and validated each hop with logs</div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="card">
+      <h2>Lessons You Can Steal</h2>
+      <div class="lessons-treasure">
+        <div class="treasure-item">
+          <div class="treasure-gem">💎</div>
+          <div class="treasure-content">
+            <div class="treasure-title">Pick Two Constraints</div>
+            <div class="treasure-lesson">Money & learning - let them drive your stack</div>
+          </div>
+        </div>
+        <div class="treasure-item">
+          <div class="treasure-gem">🔐</div>
+          <div class="treasure-content">
+            <div class="treasure-title">Own Your Infrastructure</div>
+            <div class="treasure-lesson">DNS/SSL/CDN early - where reliability and speed are won</div>
+          </div>
+        </div>
+        <div class="treasure-item">
+          <div class="treasure-gem">⚡</div>
+          <div class="treasure-content">
+            <div class="treasure-title">Automate Everything</div>
+            <div class="treasure-lesson">Even for personal sites - it keeps you fearless</div>
+          </div>
+        </div>
+        <div class="treasure-item">
+          <div class="treasure-gem">📊</div>
+          <div class="treasure-content">
+            <div class="treasure-title">Measure, Don't Track</div>
+            <div class="treasure-lesson">Favor UX metrics over invasive analytics</div>
+          </div>
+        </div>
+        <div class="treasure-item">
+          <div class="treasure-gem">📚</div>
+          <div class="treasure-content">
+            <div class="treasure-title">Write the Playbook</div>
+            <div class="treasure-lesson">As you go - your future self will reuse it in minutes</div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="card">
+      <h2>What I'd Tell My Past Self</h2>
+      <div class="advice-wisdom">
+        <div class="wisdom-item">
+          <div class="wisdom-icon">⚡</div>
+          <div class="wisdom-content">
+            <div class="wisdom-title">Stop Overthinking</div>
+            <div class="wisdom-advice">Pick something and ship. You'll learn more from shipping than from researching.</div>
+          </div>
+        </div>
+        <div class="wisdom-item">
+          <div class="wisdom-icon">🛤️</div>
+          <div class="wisdom-content">
+            <div class="wisdom-title">Two Paths is Smart</div>
+            <div class="wisdom-advice">You need to experience both managed and self-hosted to make informed decisions.</div>
+          </div>
+        </div>
+        <div class="wisdom-item">
+          <div class="wisdom-icon">📢</div>
+          <div class="wisdom-content">
+            <div class="wisdom-title">Share Early & Often</div>
+            <div class="wisdom-advice">The feedback loop from real users beats any tutorial or course.</div>
+          </div>
+        </div>
+        <div class="wisdom-item">
+          <div class="wisdom-icon">🤖</div>
+          <div class="wisdom-content">
+            <div class="wisdom-title">AI is Accelerating</div>
+            <div class="wisdom-advice">Use every tool available to move faster and learn more.</div>
+          </div>
+        </div>
+        <div class="wisdom-item">
+          <div class="wisdom-icon">📝</div>
+          <div class="wisdom-content">
+            <div class="wisdom-title">Document Everything</div>
+            <div class="wisdom-advice">Your future self will thank you when you're debugging at 2 AM.</div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="card">
+      <h2>What I'd Do Differently</h2>
+      <div class="retrospective-insights">
+        <div class="insight-section">
+          <div class="section-header">
+            <div class="section-icon">🔄</div>
+            <div class="section-title">Retrospective</div>
+          </div>
+          <div class="insight-items">
+            <div class="insight-item">
+              <div class="insight-bullet">•</div>
+              <div class="insight-text">Define an error‑budget early; alerts only when user experience is at risk</div>
+            </div>
+            <div class="insight-item">
+              <div class="insight-bullet">•</div>
+              <div class="insight-text">Lock in access‑log schemas for faster analytics iteration</div>
+            </div>
+            <div class="insight-item">
+              <div class="insight-bullet">•</div>
+              <div class="insight-text">Write a tiny "new‑service" generator to scaffold DNS, certs, and ingress in one go</div>
+            </div>
+          </div>
+        </div>
+        <div class="insight-section">
+          <div class="section-header">
+            <div class="section-icon">🚀</div>
+            <div class="section-title">What's Next</div>
+          </div>
+          <div class="insight-items">
+            <div class="insight-item">
+              <div class="insight-bullet">•</div>
+              <div class="insight-text">Publish the <span class="pill">architecture deep‑dive</span> as a separate post</div>
+            </div>
+            <div class="insight-item">
+              <div class="insight-bullet">•</div>
+              <div class="insight-text">Harden CI for blue/green previews and smoke tests</div>
+            </div>
+            <div class="insight-item">
+              <div class="insight-bullet">•</div>
+              <div class="insight-text">Ship a weekly newsletter and lightweight release notes</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="card">
+      <h2>Future Horizons</h2>
+      <div class="horizon-vision">
+        <div class="vision-item">
+          <div class="vision-icon">📰</div>
+          <div class="vision-content">
+            <div class="vision-title">Weekly Blog + Newsletter</div>
+            <div class="vision-desc">Consistent cadence for regular content delivery</div>
+          </div>
+        </div>
+        <div class="vision-item">
+          <div class="vision-icon">📚</div>
+          <div class="vision-content">
+            <div class="vision-title">Architecture Deep‑dives</div>
+            <div class="vision-desc">Publish detailed technical architecture content</div>
+          </div>
+        </div>
+        <div class="vision-item">
+          <div class="vision-icon">🤖</div>
+          <div class="vision-content">
+            <div class="vision-title">AI Integrations</div>
+            <div class="vision-desc">Chatbots, automated analytics dashboards</div>
+          </div>
+        </div>
+        <div class="vision-item">
+          <div class="vision-icon">⚙️</div>
+          <div class="vision-content">
+            <div class="vision-title">Edge Deployments</div>
+            <div class="vision-desc">Experiment with Cloudflare Workers, Fly.io</div>
+          </div>
+        </div>
+        <div class="vision-item">
+          <div class="vision-icon">📈</div>
+          <div class="vision-content">
+            <div class="vision-title">Data‑First Playground</div>
+            <div class="vision-desc">Real metrics, dashboards, A/B testing</div>
+          </div>
+        </div>
+      </div>
+    </article>
+
+    <article class="card">
+      <h2>Final Thought</h2>
+      <blockquote>"Not using AI now is like skipping the internet during the dot‑com boom. Learn it. Use it. Ship faster."</blockquote>
+      <div class="cta">
+        <a class="btn" href="https://sudharsana.dev" target="_blank">Visit my portfolio</a>
+        <a class="btn" href="#newsletter">Subscribe to the newsletter</a>
+      </div>
+    </article>
+
+    <article class="card" id="newsletter">
+      <h2>Get the next post</h2>
+      <p class="lead">I write about practical building: cloud speed, homelab reality, AI workflows, and checklists you can reuse.</p>
+      <form class="list" onsubmit="alert('Thank you!'); return false;">
+        <input aria-label="Email" required placeholder="you@example.com" type="email" style="padding:12px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:var(--ink)">
+        <button class="btn" type="submit">Subscribe</button>
+        <span class="note">No spam. Unsubscribe any time.</span>
+      </form>
+    </article>
+  </section>
+
+  <footer>
+    Built with ❤️ and curiosity. <span class="pill">Architecture deep‑dive coming soon.</span>
+  </footer>
+</div>
+
+<style>
+:root{
+  --bg: #f5f7fb;
+  --ink: #2d3642;
+  --muted: #5b6777;
+  --link: #1f6feb;
+  --accent: #0f172a;
+  --chip: #e9edf5;
+  --card-bg: #ffffff;
+  --card-br: #e6eaf2;
+  --shadow: 0 6px 18px rgba(17, 24, 39, .06);
+  --radius: 14px;
+}
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--bg); color:var(--ink);
+  font: 17px/1.7 ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial;
+}
+a{color:var(--link); text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* Layout */
+.container{max-width: 98%; margin:0 auto; padding:20px 10px 40px}
+
+/* Hero */
+header.hero{padding:20px; border:1px solid var(--card-br); background:var(--card-bg); border-radius:var(--radius); box-shadow:var(--shadow)}
+.hero h1{font-size: clamp(2.2rem, 5vw, 3.2rem); margin:0 0 14px; color:var(--accent)}
+.hero p{margin:0 0 16px; color:var(--muted)}
+
+/* Badges */
+.badges{display:flex; flex-wrap:wrap; gap:10px; margin-top:8px}
+.badge{background:var(--chip); color:var(--ink); border:1px solid #dde3ee; padding:6px 10px; border-radius:999px; font-size:.9rem}
+
+/* Grid */
+.grid{display:grid; grid-template-columns: repeat(12, 1fr); gap:12px; margin-top:16px}
+.card{grid-column: span 12; background:var(--card-bg); border:1px solid var(--card-br); padding:16px; border-radius:var(--radius); box-shadow:var(--shadow)}
+@media (min-width: 900px){.card.split{grid-column: span 7} .card.side{grid-column: span 5}}
+
+h2{font-size: clamp(1.5rem, 3vw, 2rem); margin:0 0 10px; color:var(--accent)}
+h3{font-size:1.1rem; margin:18px 0 8px; color:var(--muted)}
+.lead{font-size:1.05rem; color:var(--muted)}
+
+.list{display:grid; gap:10px; padding-left:0; list-style:disc; margin-left:20px}
+.kpis{display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-top:8px}
+.kpi{background:#f8fafc; border:1px solid var(--card-br); padding:12px 14px; border-radius:10px}
+.pill{display:inline-block; padding:.15rem .5rem; border:1px solid #dbe1ee; border-radius:999px; font-size:.8rem; color:var(--muted); background:#f6f8fc}
+
+.timeline{position:relative; padding-left:18px}
+.timeline::before{content:""; position:absolute; left:6px; top:2px; bottom:2px; width:2px; background:#dbe1ee}
+.titem{position:relative; margin:14px 0 0; padding:8px 10px 8px 12px; background:#f8fafc; border:1px solid var(--card-br); border-radius:10px}
+
+/* Journey Roadmap */
+.journey-roadmap{position:relative; margin:24px 0}
+.roadmap-step{display:flex; align-items:flex-start; margin-bottom:24px; position:relative}
+.roadmap-step:not(:last-child)::after{content:''; position:absolute; left:20px; top:40px; bottom:-24px; width:2px; background:linear-gradient(to bottom, var(--accent), transparent)}
+.step-number{flex-shrink:0; width:40px; height:40px; background:var(--accent); color:white; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:600; font-size:1.1rem; margin-right:16px}
+.step-content{flex:1; padding-top:4px}
+.step-title{font-size:1.2rem; font-weight:600; color:var(--accent); margin-bottom:6px}
+.step-quote{font-style:italic; color:var(--muted); font-size:1rem; margin-bottom:4px; background:#f8fafc; padding:8px 12px; border-radius:8px; border-left:3px solid var(--accent)}
+.step-desc{font-size:0.9rem; color:var(--muted); line-height:1.4}
+
+/* Mindset Principles */
+.mindset-principles{display:flex; flex-direction:column; gap:16px; margin:20px 0}
+.principle-item{display:flex; align-items:flex-start; padding:20px; background:linear-gradient(135deg, #fafbfc 0%, #f4f6f8 100%); border:1px solid var(--card-br); border-radius:16px; transition:all 0.3s ease; position:relative; overflow:hidden}
+.principle-item::before{content:''; position:absolute; top:0; left:0; right:0; height:3px; background:linear-gradient(90deg, var(--accent), #9fb5ff); opacity:0; transition:opacity 0.3s ease}
+.principle-item:hover{transform:translateY(-2px); box-shadow:0 6px 20px rgba(0,0,0,0.08); border-color:var(--accent)}
+.principle-item:hover::before{opacity:1}
+.principle-icon{font-size:2.2rem; margin-right:16px; flex-shrink:0; margin-top:4px}
+.principle-content{flex:1}
+.principle-title{font-size:1.2rem; font-weight:600; color:var(--accent); margin-bottom:6px}
+.principle-desc{font-size:0.95rem; color:var(--muted); line-height:1.5}
+
+/* Shipped Showcase */
+.shipped-showcase{display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:20px; margin:20px 0}
+.ship-item{display:flex; align-items:center; padding:16px; background:linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border:1px solid var(--card-br); border-radius:12px; transition:all 0.3s ease}
+.ship-item:hover{transform:translateY(-3px); box-shadow:0 8px 25px rgba(0,0,0,0.1); border-color:var(--accent)}
+.ship-icon{font-size:2.5rem; margin-right:16px; flex-shrink:0}
+.ship-content{flex:1}
+.ship-title{font-size:1.1rem; font-weight:600; color:var(--accent); margin-bottom:4px}
+.ship-flow{font-size:0.9rem; color:var(--muted); margin-bottom:2px; font-family:monospace}
+.ship-note{font-size:0.8rem; color:var(--muted); font-style:italic}
+
+/* Break-Fix Showcase */
+.break-fix-showcase{display:flex; flex-direction:column; gap:16px; margin:20px 0}
+.break-item{display:flex; align-items:flex-start; padding:20px; background:linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border:1px solid #fecaca; border-radius:12px; transition:all 0.3s ease; position:relative}
+.break-item::before{content:''; position:absolute; left:0; top:0; bottom:0; width:4px; background:linear-gradient(180deg, #ef4444, #dc2626); border-radius:0 2px 2px 0; opacity:0.8}
+.break-item:hover{transform:translateY(-2px); box-shadow:0 6px 20px rgba(239, 68, 68, 0.15); border-color:#ef4444}
+.break-icon{font-size:2rem; margin-right:16px; flex-shrink:0; margin-top:4px}
+.break-content{flex:1}
+.break-title{font-size:1.2rem; font-weight:600; color:#dc2626; margin-bottom:6px}
+.break-problem{font-size:0.9rem; color:#991b1b; margin-bottom:4px; font-style:italic; background:#fef2f2; padding:4px 8px; border-radius:6px; display:inline-block}
+.break-solution{font-size:0.95rem; color:#7f1d1d; line-height:1.4; background:#fef7f7; padding:8px 12px; border-radius:8px; border-left:3px solid #ef4444}
+
+/* Lessons Treasure */
+.lessons-treasure{display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:20px; margin:20px 0}
+.treasure-item{display:flex; align-items:center; padding:20px; background:linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border:2px solid #0ea5e9; border-radius:16px; transition:all 0.4s ease; position:relative; overflow:hidden}
+.treasure-item::before{content:''; position:absolute; top:0; left:0; right:0; bottom:0; background:linear-gradient(45deg, transparent 30%, rgba(14, 165, 233, 0.1) 50%, transparent 70%); transform:translateX(-100%); transition:transform 0.6s ease}
+.treasure-item:hover{transform:scale(1.02) rotate(1deg); box-shadow:0 10px 30px rgba(14, 165, 233, 0.2); border-color:#0284c7}
+.treasure-item:hover::before{transform:translateX(100%)}
+.treasure-gem{font-size:2.5rem; margin-right:20px; flex-shrink:0; filter:drop-shadow(0 2px 4px rgba(0,0,0,0.1))}
+.treasure-content{flex:1}
+.treasure-title{font-size:1.3rem; font-weight:700; color:#0c4a6e; margin-bottom:8px; text-shadow:0 1px 2px rgba(0,0,0,0.1)}
+.treasure-lesson{font-size:1rem; color:#075985; line-height:1.5; font-weight:500}
+
+/* Retrospective Insights */
+.retrospective-insights{display:flex; flex-direction:column; gap:24px; margin:20px 0}
+.insight-section{background:linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border:1px solid #e2e8f0; border-radius:12px; padding:20px; transition:all 0.3s ease}
+.insight-section:hover{transform:translateY(-2px); box-shadow:0 8px 25px rgba(0,0,0,0.08); border-color:#cbd5e1}
+.section-header{display:flex; align-items:center; margin-bottom:16px; padding-bottom:12px; border-bottom:2px solid #e2e8f0}
+.section-icon{font-size:1.8rem; margin-right:12px; filter:drop-shadow(0 1px 2px rgba(0,0,0,0.1))}
+.section-title{font-size:1.4rem; font-weight:700; color:#1e293b; text-transform:uppercase; letter-spacing:0.5px}
+.insight-items{display:flex; flex-direction:column; gap:12px}
+.insight-item{display:flex; align-items:flex-start; padding:12px 16px; background:white; border-radius:8px; border-left:4px solid #6366f1; transition:all 0.2s ease}
+.insight-item:hover{transform:translateX(4px); box-shadow:0 4px 12px rgba(99, 102, 241, 0.1); border-left-color:#4f46e5}
+.insight-bullet{font-size:1.2rem; color:#6366f1; font-weight:bold; margin-right:12px; margin-top:2px; flex-shrink:0}
+.insight-text{font-size:1rem; color:#374151; line-height:1.5; flex:1}
+
+/* Horizon Vision */
+.horizon-vision{display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:20px; margin:20px 0}
+.vision-item{display:flex; align-items:center; padding:24px; background:linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border:1px solid #e2e8f0; border-radius:16px; transition:all 0.3s ease; position:relative}
+.vision-item:hover{transform:translateY(-3px); box-shadow:0 12px 28px rgba(0,0,0,0.12); border-color:#cbd5e1}
+.vision-icon{font-size:2.2rem; margin-right:20px; flex-shrink:0; opacity:0.8}
+.vision-content{flex:1}
+.vision-title{font-size:1.3rem; font-weight:600; color:#374151; margin-bottom:6px}
+.vision-desc{font-size:1rem; color:#6b7280; line-height:1.5}
+
+/* Advice Wisdom */
+.advice-wisdom{display:flex; flex-direction:column; gap:12px; margin:20px 0}
+.wisdom-item{display:flex; align-items:center; padding:16px 20px; background:linear-gradient(135deg, #fff8f0 0%, #fef7ed 100%); border:1px solid #fed7aa; border-radius:12px; transition:all 0.3s ease; position:relative}
+.wisdom-item::before{content:''; position:absolute; left:0; top:0; bottom:0; width:4px; background:linear-gradient(180deg, #f59e0b, #d97706); border-radius:0 2px 2px 0; opacity:0.8}
+.wisdom-item:hover{transform:translateX(4px); box-shadow:0 4px 16px rgba(245, 158, 11, 0.15); border-color:#f59e0b}
+.wisdom-icon{font-size:1.8rem; margin-right:16px; flex-shrink:0}
+.wisdom-content{flex:1}
+.wisdom-title{font-size:1.1rem; font-weight:600; color:#92400e; margin-bottom:4px}
+.wisdom-advice{font-size:0.95rem; color:#a16207; line-height:1.4; font-style:italic}
+
+/* Challenges Grid */
+.challenges-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:16px; margin:20px 0}
+.challenge-card{background:var(--card-bg); border:1px solid var(--card-br); border-radius:var(--radius); padding:20px; text-align:center; transition:transform 0.2s ease, box-shadow 0.2s ease}
+.challenge-card:hover{transform:translateY(-2px); box-shadow:0 4px 12px rgba(0,0,0,0.1)}
+.challenge-icon{font-size:2rem; margin-bottom:12px; display:block}
+.challenge-card h4{font-size:1.1rem; margin:0 0 8px; color:var(--accent); font-weight:600}
+.challenge-card p{font-size:0.9rem; color:var(--muted); margin:0; line-height:1.5}
+
+blockquote{margin:12px 0; padding:12px 14px; border-left:4px solid #9fb5ff; background:#f6f8fc; color:var(--ink); border-radius:10px}
+
+.cta{display:flex; flex-wrap:wrap; gap:10px; margin-top:10px}
+.btn{display:inline-flex; align-items:center; gap:8px; padding:10px 14px; border-radius:10px; border:1px solid var(--card-br); background:#ffffff; box-shadow:var(--shadow)}
+
+input[type=email]{width:100%; max-width:420px}
+.note{font-size:.92rem; color:var(--muted)}
+
+footer{margin-top:28px; padding:20px 0; color:var(--muted); font-size:.92rem; border-top:none}
+</style>

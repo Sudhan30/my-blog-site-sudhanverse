@@ -62,16 +62,22 @@ function writeIndex(posts) {
 function writePosts(posts) {
   ensureDir(OUT_POSTS);
   for (const p of posts) {
-    // Check if custom HTML already exists
-    const customHtmlPath = path.join(OUT_POSTS, `${p.slug}.html`);
-    if (fs.existsSync(customHtmlPath)) {
-      console.log(`Skipping ${p.slug}.html - custom HTML already exists`);
-      continue;
-    }
+    const htmlPath = path.join(OUT_POSTS, `${p.slug}.html`);
+    const fallbackPath = path.join(OUT_POSTS, `${p.slug}.md.html`);
     
-    // Only generate basic HTML if no custom version exists
-    const htmlDoc = `<!doctype html><html><head><meta charset="utf-8"><title>${p.title}</title></head><body>${p.html}</body></html>`;
-    fs.writeFileSync(customHtmlPath, htmlDoc, 'utf8');
+    // Check if custom HTML already exists
+    if (fs.existsSync(htmlPath)) {
+      console.log(`Custom HTML exists for ${p.slug}.html - preserving it`);
+      // Generate a fallback markdown version with different name
+      const htmlDoc = `<!doctype html><html><head><meta charset="utf-8"><title>${p.title}</title></head><body>${p.html}</body></html>`;
+      fs.writeFileSync(fallbackPath, htmlDoc, 'utf8');
+      console.log(`Generated fallback: ${p.slug}.md.html`);
+    } else {
+      // Generate basic HTML from markdown
+      const htmlDoc = `<!doctype html><html><head><meta charset="utf-8"><title>${p.title}</title></head><body>${p.html}</body></html>`;
+      fs.writeFileSync(htmlPath, htmlDoc, 'utf8');
+      console.log(`Generated: ${p.slug}.html`);
+    }
   }
 }
 

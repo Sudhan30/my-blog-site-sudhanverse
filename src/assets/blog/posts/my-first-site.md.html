@@ -1,0 +1,85 @@
+<!doctype html><html><head><meta charset="utf-8"><title>Two Sites, Two Paths: Cloud Portfolio + Self-Hosted Blog</title></head><body><h1>Two Sites, Two Paths: Cloud Portfolio + Self‑Hosted Blog</h1>
+<p>Why I built two versions of my blog—one in the cloud, one self-hosted. The lessons, the costs, and what I&#39;d do differently.</p>
+<h2>Why Two Paths?</h2>
+<p>I wanted to experience both managed and self-hosted approaches. The cloud version teaches me about managed services, while the homelab version gives me complete control and deeper system understanding.</p>
+<h3>The Mindset</h3>
+<ul>
+<li><strong>🧠 Build to learn.</strong> System design sticks better when you deploy it, not just read about it.</li>
+<li><strong>🔧 Own the layers.</strong> From HTML div to DNS to CDN—ownership unlocks infinite customization.</li>
+<li><strong>🤖 Use AI, ruthlessly.</strong> It makes me 5–10× faster for scaffolding, docs, and first drafts.</li>
+</ul>
+<h3>What I Shipped (High‑level)</h3>
+<ul>
+<li><strong>☁️ Portfolio @ Cloud:</strong> domain → SSL → hosting → CI in a sitting. Free‑tier friendly.</li>
+<li><strong>🖥️ Blog @ Homelab:</strong> self‑hosted on my mini‑PC; Kubernetes for repeatable deploys.</li>
+<li><strong>📊 Analytics:</strong> lightweight, privacy‑aware signals to improve UX (no creepy tracking).</li>
+<li><strong>🛡️ Hardening:</strong> Cloudflare, DNS hygiene, sane bot rules, and reputation clean‑up.</li>
+</ul>
+<h2>The Journey</h2>
+<h3>Week 1: &quot;I should build something real&quot;</h3>
+<p>The initial spark and overwhelming choice paralysis</p>
+<h3>Week 2: &quot;Let&#39;s just start with the cloud&quot;</h3>
+<p>GCP setup, domain purchase, first deployment</p>
+<h3>Week 3: &quot;Wait, what about my homelab?&quot;</h3>
+<p>The realization that two paths could teach different lessons</p>
+<h3>Week 4: &quot;This is actually working&quot;</h3>
+<p>First real visitors, feedback, and the confidence boost</p>
+<h2>Technical Challenges &amp; Solutions</h2>
+<ul>
+<li><strong>🔧 Infrastructure as Code:</strong> Learned Kubernetes manifests, Helm charts, and GitOps workflows the hard way.</li>
+<li><strong>🌐 DNS Mastery:</strong> From basic A records to CNAME chains, SPF/DKIM setup, and subdomain routing.</li>
+<li><strong>🔒 Security Hardening:</strong> Rate limiting, WAF rules, bot detection, and SSL certificate automation.</li>
+<li><strong>📈 Performance Optimization:</strong> CDN configuration, image optimization, and caching strategies.</li>
+<li><strong>🔄 CI/CD Pipeline:</strong> Automated builds, testing, and deployments across multiple environments.</li>
+<li><strong>Dynamic DNS issues:</strong> Some VPNs blocked DuckDNS; migrating to Cloudflare solved it completely.</li>
+<li><strong>SEO optimization:</strong> Added meta tags, structured data, and clean URLs for better discoverability.</li>
+<li><strong>Security mindset:</strong> Coming from Walmart, I realized preventing bad actors is as important as building features. Rate limits, WAF rules, and bot filters became must‑dos.</li>
+<li><strong>Newsletter funnel:</strong> Owning my own newsletter pipeline gives me freedom beyond Medium or Substack.</li>
+</ul>
+<h2>Things That Broke (and How I Fixed Them)</h2>
+<ul>
+<li><strong>🌐 Dynamic DNS Issues:</strong> Got flagged by VPNs. Solution: Moved records and TLS to Cloudflare; reputation + caches improved reachability.</li>
+<li><strong>🤖 Bot noise &amp; crawlers:</strong> Solution: Basic WAF rules, rate limiting, and a stricter robots policy for non‑content paths.</li>
+<li><strong>🧠 Complex routing brain‑twisters:</strong> Solution: Drew the traffic flow (client → CDN → ingress → service) and validated each hop with logs.</li>
+</ul>
+<h2>Lessons You Can Steal</h2>
+<ul>
+<li><strong>💎 Pick Two Constraints:</strong> Money &amp; learning - let them drive your stack.</li>
+<li><strong>🔐 Own Your DNS/SSL/CDN:</strong> Early—it&#39;s where reliability and speed are won.</li>
+<li><strong>⚙️ Automate Deploys:</strong> Even for a personal site; it keeps you fearless.</li>
+<li><strong>📊 Measure, Don&#39;t Track:</strong> Favor UX metrics over invasive analytics.</li>
+<li><strong>📝 Write the Playbook:</strong> As you go. Your future self will reuse it in minutes.</li>
+</ul>
+<h2>What I&#39;d Tell My Past Self</h2>
+<ul>
+<li><strong>⚡ Stop Overthinking:</strong> Pick something and ship. You&#39;ll learn more from shipping than from researching.</li>
+<li><strong>🛤️ Two Paths Isn&#39;t Overkill:</strong> It&#39;s smart. You need to experience both managed and self-hosted to make informed decisions.</li>
+<li><strong>📢 Share Early, Share Often:</strong> The feedback loop from real users beats any tutorial or course.</li>
+<li><strong>🤖 AI Isn&#39;t Cheating:</strong> It&#39;s accelerating. Use every tool available to move faster and learn more.</li>
+<li><strong>📚 Document Everything:</strong> Your future self will thank you when you&#39;re debugging at 2 AM.</li>
+</ul>
+<h2>What I&#39;d Do Differently</h2>
+<h3>Retrospective</h3>
+<ul>
+<li>Define an error‑budget early; alerts only when user experience is at risk.</li>
+<li>Lock in access‑log schemas for faster analytics iteration.</li>
+<li>Write a tiny &quot;new‑service&quot; generator to scaffold DNS, certs, and ingress in one go.</li>
+</ul>
+<h3>What&#39;s Next</h3>
+<ul>
+<li>Publish the architecture deep‑dive as a separate post.</li>
+<li>Harden CI for blue/green previews and smoke tests.</li>
+<li>Ship a weekly newsletter and lightweight release notes.</li>
+</ul>
+<h2>Future Horizons</h2>
+<ul>
+<li><strong>📰 Weekly Blog + Newsletter:</strong> Consistent cadence for regular content delivery.</li>
+<li><strong>📚 Architecture Deep‑dives:</strong> Publish detailed technical architecture content.</li>
+<li><strong>🤖 AI Integrations:</strong> Chatbots, automated analytics dashboards.</li>
+<li><strong>⚙️ Edge Deployments:</strong> Experiment with Cloudflare Workers, Fly.io.</li>
+<li><strong>📈 Data‑First Playground:</strong> Real metrics, dashboards, A/B testing.</li>
+</ul>
+<h2>Final Thought</h2>
+<p>&quot;Not using AI now is like skipping the internet during the dot‑com boom. Learn it. Use it. Ship faster.&quot;</p>
+<p>Built with ❤️ and curiosity. Architecture deep‑dive coming soon.</p>
+</body></html>

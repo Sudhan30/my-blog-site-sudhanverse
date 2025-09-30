@@ -16,12 +16,12 @@
     </item>
 
     <item>
-      <title><![CDATA[Building My First Website]]></title>
+      <title><![CDATA[Two Sites, Two Paths: Cloud Portfolio + Self-Hosted Blog]]></title>
       <link>https://blog.sudharsana.dev/post/my-first-site</link>
       <guid>https://blog.sudharsana.dev/post/my-first-site</guid>
       <pubDate>Mon, 15 Jan 2024 00:00:00 GMT</pubDate>
-      <description><![CDATA[A journey through building my very first website from scratch. Learn about the challenges, discoveries, and lessons learned along the way.]]></description>
-      <category><![CDATA[web-development]]></category><category><![CDATA[beginner]]></category><category><![CDATA[html]]></category><category><![CDATA[css]]></category>
+      <description><![CDATA[Why I built two versions of my blog—one in the cloud, one self-hosted. The lessons, the costs, and what I'd do differently.]]></description>
+      <category><![CDATA[web-development]]></category><category><![CDATA[cloud]]></category><category><![CDATA[homelab]]></category><category><![CDATA[architecture]]></category>
     </item>
     </channel>
   </rss>

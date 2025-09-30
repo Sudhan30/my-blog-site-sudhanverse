@@ -14,25 +14,24 @@
     },
     {
       "slug": "my-first-site",
-      "title": "Building My First Website",
+      "title": "Two Sites, Two Paths: Cloud Portfolio + Self-Hosted Blog",
       "date": "2024-01-15T00:00:00.000Z",
       "tags": [
         "web-development",
-        "beginner",
-        "html",
-        "css"
+        "cloud",
+        "homelab",
+        "architecture"
       ],
-      "excerpt": "A journey through building my very first website from scratch. Learn about the challenges, discoveries, and lessons learned along the way."
+      "excerpt": "Why I built two versions of my blog—one in the cloud, one self-hosted. The lessons, the costs, and what I'd do differently."
     }
   ],
   "tags": {
-    "cloud": 1,
+    "cloud": 2,
     "deployment": 1,
     "infrastructure": 1,
     "devops": 1,
     "web-development": 1,
-    "beginner": 1,
-    "html": 1,
-    "css": 1
+    "homelab": 1,
+    "architecture": 1
   }
 }
