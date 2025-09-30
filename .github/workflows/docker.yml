@@ -97,11 +97,7 @@ jobs:
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
           git add clusters/prod/apps/blog/deployment.yaml
-          git commit -m "🚀 Update blog image to blog-${{ steps.blog-info.outputs.commit_sha }}
-
-          - Built from: ${{ env.BLOG_REPO }}@${{ steps.blog-info.outputs.branch }}
-          - Commit: ${{ steps.blog-info.outputs.commit_message }}
-          - SHA: ${{ steps.blog-info.outputs.commit_sha }}"
+          git commit -m "🚀 Update blog image to blog-${{ steps.blog-info.outputs.commit_sha }}"
           git remote set-url origin https://${{ secrets.PAT_TOKEN }}@github.com/${{ env.INFRA_REPO }}.git
           git push origin main
           
@@ -116,7 +112,7 @@ jobs:
         echo "✅ Blog image built and deployment updated successfully!"
         echo "📦 Image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_BLOG }}:blog-${{ steps.blog-info.outputs.commit_sha }}"
         echo "📝 Source: ${{ env.BLOG_REPO }}@${{ steps.blog-info.outputs.branch }}"
-        echo "🔗 Commit: ${{ steps.blog-info.outputs.commit_message }}"
+        echo "🔗 Commit: ${{ steps.blog-info.outputs.commit_sha }}"
         echo ""
         echo "🔄 Flux CD will now deploy the updated image to your cluster"
         echo "⏱️  Expected deployment time: 2-3 minutes"
