@@ -34,10 +34,30 @@ import { CommonModule } from '@angular/common';
       <!-- Header -->
       <header class="blog-header">
         <div class="header-content">
-          <h1 class="site-title">SudharVerse</h1>
+          <div class="site-title">
+            <div class="logo-container">
+              <div class="logo-initials">SR</div>
+              <div class="logo-text">Sudharsana</div>
+            </div>
+          </div>
                   <nav class="header-nav">
-                    <a [routerLink]="['/']" class="nav-link">Home</a>
+                    <a [routerLink]="['/']" class="nav-link active">Home</a>
+                    <a href="https://sudharsana.dev" target="_blank" rel="noopener" class="nav-link">About</a>
                     <a href="https://www.linkedin.com/in/sudharsanarajasekaran/" target="_blank" rel="noopener" class="nav-link">Contact</a>
+                  </nav>
+                  
+                  <!-- Mobile Menu Button -->
+                  <button class="mobile-menu-btn" (click)="toggleMobileMenu()" [class.active]="isMobileMenuOpen">
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                    <span class="hamburger-line"></span>
+                  </button>
+                  
+                  <!-- Mobile Menu -->
+                  <nav class="mobile-nav" [class.open]="isMobileMenuOpen">
+                    <a [routerLink]="['/']" class="mobile-nav-link active" (click)="closeMobileMenu()">Home</a>
+                    <a href="https://sudharsana.dev" target="_blank" rel="noopener" class="mobile-nav-link" (click)="closeMobileMenu()">About</a>
+                    <a href="https://www.linkedin.com/in/sudharsanarajasekaran/" target="_blank" rel="noopener" class="mobile-nav-link" (click)="closeMobileMenu()">Contact</a>
                   </nav>
         </div>
       </header>
@@ -275,10 +295,10 @@ import { CommonModule } from '@angular/common';
 
     /* Header */
     .blog-header {
-      background: linear-gradient(135deg, #2c2c2c 0%, #1a1a1a 100%);
-      color: #b8b8b8;
-      padding: 0.75rem 1.5rem;
-      border-bottom: 1px solid #404040;
+      background: #161616;
+      color: #f4f4f4;
+      padding: 1rem 0;
+      border-bottom: 1px solid #393939;
       box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
     }
 
@@ -286,18 +306,82 @@ import { CommonModule } from '@angular/common';
       display: flex;
       justify-content: space-between;
       align-items: center;
-      max-width: 1200px;
+      max-width: 64rem;
       margin: 0 auto;
+      position: relative;
+      width: 100%;
+      padding: 0 1rem;
     }
 
     .site-title {
-      font-size: 1.25rem;
-      font-weight: bold;
-      font-family: 'Lora', serif;
       margin: 0;
-      color: #ffffff;
-      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
     }
+
+    .logo-container {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex: 1;
+      justify-content: flex-start;
+      margin-left: 0;
+    }
+
+    .logo-initials {
+      width: 44px;
+      height: 44px;
+      background: linear-gradient(135deg, #ffffff 0%, #f8fafc 100%);
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Playfair Display', 'Georgia', 'Times New Roman', serif;
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: #0f62fe;
+      letter-spacing: -0.01em;
+      position: relative;
+      box-shadow: 
+        0 2px 8px rgba(0, 0, 0, 0.1),
+        0 1px 3px rgba(0, 0, 0, 0.05),
+        inset 0 1px 0 rgba(255, 255, 255, 0.8);
+      transition: all 0.3s ease;
+      border: 2px solid rgba(15, 98, 254, 0.2);
+    }
+
+    .logo-initials::before {
+      content: '';
+      position: absolute;
+      top: -3px;
+      left: -3px;
+      right: -3px;
+      bottom: -3px;
+      background: linear-gradient(135deg, #0f62fe, #0043ce);
+      border-radius: 50%;
+      z-index: -1;
+      opacity: 0.3;
+      filter: blur(2px);
+    }
+
+    .logo-initials:hover {
+      transform: translateY(-1px) scale(1.02);
+      box-shadow: 
+        0 4px 12px rgba(15, 98, 254, 0.2),
+        0 2px 6px rgba(0, 0, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.9);
+      border-color: rgba(15, 98, 254, 0.3);
+    }
+
+    .logo-text {
+      font-size: 1.4rem;
+      font-weight: 700;
+      font-family: 'Helvetica Neue', 'Arial', 'sans-serif';
+      color: #ffffff;
+      text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+      letter-spacing: 0.08em;
+      position: relative;
+      text-transform: uppercase;
+    }
+
 
     .header-nav {
       display: flex;
@@ -305,15 +389,107 @@ import { CommonModule } from '@angular/common';
     }
 
     .nav-link {
-      color: #b8b8b8;
+      color: #a8a8a8;
       text-decoration: none;
       transition: color 0.2s ease;
       font-family: 'Open Sans', sans-serif;
       font-size: 0.9rem;
+      padding: 0.5rem 1rem;
+      border-radius: 0.375rem;
     }
 
-    .nav-link:hover {
+    .nav-link:hover,
+    .nav-link.active {
       color: #ffffff;
+      background-color: #262626;
+    }
+
+    /* Mobile Menu Button */
+    .mobile-menu-btn {
+      display: none;
+      flex-direction: column;
+      justify-content: space-around;
+      width: 30px;
+      height: 30px;
+      background: transparent;
+      border: none;
+      cursor: pointer;
+      padding: 0;
+      z-index: 1001;
+      position: absolute;
+      right: 0;
+      top: 50%;
+      transform: translateY(-50%);
+    }
+
+    .hamburger-line {
+      width: 25px;
+      height: 3px;
+      background-color: #f4f4f4;
+      transition: all 0.3s ease;
+      transform-origin: center;
+    }
+
+    .mobile-menu-btn.active .hamburger-line:nth-child(1) {
+      transform: rotate(45deg) translate(6px, 6px);
+    }
+
+    .mobile-menu-btn.active .hamburger-line:nth-child(2) {
+      opacity: 0;
+    }
+
+    .mobile-menu-btn.active .hamburger-line:nth-child(3) {
+      transform: rotate(-45deg) translate(6px, -6px);
+    }
+
+    /* Mobile Navigation */
+    .mobile-nav {
+      display: none;
+      position: fixed;
+      top: 0;
+      right: 0;
+      width: 280px;
+      height: 100vh;
+      background: #161616;
+      border-left: 1px solid #393939;
+      padding: 80px 20px 20px;
+      transform: translateX(100%);
+      transition: transform 0.3s ease;
+      z-index: 1000;
+    }
+
+    .mobile-nav.open {
+      transform: translateX(0);
+    }
+
+    .mobile-nav-link {
+      display: block;
+      color: #a8a8a8;
+      text-decoration: none;
+      padding: 15px 0;
+      border-bottom: 1px solid #393939;
+      font-size: 1rem;
+      transition: color 0.2s ease;
+    }
+
+    .mobile-nav-link:hover,
+    .mobile-nav-link.active {
+      color: #ffffff;
+    }
+
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+      .header-nav {
+        display: none;
+      }
+
+      .mobile-menu-btn {
+        display: flex;
+      }
+
+      .mobile-nav {
+        display: block;
+      }
     }
 
     /* Main Content */
@@ -991,6 +1167,8 @@ export class PostComponent implements OnInit {
     });
   }
 
+  isMobileMenuOpen = false;
+
   ngOnInit() {
     this.route.params.subscribe(params => {
       this.currentSlug = params['slug'];
@@ -999,6 +1177,14 @@ export class PostComponent implements OnInit {
       this.loadClapCount();
       this.loadComments();
     });
+  }
+
+  toggleMobileMenu() {
+    this.isMobileMenuOpen = !this.isMobileMenuOpen;
+  }
+
+  closeMobileMenu() {
+    this.isMobileMenuOpen = false;
   }
 
   private getPostIdFromSlug(slug: string): string {

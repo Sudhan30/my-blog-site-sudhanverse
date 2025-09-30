@@ -24,12 +24,12 @@
     <aside class="card side">
       <h2>Stack at a Glance</h2>
       <ul class="list">
-        <li>☁️ GCP hosting, CDN/SSL</li>
-        <li>🖥️ Linux + K3s/Kubernetes</li>
-        <li>🌐 Cloudflare for DNS & Edge</li>
-        <li>📧 Zoho Mail newsletters</li>
-        <li>🔍 SEO + performance tweaks</li>
-      </ul>
+        <li>GCP hosting, CDN/SSL</li>
+        <li>Linux + K3s/Kubernetes</li>
+        <li>Cloudflare for DNS & Edge</li>
+        <li>Zoho Mail newsletters</li>
+        <li>SEO + performance tweaks</li>
+</ul>
       <blockquote>"If Medium is a freeway, I chose the scenic route—more work, way more control."</blockquote>
     </aside>
 
@@ -260,40 +260,35 @@
 
     <article class="card">
       <h2>What I'd Tell My Past Self</h2>
-      <div class="advice-wisdom">
-        <div class="wisdom-item">
-          <div class="wisdom-icon">⚡</div>
-          <div class="wisdom-content">
-            <div class="wisdom-title">Stop Overthinking</div>
-            <div class="wisdom-advice">Pick something and ship. You'll learn more from shipping than from researching.</div>
+      <div class="insights-grid">
+        <div class="insight-card">
+          <div class="card-content">
+            <h3 class="card-title">Stop Overthinking</h3>
+            <p class="card-text">Pick something and ship. You'll learn more from shipping than from researching.</p>
           </div>
         </div>
-        <div class="wisdom-item">
-          <div class="wisdom-icon">🛤️</div>
-          <div class="wisdom-content">
-            <div class="wisdom-title">Two Paths is Smart</div>
-            <div class="wisdom-advice">You need to experience both managed and self-hosted to make informed decisions.</div>
+        <div class="insight-card">
+          <div class="card-content">
+            <h3 class="card-title">Two Paths is Smart</h3>
+            <p class="card-text">You need to experience both managed and self-hosted to make informed decisions.</p>
           </div>
         </div>
-        <div class="wisdom-item">
-          <div class="wisdom-icon">📢</div>
-          <div class="wisdom-content">
-            <div class="wisdom-title">Share Early & Often</div>
-            <div class="wisdom-advice">The feedback loop from real users beats any tutorial or course.</div>
+        <div class="insight-card">
+          <div class="card-content">
+            <h3 class="card-title">Share Early & Often</h3>
+            <p class="card-text">The feedback loop from real users beats any tutorial or course.</p>
           </div>
         </div>
-        <div class="wisdom-item">
-          <div class="wisdom-icon">🤖</div>
-          <div class="wisdom-content">
-            <div class="wisdom-title">AI is Accelerating</div>
-            <div class="wisdom-advice">Use every tool available to move faster and learn more.</div>
+        <div class="insight-card">
+          <div class="card-content">
+            <h3 class="card-title">AI is Accelerating</h3>
+            <p class="card-text">Use every tool available to move faster and learn more.</p>
           </div>
         </div>
-        <div class="wisdom-item">
-          <div class="wisdom-icon">📝</div>
-          <div class="wisdom-content">
-            <div class="wisdom-title">Document Everything</div>
-            <div class="wisdom-advice">Your future self will thank you when you're debugging at 2 AM.</div>
+        <div class="insight-card">
+          <div class="card-content">
+            <h3 class="card-title">Document Everything</h3>
+            <p class="card-text">Your future self will thank you when you're debugging at 2 AM.</p>
           </div>
         </div>
       </div>
@@ -391,18 +386,27 @@
       <blockquote>"Not using AI now is like skipping the internet during the dot‑com boom. Learn it. Use it. Ship faster."</blockquote>
       <div class="cta">
         <a class="btn" href="https://sudharsana.dev" target="_blank">Visit my portfolio</a>
-        <a class="btn" href="#newsletter">Subscribe to the newsletter</a>
       </div>
     </article>
 
     <article class="card" id="newsletter">
       <h2>Get the next post</h2>
       <p class="lead">I write about practical building: cloud speed, homelab reality, AI workflows, and checklists you can reuse.</p>
-      <form class="list" onsubmit="alert('Thank you!'); return false;">
-        <input aria-label="Email" required placeholder="you@example.com" type="email" style="padding:12px 14px;border-radius:12px;border:1px solid rgba(255,255,255,.2);background:rgba(255,255,255,.06);color:var(--ink)">
-        <button class="btn" type="submit">Subscribe</button>
-        <span class="note">No spam. Unsubscribe any time.</span>
-      </form>
+      <div class="newsletter-form">
+        <form class="newsletter-signup" onsubmit="alert('Thank you for subscribing!'); return false;">
+          <div class="form-group">
+            <input 
+              aria-label="Email address" 
+              required 
+              placeholder="Enter your email address" 
+              type="email" 
+              class="email-input"
+              name="email">
+            <button class="subscribe-btn" type="submit">Subscribe to the newsletter</button>
+          </div>
+          <p class="newsletter-note">No spam. Unsubscribe any time.</p>
+        </form>
+      </div>
     </article>
   </section>
 
@@ -433,11 +437,11 @@ a{color:var(--link); text-decoration:none}
 a:hover{text-decoration:underline}
 
 /* Layout */
-.container{max-width: 98%; margin:0 auto; padding:20px 10px 40px}
+.container{max-width: 98%; margin:0 auto; padding:30px 20px 50px}
 
 /* Hero */
 header.hero{padding:20px; border:1px solid var(--card-br); background:var(--card-bg); border-radius:var(--radius); box-shadow:var(--shadow)}
-.hero h1{font-size: clamp(2.2rem, 5vw, 3.2rem); margin:0 0 14px; color:var(--accent)}
+.hero h1{font-size: clamp(1.8rem, 4vw, 2.4rem); margin:0 0 14px; color:var(--accent)}
 .hero p{margin:0 0 16px; color:var(--muted)}
 
 /* Badges */
@@ -449,11 +453,14 @@ header.hero{padding:20px; border:1px solid var(--card-br); background:var(--card
 .card{grid-column: span 12; background:var(--card-bg); border:1px solid var(--card-br); padding:16px; border-radius:var(--radius); box-shadow:var(--shadow)}
 @media (min-width: 900px){.card.split{grid-column: span 7} .card.side{grid-column: span 5}}
 
-h2{font-size: clamp(1.5rem, 3vw, 2rem); margin:0 0 10px; color:var(--accent)}
-h3{font-size:1.1rem; margin:18px 0 8px; color:var(--muted)}
+h2{font-size: clamp(1.3rem, 2.8vw, 1.6rem) !important; margin:0 0 10px; color:var(--accent)}
+.card h2{font-size: clamp(1.2rem, 2.5vw, 1.5rem) !important; margin:0 0 8px; color:var(--accent)}
+h3{font-size:1rem; margin:18px 0 8px; color:var(--muted)}
 .lead{font-size:1.05rem; color:var(--muted)}
 
-.list{display:grid; gap:10px; padding-left:0; list-style:disc; margin-left:20px}
+.list{display:grid; gap:10px; padding-left:0; list-style:none; margin-left:0}
+.list li{display:flex; align-items:center; gap:8px; color:var(--text); font-weight:500}
+.list li::before{content:'✓'; display:flex; align-items:center; justify-content:center; width:20px; height:20px; border-radius:50%; background-color:#0f62fe; color:#ffffff; font-weight:normal; font-size:0.7rem; flex-shrink:0; line-height:1}
 .kpis{display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-top:8px}
 .kpi{background:#f8fafc; border:1px solid var(--card-br); padding:12px 14px; border-radius:10px}
 .pill{display:inline-block; padding:.15rem .5rem; border:1px solid #dbe1ee; border-radius:999px; font-size:.8rem; color:var(--muted); background:#f6f8fc}
@@ -468,7 +475,7 @@ h3{font-size:1.1rem; margin:18px 0 8px; color:var(--muted)}
 .roadmap-step:not(:last-child)::after{content:''; position:absolute; left:20px; top:40px; bottom:-24px; width:2px; background:linear-gradient(to bottom, var(--accent), transparent)}
 .step-number{flex-shrink:0; width:40px; height:40px; background:var(--accent); color:white; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:600; font-size:1.1rem; margin-right:16px}
 .step-content{flex:1; padding-top:4px}
-.step-title{font-size:1.2rem; font-weight:600; color:var(--accent); margin-bottom:6px}
+.step-title{font-size:1.1rem; font-weight:600; color:var(--accent); margin-bottom:6px}
 .step-quote{font-style:italic; color:var(--muted); font-size:1rem; margin-bottom:4px; background:#f8fafc; padding:8px 12px; border-radius:8px; border-left:3px solid var(--accent)}
 .step-desc{font-size:0.9rem; color:var(--muted); line-height:1.4}
 
@@ -480,7 +487,7 @@ h3{font-size:1.1rem; margin:18px 0 8px; color:var(--muted)}
 .principle-item:hover::before{opacity:1}
 .principle-icon{font-size:2.2rem; margin-right:16px; flex-shrink:0; margin-top:4px}
 .principle-content{flex:1}
-.principle-title{font-size:1.2rem; font-weight:600; color:var(--accent); margin-bottom:6px}
+.principle-title{font-size:1.1rem; font-weight:600; color:var(--accent); margin-bottom:6px}
 .principle-desc{font-size:0.95rem; color:var(--muted); line-height:1.5}
 
 /* Shipped Showcase */
@@ -495,25 +502,25 @@ h3{font-size:1.1rem; margin:18px 0 8px; color:var(--muted)}
 
 /* Break-Fix Showcase */
 .break-fix-showcase{display:flex; flex-direction:column; gap:16px; margin:20px 0}
-.break-item{display:flex; align-items:flex-start; padding:20px; background:linear-gradient(135deg, #fef2f2 0%, #fee2e2 100%); border:1px solid #fecaca; border-radius:12px; transition:all 0.3s ease; position:relative}
-.break-item::before{content:''; position:absolute; left:0; top:0; bottom:0; width:4px; background:linear-gradient(180deg, #ef4444, #dc2626); border-radius:0 2px 2px 0; opacity:0.8}
-.break-item:hover{transform:translateY(-2px); box-shadow:0 6px 20px rgba(239, 68, 68, 0.15); border-color:#ef4444}
+.break-item{display:flex; align-items:flex-start; padding:20px; background:linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border:1px solid #e2e8f0; border-radius:12px; transition:all 0.3s ease; position:relative}
+.break-item::before{content:''; position:absolute; left:0; top:0; bottom:0; width:4px; background:linear-gradient(180deg, #64748b, #475569); border-radius:0 2px 2px 0; opacity:0.8}
+.break-item:hover{transform:translateY(-2px); box-shadow:0 6px 20px rgba(100, 116, 139, 0.15); border-color:#64748b}
 .break-icon{font-size:2rem; margin-right:16px; flex-shrink:0; margin-top:4px}
 .break-content{flex:1}
-.break-title{font-size:1.2rem; font-weight:600; color:#dc2626; margin-bottom:6px}
-.break-problem{font-size:0.9rem; color:#991b1b; margin-bottom:4px; font-style:italic; background:#fef2f2; padding:4px 8px; border-radius:6px; display:inline-block}
-.break-solution{font-size:0.95rem; color:#7f1d1d; line-height:1.4; background:#fef7f7; padding:8px 12px; border-radius:8px; border-left:3px solid #ef4444}
+.break-title{font-size:1.1rem; font-weight:600; color:#475569; margin-bottom:6px}
+.break-problem{font-size:0.9rem; color:#64748b; margin-bottom:4px; font-style:italic; background:#f1f5f9; padding:4px 8px; border-radius:6px; display:inline-block}
+.break-solution{font-size:0.95rem; color:#334155; line-height:1.4; background:#f8fafc; padding:8px 12px; border-radius:8px; border-left:3px solid #64748b}
 
 /* Lessons Treasure */
 .lessons-treasure{display:grid; grid-template-columns:repeat(auto-fit, minmax(320px, 1fr)); gap:20px; margin:20px 0}
-.treasure-item{display:flex; align-items:center; padding:20px; background:linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border:2px solid #0ea5e9; border-radius:16px; transition:all 0.4s ease; position:relative; overflow:hidden}
-.treasure-item::before{content:''; position:absolute; top:0; left:0; right:0; bottom:0; background:linear-gradient(45deg, transparent 30%, rgba(14, 165, 233, 0.1) 50%, transparent 70%); transform:translateX(-100%); transition:transform 0.6s ease}
-.treasure-item:hover{transform:scale(1.02) rotate(1deg); box-shadow:0 10px 30px rgba(14, 165, 233, 0.2); border-color:#0284c7}
+.treasure-item{display:flex; align-items:center; padding:20px; background:linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border:2px solid #e2e8f0; border-radius:16px; transition:all 0.4s ease; position:relative; overflow:hidden}
+.treasure-item::before{content:''; position:absolute; top:0; left:0; right:0; bottom:0; background:linear-gradient(45deg, transparent 30%, rgba(148, 163, 184, 0.1) 50%, transparent 70%); transform:translateX(-100%); transition:transform 0.6s ease}
+.treasure-item:hover{transform:scale(1.02) rotate(1deg); box-shadow:0 10px 30px rgba(148, 163, 184, 0.2); border-color:#cbd5e1}
 .treasure-item:hover::before{transform:translateX(100%)}
 .treasure-gem{font-size:2.5rem; margin-right:20px; flex-shrink:0; filter:drop-shadow(0 2px 4px rgba(0,0,0,0.1))}
 .treasure-content{flex:1}
-.treasure-title{font-size:1.3rem; font-weight:700; color:#0c4a6e; margin-bottom:8px; text-shadow:0 1px 2px rgba(0,0,0,0.1)}
-.treasure-lesson{font-size:1rem; color:#075985; line-height:1.5; font-weight:500}
+.treasure-title{font-size:1.2rem; font-weight:700; color:#374151; margin-bottom:8px; text-shadow:0 1px 2px rgba(0,0,0,0.1)}
+.treasure-lesson{font-size:1rem; color:#6b7280; line-height:1.5; font-weight:500}
 
 /* Retrospective Insights */
 .retrospective-insights{display:flex; flex-direction:column; gap:24px; margin:20px 0}
@@ -521,7 +528,7 @@ h3{font-size:1.1rem; margin:18px 0 8px; color:var(--muted)}
 .insight-section:hover{transform:translateY(-2px); box-shadow:0 8px 25px rgba(0,0,0,0.08); border-color:#cbd5e1}
 .section-header{display:flex; align-items:center; margin-bottom:16px; padding-bottom:12px; border-bottom:2px solid #e2e8f0}
 .section-icon{font-size:1.8rem; margin-right:12px; filter:drop-shadow(0 1px 2px rgba(0,0,0,0.1))}
-.section-title{font-size:1.4rem; font-weight:700; color:#1e293b; text-transform:uppercase; letter-spacing:0.5px}
+.section-title{font-size:1.2rem; font-weight:700; color:#1e293b; text-transform:uppercase; letter-spacing:0.5px}
 .insight-items{display:flex; flex-direction:column; gap:12px}
 .insight-item{display:flex; align-items:flex-start; padding:12px 16px; background:white; border-radius:8px; border-left:4px solid #6366f1; transition:all 0.2s ease}
 .insight-item:hover{transform:translateX(4px); box-shadow:0 4px 12px rgba(99, 102, 241, 0.1); border-left-color:#4f46e5}
@@ -534,25 +541,62 @@ h3{font-size:1.1rem; margin:18px 0 8px; color:var(--muted)}
 .vision-item:hover{transform:translateY(-3px); box-shadow:0 12px 28px rgba(0,0,0,0.12); border-color:#cbd5e1}
 .vision-icon{font-size:2.2rem; margin-right:20px; flex-shrink:0; opacity:0.8}
 .vision-content{flex:1}
-.vision-title{font-size:1.3rem; font-weight:600; color:#374151; margin-bottom:6px}
+.vision-title{font-size:1.2rem; font-weight:600; color:#374151; margin-bottom:6px}
 .vision-desc{font-size:1rem; color:#6b7280; line-height:1.5}
 
-/* Advice Wisdom */
-.advice-wisdom{display:flex; flex-direction:column; gap:12px; margin:20px 0}
-.wisdom-item{display:flex; align-items:center; padding:16px 20px; background:linear-gradient(135deg, #fff8f0 0%, #fef7ed 100%); border:1px solid #fed7aa; border-radius:12px; transition:all 0.3s ease; position:relative}
-.wisdom-item::before{content:''; position:absolute; left:0; top:0; bottom:0; width:4px; background:linear-gradient(180deg, #f59e0b, #d97706); border-radius:0 2px 2px 0; opacity:0.8}
-.wisdom-item:hover{transform:translateX(4px); box-shadow:0 4px 16px rgba(245, 158, 11, 0.15); border-color:#f59e0b}
-.wisdom-icon{font-size:1.8rem; margin-right:16px; flex-shrink:0}
+/* Clean Insights Grid Design */
+.insights-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:24px; margin:20px 0}
+.insight-card{background:#ffffff; border:1px solid #e5e7eb; border-radius:16px; padding:32px; position:relative; transition:all 0.3s ease; overflow:hidden}
+.insight-card::before{content:''; position:absolute; top:0; left:0; right:0; height:4px; background:linear-gradient(90deg, #3b82f6, #8b5cf6, #06b6d4); border-radius:16px 16px 0 0}
+.insight-card:hover{transform:translateY(-4px); box-shadow:0 20px 40px rgba(0,0,0,0.1); border-color:#d1d5db}
+.card-content{margin-top:0}
+.card-title{font-size:1rem; font-weight:600; color:#111827; margin-bottom:12px; line-height:1.4}
+.card-text{font-size:1rem; color:#6b7280; line-height:1.6; margin:0}
+
+
+
+/* Newsletter Form */
+.newsletter-form{margin:20px 0}
+.newsletter-signup{max-width:500px}
+.form-group{display:flex; gap:12px; margin-bottom:12px; flex-wrap:wrap}
+.email-input{flex:1; padding:12px 16px; border:2px solid #e2e8f0; border-radius:8px; background:#ffffff; color:#374151; font-size:1rem; min-width:200px; transition:border-color 0.2s ease}
+.email-input:focus{outline:none; border-color:#0f62fe; box-shadow:0 0 0 3px rgba(15, 98, 254, 0.1)}
+.subscribe-btn{background:#0f62fe; color:#ffffff; border:none; padding:12px 24px; border-radius:8px; font-size:1rem; font-weight:600; cursor:pointer; transition:background-color 0.2s ease; white-space:nowrap}
+.subscribe-btn:hover{background:#0043ce}
+.newsletter-note{font-size:0.9rem; color:#6b7280; margin:0}
+
+@media (max-width: 480px) {
+  .form-group{flex-direction:column}
+  .email-input{min-width:100%}
+  .subscribe-btn{width:100%}
+}
+
+/* Advice Wisdom - Conversation Style */
+.advice-wisdom{display:flex; flex-direction:column; gap:20px; margin:20px 0; position:relative}
+.advice-wisdom::before{content:''; position:absolute; left:30px; top:0; bottom:0; width:2px; background:linear-gradient(180deg, #64748b, transparent); opacity:0.3}
+
+.wisdom-item{display:flex; align-items:flex-start; padding:0; position:relative; margin-left:60px}
+.wisdom-item:nth-child(odd){margin-left:0; margin-right:60px; flex-direction:row-reverse}
+.wisdom-item:nth-child(odd) .wisdom-bubble{margin-left:0; margin-right:20px; background:linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); color:#374151}
+.wisdom-item:nth-child(odd) .wisdom-bubble::after{left:auto; right:-8px; border-left-color:#f8fafc; border-right:none}
+.wisdom-item:nth-child(odd) .wisdom-avatar{order:2}
+
+.wisdom-avatar{width:50px; height:50px; border-radius:50%; background:linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 100%); border:3px solid #94a3b8; display:flex; align-items:center; justify-content:center; font-size:1.2rem; font-weight:bold; color:#64748b; flex-shrink:0; margin-top:8px}
+.wisdom-bubble{background:linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%); border:2px solid #e2e8f0; border-radius:20px; padding:16px 20px; margin-left:20px; position:relative; max-width:400px; box-shadow:0 4px 12px rgba(0,0,0,0.08); transition:all 0.3s ease}
+.wisdom-bubble::after{content:''; position:absolute; left:-8px; top:20px; width:0; height:0; border-top:8px solid transparent; border-bottom:8px solid transparent; border-right:8px solid #f8fafc}
+.wisdom-bubble:hover{transform:translateY(-2px); box-shadow:0 8px 20px rgba(0,0,0,0.12)}
+
 .wisdom-content{flex:1}
-.wisdom-title{font-size:1.1rem; font-weight:600; color:#92400e; margin-bottom:4px}
-.wisdom-advice{font-size:0.95rem; color:#a16207; line-height:1.4; font-style:italic}
+.wisdom-title{font-size:1rem; font-weight:600; color:#1e293b; margin-bottom:6px; display:flex; align-items:center; gap:8px}
+.wisdom-title::before{content:'💭'; font-size:1.1rem}
+.wisdom-advice{font-size:0.95rem; color:#475569; line-height:1.5; font-style:italic; margin:0}
 
 /* Challenges Grid */
 .challenges-grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:16px; margin:20px 0}
 .challenge-card{background:var(--card-bg); border:1px solid var(--card-br); border-radius:var(--radius); padding:20px; text-align:center; transition:transform 0.2s ease, box-shadow 0.2s ease}
 .challenge-card:hover{transform:translateY(-2px); box-shadow:0 4px 12px rgba(0,0,0,0.1)}
 .challenge-icon{font-size:2rem; margin-bottom:12px; display:block}
-.challenge-card h4{font-size:1.1rem; margin:0 0 8px; color:var(--accent); font-weight:600}
+.challenge-card h4{font-size:1rem; margin:0 0 8px; color:var(--accent); font-weight:600}
 .challenge-card p{font-size:0.9rem; color:var(--muted); margin:0; line-height:1.5}
 
 blockquote{margin:12px 0; padding:12px 14px; border-left:4px solid #9fb5ff; background:#f6f8fc; color:var(--ink); border-radius:10px}
