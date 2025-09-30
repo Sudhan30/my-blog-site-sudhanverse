@@ -229,16 +229,21 @@ export class AnalyticsConsentComponent implements OnInit, OnDestroy {
     }
   }
 
-  acceptAnalytics() {
+  async acceptAnalytics() {
     if (isPlatformBrowser(this.platformId)) {
       localStorage.setItem('analytics_consent', 'accepted');
       this.showBanner = false;
       
       console.log('Analytics consent accepted, initializing tracking...');
       
-      // The UnifiedAnalyticsService will automatically initialize when consent is accepted
-      // It handles both the backend API calls and Prometheus metrics
-      this.unifiedAnalytics.initialize();
+      try {
+        // The UnifiedAnalyticsService will automatically initialize when consent is accepted
+        // It handles both the backend API calls and Prometheus metrics
+        await this.unifiedAnalytics.initialize();
+      } catch (error) {
+        console.error('Error initializing analytics after consent:', error);
+        // Continue without analytics if initialization fails
+      }
     }
   }
 
@@ -249,11 +254,16 @@ export class AnalyticsConsentComponent implements OnInit, OnDestroy {
     }
   }
 
-  private loadAnalytics() {
+  private async loadAnalytics() {
     console.log('Loading analytics for existing consent...');
-    // The UnifiedAnalyticsService will automatically initialize when consent is accepted
-    // It handles both the backend API calls and Prometheus metrics
-    this.unifiedAnalytics.initialize();
+    try {
+      // The UnifiedAnalyticsService will automatically initialize when consent is accepted
+      // It handles both the backend API calls and Prometheus metrics
+      await this.unifiedAnalytics.initialize();
+    } catch (error) {
+      console.error('Error initializing analytics:', error);
+      // Continue without analytics if initialization fails
+    }
   }
 
   ngOnDestroy() {

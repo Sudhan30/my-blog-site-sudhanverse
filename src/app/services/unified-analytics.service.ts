@@ -90,36 +90,56 @@ export class UnifiedAnalyticsService {
     }
   }
 
-  initialize() {
-    if (!isPlatformBrowser(this.platformId)) return;
+  async initialize() {
+    try {
+      if (!isPlatformBrowser(this.platformId)) return;
 
-    console.log('🔧 UnifiedAnalyticsService: Initializing analytics tracking...');
-    console.log('🔧 API Base URL:', this.apiBaseUrl);
+      console.log('🔧 UnifiedAnalyticsService: Initializing analytics tracking...');
+      console.log('🔧 API Base URL:', this.apiBaseUrl);
 
-    this.initializeAnalytics();
-    
-    // Initialize Prometheus metrics via backend API
-    this.prometheusMetrics.initialize({
-      endpoint: this.apiBaseUrl, // Use backend API instead of direct Prometheus
-      job: 'blog-frontend',
-      instance: window.location.hostname
-    });
-    this.prometheusMetrics.trackAnalyticsConsent(true);
-    
-    console.log('🔧 Prometheus metrics will be sent via backend API');
-    
-    console.log('🔧 UnifiedAnalyticsService: Analytics tracking initialized successfully');
+      await this.initializeAnalytics();
+      
+      // Initialize Prometheus metrics via backend API
+      this.prometheusMetrics.initialize({
+        endpoint: this.apiBaseUrl, // Use backend API instead of direct Prometheus
+        job: 'blog-frontend',
+        instance: window.location.hostname
+      });
+      this.prometheusMetrics.trackAnalyticsConsent(true);
+      
+      console.log('🔧 Prometheus metrics will be sent via backend API');
+      
+      console.log('🔧 UnifiedAnalyticsService: Analytics tracking initialized successfully');
+    } catch (error) {
+      console.error('❌ Error initializing UnifiedAnalyticsService:', error);
+      console.log('⚠️ Analytics will be disabled due to initialization failure');
+      // Disable analytics completely if initialization fails
+      this.disableAnalytics();
+    }
   }
 
-  private initializeAnalytics() {
-    console.log('🔧 initializeAnalytics called');
-    this.userId = this.getOrCreateUserId();
-    this.sessionId = this.getOrCreateSessionId();
-    this.startSession();
-    this.startBatchProcessing();
-    this.trackPageView();
-    this.setupEventListeners();
-    this.setupInactivityDetection();
+  private disableAnalytics() {
+    console.log('🔧 Disabling analytics due to initialization failure');
+    // Set a flag to prevent further analytics calls
+    if (isPlatformBrowser(this.platformId)) {
+      localStorage.setItem('analytics_disabled', 'true');
+    }
+  }
+
+  private async initializeAnalytics() {
+    try {
+      console.log('🔧 initializeAnalytics called');
+      this.userId = this.getOrCreateUserId();
+      this.sessionId = this.getOrCreateSessionId();
+      await this.startSession();
+      this.startBatchProcessing();
+      this.trackPageView();
+      this.setupEventListeners();
+      this.setupInactivityDetection();
+    } catch (error) {
+      console.error('❌ Error initializing analytics:', error);
+      // Continue without analytics if initialization fails
+    }
   }
 
   private getOrCreateUserId(): string {
