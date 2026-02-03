@@ -1,3 +1,0 @@
-# Extra rules for feed and index
-location = /assets/blog/rss.xml { add_header Cache-Control "no-cache"; }
-location = /assets/blog/index.json { add_header Cache-Control "no-cache"; }
