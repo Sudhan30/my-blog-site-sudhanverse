@@ -7,7 +7,7 @@ import { sitemapRoute } from "./routes/sitemap";
 import { rssRoute } from "./routes/rss";
 import { apiRouter } from "./routes/api";
 
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 80;
 const PUBLIC_DIR = join(import.meta.dir, "..", "public");
 
 serve({
@@ -15,6 +15,13 @@ serve({
     async fetch(req) {
         const url = new URL(req.url);
         const path = url.pathname;
+
+        // Health check endpoint for Kubernetes
+        if (path === "/health" || path === "/healthz") {
+            return new Response(JSON.stringify({ status: "ok", timestamp: new Date().toISOString() }), {
+                headers: { "Content-Type": "application/json" }
+            });
+        }
 
         // Static file serving
         if (path.startsWith("/styles/") || path.startsWith("/assets/") || path === "/favicon.ico" || path === "/robots.txt") {

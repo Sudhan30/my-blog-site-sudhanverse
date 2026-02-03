@@ -17,7 +17,7 @@ COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/package.json ./
 
 # Expose port
-EXPOSE 3000
+EXPOSE 80
 
 # Start the server
 CMD ["bun", "run", "server/index.ts"]
