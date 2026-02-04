@@ -115,7 +115,8 @@ export async function apiRouter(req: Request, path: string): Promise<Response> {
             try {
                 // Get clientId from localStorage (sent in body or generate new)
                 const body = await req.json().catch(() => ({})) as { clientId?: string };
-                const data = await fetchWithFallback(`${BACKEND_URL}/api/posts/${postId}/like`, {
+                console.log(`[Proxy] POSTing like for ${postId}`);
+                const data = await fetchWithFallback(`${BACKEND_URL}/api/posts/${postId}/likes`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ clientId: body.clientId })
@@ -130,7 +131,8 @@ export async function apiRouter(req: Request, path: string): Promise<Response> {
         if (method === "DELETE") {
             try {
                 const body = await req.json().catch(() => ({})) as { clientId?: string };
-                const data = await fetchWithFallback(`${BACKEND_URL}/api/posts/${postId}/unlike`, {
+                console.log(`[Proxy] DELETing like for ${postId}`);
+                const data = await fetchWithFallback(`${BACKEND_URL}/api/posts/${postId}/likes`, {
                     method: 'DELETE',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ clientId: body.clientId })
