@@ -92,10 +92,30 @@ export async function postRoute(slug: string): Promise<Response> {
     <script>
       const slug = "${post.slug}";
       
+      // Client ID management
+      function getClientId() {
+        let id = localStorage.getItem('blog-client-id');
+        if (!id) {
+          if (typeof crypto !== 'undefined' && crypto.randomUUID) {
+            id = crypto.randomUUID();
+          } else {
+             // Fallback for older browsers / non-secure contexts
+            id = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+              var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
+              return v.toString(16);
+            });
+          }
+          localStorage.setItem('blog-client-id', id);
+        }
+        return id;
+      }
+
+      const clientId = getClientId();
+      let hasLiked = localStorage.getItem('liked-' + slug) === 'true';
+      
       // Like functionality
       const likeBtn = document.getElementById('like-btn');
       const likeCount = document.getElementById('like-count');
-      let hasLiked = localStorage.getItem('liked-' + slug) === 'true';
       
       async function loadLikes() {
         const res = await fetch('/api/posts/' + slug + '/likes');
@@ -116,12 +136,22 @@ export async function postRoute(slug: string): Promise<Response> {
       
       likeBtn.addEventListener('click', async () => {
         const method = hasLiked ? 'DELETE' : 'POST';
-        const res = await fetch('/api/posts/' + slug + '/likes', { method });
+        const res = await fetch('/api/posts/' + slug + '/likes', { 
+            method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ clientId })
+        });
         const data = await res.json();
         likeCount.textContent = data.count;
-        hasLiked = !hasLiked;
-        localStorage.setItem('liked-' + slug, hasLiked);
-        updateLikeBtn();
+        
+        // Update local state based on success
+        if (!data.error) {
+            hasLiked = !hasLiked;
+            localStorage.setItem('liked-' + slug, hasLiked);
+            updateLikeBtn();
+        } else {
+            console.error('Like failed:', data.error);
+        }
       });
       
       loadLikes();
