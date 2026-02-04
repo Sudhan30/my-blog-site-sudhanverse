@@ -3,25 +3,25 @@ import { getPostBySlug } from "../lib/posts";
 import { renderMarkdown } from "../lib/markdown";
 
 export async function postRoute(slug: string): Promise<Response> {
-    const post = await getPostBySlug(slug);
+  const post = await getPostBySlug(slug);
 
-    if (!post) {
-        return new Response("Post not found", { status: 404 });
-    }
+  if (!post) {
+    return new Response("Post not found", { status: 404 });
+  }
 
-    const date = new Date(post.date).toLocaleDateString("en-US", {
-        year: "numeric",
-        month: "long",
-        day: "numeric"
-    });
+  const date = new Date(post.date).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric"
+  });
 
-    const htmlContent = renderMarkdown(post.content);
+  const htmlContent = renderMarkdown(post.content);
 
-    const tags = post.tags.map(t =>
-        `<a href="/tag/${encodeURIComponent(t)}" class="tag">${t}</a>`
-    ).join("");
+  const tags = post.tags.map(t =>
+    `<a href="/tag/${encodeURIComponent(t)}" class="tag">${t}</a>`
+  ).join("");
 
-    const content = `
+  const content = `
     <article class="article-page">
       <div class="container article-container">
         <!-- Article Header -->
@@ -45,21 +45,6 @@ export async function postRoute(slug: string): Promise<Response> {
               <i class="far fa-thumbs-up"></i>
               <span id="like-count">0</span>
             </button>
-            
-            <div class="share-buttons">
-              <button class="share-btn" onclick="shareOnTwitter()" title="Share on X">
-                <i class="fa-brands fa-x-twitter"></i>
-              </button>
-              <button class="share-btn" onclick="shareOnLinkedIn()" title="Share on LinkedIn">
-                <i class="fab fa-linkedin-in"></i>
-              </button>
-              <button class="share-btn" onclick="shareOnReddit()" title="Share on Reddit">
-                <i class="fab fa-reddit-alien"></i>
-              </button>
-              <button class="share-btn" onclick="copyLink()" title="Copy link">
-                <i class="fas fa-link"></i>
-              </button>
-            </div>
           </div>
         </footer>
         
@@ -70,9 +55,9 @@ export async function postRoute(slug: string): Promise<Response> {
             <h3>About the Author</h3>
             <p>Passionate about solving real-world problems with data, I'm a data engineer with experience building enterprise-level solutions.</p>
             <div class="author-links">
-              <a href="https://sudharsana.dev" target="_blank" rel="noopener">Portfolio</a>
-              <a href="https://github.com/sudharsanarajasekaran" target="_blank" rel="noopener">GitHub</a>
-              <a href="https://www.linkedin.com/in/sudharsanarajasekaran/" target="_blank" rel="noopener">LinkedIn</a>
+              <a href="https://sudharsana.dev" target="_blank" rel="noopener" title="Portfolio"><i class="fas fa-globe"></i></a>
+              <a href="https://github.com/sudharsanarajasekaran" target="_blank" rel="noopener" title="GitHub"><i class="fab fa-github"></i></a>
+              <a href="https://www.linkedin.com/in/sudharsanarajasekaran/" target="_blank" rel="noopener" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
             </div>
           </div>
         </section>
@@ -97,26 +82,6 @@ export async function postRoute(slug: string): Promise<Response> {
     
     <script>
       const slug = "${post.slug}";
-      const url = encodeURIComponent(window.location.href);
-      const title = encodeURIComponent("${post.title.replace(/"/g, '\\"')}");
-      
-      // Share functions
-      function shareOnTwitter() {
-        window.open('https://twitter.com/intent/tweet?url=' + url + '&text=' + title, '_blank');
-      }
-      
-      function shareOnLinkedIn() {
-        window.open('https://www.linkedin.com/sharing/share-offsite/?url=' + url, '_blank');
-      }
-      
-      function shareOnReddit() {
-        window.open('https://reddit.com/submit?url=' + url + '&title=' + title, '_blank');
-      }
-      
-      function copyLink() {
-        navigator.clipboard.writeText(window.location.href);
-        alert('Link copied!');
-      }
       
       // Like functionality
       const likeBtn = document.getElementById('like-btn');
@@ -160,9 +125,10 @@ export async function postRoute(slug: string): Promise<Response> {
       async function loadComments() {
         const res = await fetch('/api/posts/' + slug + '/comments');
         const data = await res.json();
-        commentCount.textContent = '(' + data.total + ')';
+        const total = data.total || data.comments?.length || 0;
+        commentCount.textContent = '(' + total + ')';
         
-        if (data.comments.length === 0) {
+        if (!data.comments || data.comments.length === 0) {
           commentsList.innerHTML = '<p class="no-comments">No comments yet. Be the first to share your thoughts!</p>';
           return;
         }
@@ -202,15 +168,15 @@ export async function postRoute(slug: string): Promise<Response> {
     </script>
   `;
 
-    const html = layout({
-        title: post.title,
-        description: post.excerpt,
-        url: `/post/${post.slug}`,
-        ogType: "article",
-        content
-    });
+  const html = layout({
+    title: post.title,
+    description: post.excerpt,
+    url: `/post/${post.slug}`,
+    ogType: "article",
+    content
+  });
 
-    return new Response(html, {
-        headers: { "Content-Type": "text/html; charset=utf-8" }
-    });
+  return new Response(html, {
+    headers: { "Content-Type": "text/html; charset=utf-8" }
+  });
 }

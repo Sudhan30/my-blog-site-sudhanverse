@@ -938,12 +938,18 @@ img {
 
 .author-links {
   display: flex;
-  gap: var(--space-md);
+  gap: var(--space-lg);
 }
 
 .author-links a {
-  font-size: 0.875rem;
-  font-weight: 500;
+  font-size: 1.5rem;
+  color: var(--color-text-secondary);
+  transition: all var(--transition-fast);
+}
+
+.author-links a:hover {
+  color: var(--color-primary);
+  transform: scale(1.15);
 }
 
 /* Comments Section */
