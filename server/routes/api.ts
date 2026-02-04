@@ -1,132 +1,146 @@
-import { likesStore, commentsStore, newsletterStore, type CommentData } from "../lib/storage";
+// Proxy API requests to the blog-backend service
+// The blog-backend handles likes, comments, newsletter with PostgreSQL + Redis
+
+const BACKEND_URL = process.env.BACKEND_URL || 'http://blog-backend-service:3001';
 
 export async function apiRouter(req: Request, path: string): Promise<Response> {
     const method = req.method;
 
-    // Newsletter subscription
+    // Newsletter subscription - proxy to backend
     if (path === "/api/newsletter" && method === "POST") {
         try {
             const body = await req.json() as { email: string };
-            const email = body.email?.toLowerCase().trim();
-
-            if (!email || !email.includes("@")) {
-                return json({ error: "Invalid email" }, 400);
-            }
-
-            const data = await newsletterStore.read();
-            const exists = data.subscribers.some(s => s.email === email);
-
-            if (exists) {
-                return json({ message: "Already subscribed!" }, 200);
-            }
-
-            data.subscribers.push({ email, subscribedAt: new Date().toISOString() });
-            await newsletterStore.write(data);
-
-            return json({ message: "Successfully subscribed!" }, 200);
-        } catch {
-            return json({ error: "Invalid request" }, 400);
-        }
-    }
-
-    // Post likes
-    const likesMatch = path.match(/^\/api\/posts\/([^/]+)\/likes$/);
-    if (likesMatch) {
-        const slug = likesMatch[1];
-        const data = await likesStore.read();
-
-        if (!data[slug]) {
-            data[slug] = { count: 0, users: [] };
-        }
-
-        if (method === "GET") {
-            return json({ count: data[slug].count });
-        }
-
-        if (method === "POST") {
-            data[slug].count++;
-            await likesStore.write(data);
-            return json({ count: data[slug].count, liked: true });
-        }
-
-        if (method === "DELETE") {
-            data[slug].count = Math.max(0, data[slug].count - 1);
-            await likesStore.write(data);
-            return json({ count: data[slug].count, liked: false });
-        }
-    }
-
-    // Post comments
-    const commentsMatch = path.match(/^\/api\/posts\/([^/]+)\/comments$/);
-    if (commentsMatch) {
-        const slug = commentsMatch[1];
-        const data = await commentsStore.read();
-
-        if (method === "GET") {
-            const postComments = data.comments
-                .filter(c => c.postSlug === slug && c.status === "approved")
-                .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-
-            return json({
-                comments: postComments.map(c => ({
-                    id: c.id,
-                    display_name: c.displayName,
-                    content: c.content,
-                    created_at: c.createdAt,
-                    status: c.status
-                })),
-                total: postComments.length
+            const backendRes = await fetch(`${BACKEND_URL}/api/newsletter/subscribe`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
             });
-        }
-
-        if (method === "POST") {
-            try {
-                const body = await req.json() as { name?: string; comment: string };
-                const comment = body.comment?.trim();
-
-                if (!comment || comment.length > 2000) {
-                    return json({ error: "Invalid comment" }, 400);
-                }
-
-                const newComment: CommentData = {
-                    id: crypto.randomUUID(),
-                    postSlug: slug,
-                    displayName: body.name?.trim() || "Anonymous",
-                    content: comment,
-                    status: "approved", // Auto-approve for demo
-                    createdAt: new Date().toISOString()
-                };
-
-                data.comments.push(newComment);
-                await commentsStore.write(data);
-
-                return json({ message: "Comment submitted!", id: newComment.id }, 201);
-            } catch {
-                return json({ error: "Invalid request" }, 400);
-            }
+            const data = await backendRes.json();
+            return json(data, backendRes.status);
+        } catch (error) {
+            console.error('Newsletter proxy error:', error);
+            return json({ error: 'Failed to connect to backend' }, 502);
         }
     }
 
-    // Feedback
+    // Post likes (GET)
+    const likesGetMatch = path.match(/^\/api\/posts\/([^/]+)\/likes$/) ||
+        path.match(/^\/posts\/([^/]+)\/likes$/);
+    if (likesGetMatch && method === "GET") {
+        const postId = likesGetMatch[1];
+        try {
+            const backendRes = await fetch(`${BACKEND_URL}/api/posts/${postId}/likes`);
+            const data = await backendRes.json() as { likes?: number };
+            // Return in format expected by frontend
+            return json({ count: data.likes || 0 });
+        } catch (error) {
+            console.error('Likes GET proxy error:', error);
+            return json({ count: 0 });
+        }
+    }
+
+    // Post likes (POST)
+    if (likesGetMatch && method === "POST") {
+        const postId = likesGetMatch[1];
+        try {
+            const body = await req.json().catch(() => ({}));
+            const backendRes = await fetch(`${BACKEND_URL}/api/posts/${postId}/like`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            });
+            const data = await backendRes.json() as { likes?: number; success?: boolean };
+            return json({ count: data.likes || 0, liked: true });
+        } catch (error) {
+            console.error('Likes POST proxy error:', error);
+            return json({ error: 'Failed to like post' }, 502);
+        }
+    }
+
+    // Post unlike (DELETE)
+    if (likesGetMatch && method === "DELETE") {
+        const postId = likesGetMatch[1];
+        try {
+            const body = await req.json().catch(() => ({}));
+            const backendRes = await fetch(`${BACKEND_URL}/api/posts/${postId}/unlike`, {
+                method: 'DELETE',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(body)
+            });
+            const data = await backendRes.json() as { likes?: number };
+            return json({ count: data.likes || 0, liked: false });
+        } catch (error) {
+            console.error('Unlike proxy error:', error);
+            return json({ error: 'Failed to unlike post' }, 502);
+        }
+    }
+
+    // Post comments (GET)
+    const commentsMatch = path.match(/^\/api\/posts\/([^/]+)\/comments$/) ||
+        path.match(/^\/posts\/([^/]+)\/comments$/);
+    if (commentsMatch && method === "GET") {
+        const postId = commentsMatch[1];
+        try {
+            const backendRes = await fetch(`${BACKEND_URL}/api/posts/${postId}/comments`);
+            const data = await backendRes.json() as { comments?: unknown[]; pagination?: { total: number } };
+            return json({
+                comments: data.comments || [],
+                total: data.pagination?.total || 0
+            });
+        } catch (error) {
+            console.error('Comments GET proxy error:', error);
+            return json({ comments: [], total: 0 });
+        }
+    }
+
+    // Post comments (POST)
+    if (commentsMatch && method === "POST") {
+        const postId = commentsMatch[1];
+        try {
+            const body = await req.json() as { name?: string; comment: string };
+            const backendRes = await fetch(`${BACKEND_URL}/api/posts/${postId}/comments`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    displayName: body.name || 'Anonymous',
+                    content: body.comment
+                })
+            });
+            const data = await backendRes.json();
+            if (backendRes.ok) {
+                return json({ message: 'Comment submitted!', id: (data as { comment?: { id?: string } }).comment?.id }, 201);
+            }
+            return json(data, backendRes.status);
+        } catch (error) {
+            console.error('Comments POST proxy error:', error);
+            return json({ error: 'Failed to add comment' }, 502);
+        }
+    }
+
+    // Feedback - proxy to backend
     if (path === "/api/feedback" && method === "POST") {
         try {
-            const body = await req.json() as { name?: string; message: string };
-            const message = body.message?.trim();
-
-            if (!message || message.length > 2000) {
-                return json({ error: "Invalid feedback" }, 400);
-            }
-
-            // For now, just log it (could store or email)
-            console.log("Feedback received:", {
-                name: body.name || "Anonymous",
-                message,
-                timestamp: new Date().toISOString()
+            const body = await req.json() as { name?: string; message: string; feedbackType?: string; rating?: number };
+            const backendRes = await fetch(`${BACKEND_URL}/api/feedback`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    displayName: body.name || 'Anonymous',
+                    feedbackType: body.feedbackType || 'general',
+                    message: body.message,
+                    rating: body.rating || 5
+                })
             });
-
-            return json({ message: "Feedback received! Thank you." }, 200);
-        } catch {
-            return json({ error: "Invalid request" }, 400);
+            const data = await backendRes.json();
+            if (backendRes.ok) {
+                return json({ message: 'Feedback received! Thank you.' }, 200);
+            }
+            return json(data, backendRes.status);
+        } catch (error) {
+            console.error('Feedback proxy error:', error);
+            // Fallback to logging if backend is unavailable
+            console.log("Feedback (fallback):", await req.text());
+            return json({ message: 'Feedback received! Thank you.' }, 200);
         }
     }
 
