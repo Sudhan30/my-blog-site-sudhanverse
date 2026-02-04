@@ -11,7 +11,7 @@ export function getMyFirstSiteContent(): string {
         <h1 class="post-hero-title">Two Sites, <span class="gradient-text">Two Paths</span></h1>
         <p class="post-hero-subtitle">Cloud Portfolio + Self-Hosted Blog</p>
         <div class="post-hero-stats">
-          <div class="stat-pill"><i class="fas fa-clock"></i> 8 min read</div>
+          <div class="stat-pill"><i class="fas fa-clock"></i> 2 min read</div>
           <div class="stat-pill"><i class="fas fa-calendar"></i> Jan 15, 2024</div>
           <div class="stat-pill"><i class="fas fa-fire"></i> Popular</div>
         </div>
