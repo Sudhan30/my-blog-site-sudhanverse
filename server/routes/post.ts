@@ -1,6 +1,7 @@
 import { layout } from "../templates/layout";
 import { getPostBySlug } from "../lib/posts";
 import { renderMarkdown } from "../lib/markdown";
+import { getMyFirstSiteContent } from "../templates/posts/my-first-site";
 
 export async function postRoute(slug: string): Promise<Response> {
   const post = await getPostBySlug(slug);
@@ -15,16 +16,18 @@ export async function postRoute(slug: string): Promise<Response> {
     day: "numeric"
   });
 
-  const htmlContent = renderMarkdown(post.content);
+  // Use custom HTML templates for specific posts
+  const isCustomTemplate = slug === "my-first-site";
+  const htmlContent = isCustomTemplate
+    ? getMyFirstSiteContent()
+    : renderMarkdown(post.content);
 
   const tags = post.tags.map(t =>
     `<a href="/tag/${encodeURIComponent(t)}" class="tag">${t}</a>`
   ).join("");
 
-  const content = `
-    <article class="article-page">
-      <div class="container article-container">
-        <!-- Article Header -->
+  // Only show article header for non-custom template posts
+  const articleHeader = isCustomTemplate ? '' : `
         <header class="article-header">
           <div class="article-meta">
             <time datetime="${post.date}">${date}</time>
@@ -32,6 +35,12 @@ export async function postRoute(slug: string): Promise<Response> {
           <h1 class="article-title">${post.title}</h1>
           <div class="article-tags">${tags}</div>
         </header>
+  `;
+
+  const content = `
+    <article class="article-page${isCustomTemplate ? ' custom-template' : ''}">
+      <div class="container article-container">
+        ${articleHeader}
         
         <!-- Article Content -->
         <div class="article-content">

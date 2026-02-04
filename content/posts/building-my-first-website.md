@@ -8,93 +8,269 @@ slug: my-first-site
 
 # Two Sites, Two Paths: Cloud Portfolio + Self‑Hosted Blog
 
-Why I built two versions of my blog—one in the cloud, one self-hosted. The lessons, the costs, and what I'd do differently.
+> "The best way to learn infrastructure is to break it yourself." — Me, at 2 AM debugging DNS
 
-## Why Two Paths?
+Why I built two versions of my web presence—one in the cloud, one self-hosted on bare metal. The lessons, the costs, the 3 AM debugging sessions, and what I'd do differently.
 
-I wanted to experience both managed and self-hosted approaches. The cloud version teaches me about managed services, while the homelab version gives me complete control and deeper system understanding.
+---
 
-### The Mindset
-- **🧠 Build to learn.** System design sticks better when you deploy it, not just read about it.
-- **🔧 Own the layers.** From HTML div to DNS to CDN—ownership unlocks infinite customization.
-- **🤖 Use AI, ruthlessly.** It makes me 5–10× faster for scaffolding, docs, and first drafts.
+## 🤔 Why Two Paths?
 
-### What I Shipped (High‑level)
-- **☁️ Portfolio @ Cloud:** domain → SSL → hosting → CI in a sitting. Free‑tier friendly.
-- **🖥️ Blog @ Homelab:** self‑hosted on my mini‑PC; Kubernetes for repeatable deploys.
-- **📊 Analytics:** lightweight, privacy‑aware signals to improve UX (no creepy tracking).
-- **🛡️ Hardening:** Cloudflare, DNS hygiene, sane bot rules, and reputation clean‑up.
+I've always been curious: **how does the internet actually work?** Not the textbook version, but the real thing—from buying a domain to seeing your site load in a browser half a world away.
 
-## The Journey
+So I built two sites:
+
+| | **Portfolio (Cloud)** | **Blog (Homelab)** |
+|---|---|---|
+| **Where** | Firebase + GCP | Mini-PC under my desk |
+| **Stack** | React, Node.js | Bun.js, TypeScript |
+| **Infra** | Managed everything | Kubernetes, bare metal |
+| **Cost** | ~$0/month (free tier) | ~$50 one-time hardware |
+| **Learning** | CI/CD, CDN, managed DBs | K8s, networking, DNS |
+
+### The Mindset That Drove Me
+
+- **🧠 Build to learn.** System design sticks better when you deploy it yourself, not just read about it.
+- **🔧 Own the layers.** From `<div>` to DNS to CDN—ownership unlocks infinite customization.
+- **🤖 Use AI ruthlessly.** It makes me 5–10× faster for scaffolding, docs, and first drafts.
+
+---
+
+## 🚀 What I Actually Shipped
+
+### ☁️ Portfolio @ Cloud (sudharsana.dev)
+
+A React SPA hosted on Firebase with some fun features:
+
+```javascript
+// Animated hero with confetti on milestone visits
+useEffect(() => {
+  if (specialMessage) {
+    Swal.fire({ title: 'Welcome!', html: specialMessage });
+    setShowConfetti(true);
+  }
+}, [specialMessage]);
+```
+
+**Features built:**
+- 🎨 Smooth scroll navigation with active section tracking
+- 🤖 AI-powered Job Fit Evaluator (yes, it actually works!)
+- 📊 OpenTelemetry integration for observability
+- 🎉 Confetti celebrations for milestone visitors
+
+### 🖥️ Blog @ Homelab (blog.sudharsana.dev)
+
+A Bun.js server-rendered blog running on Kubernetes:
+
+```yaml
+# deployment.yaml - running on my mini-PC!
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: blog
+spec:
+  replicas: 2
+  template:
+    spec:
+      containers:
+      - name: blog
+        image: sudhan30/my-blog-site:latest
+        ports:
+        - containerPort: 3000
+```
+
+**The homelab stack:**
+- 🐳 Docker + Kubernetes (K3s)
+- 🔄 FluxCD for GitOps deployments
+- 📊 Prometheus + Grafana for monitoring
+- 🔒 Cloudflare for DNS + SSL + CDN
+
+---
+
+## 📅 The 4-Week Journey
 
 ### Week 1: "I should build something real"
-The initial spark and overwhelming choice paralysis
 
-### Week 2: "Let's just start with the cloud"
-GCP setup, domain purchase, first deployment
+*The spark:* I realized I'd been reading about infrastructure for years but never actually built anything end-to-end.
 
-### Week 3: "Wait, what about my homelab?"
-The realization that two paths could teach different lessons
+**What actually happened:**
+- Spent 3 days researching frameworks (analysis paralysis is real)
+- Made a spreadsheet comparing Firebase vs. Vercel vs. AWS
+- Finally just picked Firebase because it had the nicest docs
 
-### Week 4: "This is actually working"
-First real visitors, feedback, and the confidence boost
+> 💡 **Lesson:** Perfect is the enemy of done. Just pick something.
 
-## Technical Challenges & Solutions
+### Week 2: "Let's start with cloud"
 
-- **🔧 Infrastructure as Code:** Learned Kubernetes manifests, Helm charts, and GitOps workflows the hard way.
-- **🌐 DNS Mastery:** From basic A records to CNAME chains, SPF/DKIM setup, and subdomain routing.
-- **🔒 Security Hardening:** Rate limiting, WAF rules, bot detection, and SSL certificate automation.
-- **📈 Performance Optimization:** CDN configuration, image optimization, and caching strategies.
-- **🔄 CI/CD Pipeline:** Automated builds, testing, and deployments across multiple environments.
-- **Dynamic DNS issues:** Some VPNs blocked DuckDNS; migrating to Cloudflare solved it completely.
-- **SEO optimization:** Added meta tags, structured data, and clean URLs for better discoverability.
-- **Security mindset:** Coming from Walmart, I realized preventing bad actors is as important as building features. Rate limits, WAF rules, and bot filters became must‑dos.
-- **Newsletter funnel:** Owning my own newsletter pipeline gives me freedom beyond Medium or Substack.
+*The goal:* Get something live. Fast.
 
-## Things That Broke (and How I Fixed Them)
+**What I learned:**
+- Domain registration is weirdly satisfying
+- Firebase deploy is almost too easy (`firebase deploy` and you're live)
+- SSL certificates used to be a nightmare—now they're automatic
 
-- **🌐 Dynamic DNS Issues:** Got flagged by VPNs. Solution: Moved records and TLS to Cloudflare; reputation + caches improved reachability.
-- **🤖 Bot noise & crawlers:** Solution: Basic WAF rules, rate limiting, and a stricter robots policy for non‑content paths.
-- **🧠 Complex routing brain‑twisters:** Solution: Drew the traffic flow (client → CDN → ingress → service) and validated each hop with logs.
+```bash
+# This felt like magic
+$ firebase deploy
+✓ Deploy complete!
+Project Console: https://console.firebase.google.com/project/my-portfolio
+Hosting URL: https://sudharsana.dev
+```
 
-## Lessons You Can Steal
+### Week 3: "What about my homelab?"
 
-- **💎 Pick Two Constraints:** Money & learning - let them drive your stack.
-- **🔐 Own Your DNS/SSL/CDN:** Early—it's where reliability and speed are won.
-- **⚙️ Automate Deploys:** Even for a personal site; it keeps you fearless.
-- **📊 Measure, Don't Track:** Favor UX metrics over invasive analytics.
-- **📝 Write the Playbook:** As you go. Your future self will reuse it in minutes.
+*The realization:* Cloud is convenient, but I wasn't learning the fundamentals.
 
-## What I'd Tell My Past Self
+**The pivot:**
+- Dusted off my Intel NUC mini-PC
+- Installed Ubuntu Server + K3s
+- Spent 6 hours figuring out why pods wouldn't start (spoiler: resource limits)
 
-- **⚡ Stop Overthinking:** Pick something and ship. You'll learn more from shipping than from researching.
-- **🛤️ Two Paths Isn't Overkill:** It's smart. You need to experience both managed and self-hosted to make informed decisions.
-- **📢 Share Early, Share Often:** The feedback loop from real users beats any tutorial or course.
-- **🤖 AI Isn't Cheating:** It's accelerating. Use every tool available to move faster and learn more.
-- **📚 Document Everything:** Your future self will thank you when you're debugging at 2 AM.
+```bash
+# The debugging journey
+$ kubectl get pods
+NAME                    READY   STATUS             RESTARTS   AGE
+blog-5d4f9c8b7-x2k9p   0/1     CrashLoopBackOff   5          10m
 
-## What I'd Do Differently
+# Ah, memory limits were too low
+$ kubectl describe pod blog-5d4f9c8b7-x2k9p
+... OOMKilled ...
+```
 
-### Retrospective
-- Define an error‑budget early; alerts only when user experience is at risk.
-- Lock in access‑log schemas for faster analytics iteration.
-- Write a tiny "new‑service" generator to scaffold DNS, certs, and ingress in one go.
+### Week 4: "This is actually working!"
 
-### What's Next
-- Publish the architecture deep‑dive as a separate post.
-- Harden CI for blue/green previews and smoke tests.
-- Ship a weekly newsletter and lightweight release notes.
+*The payoff:* Both sites live. Real visitors. Real feedback.
 
-## Future Horizons
+**Milestones:**
+- ✅ First visitor from Google search
+- ✅ Portfolio milestone celebrations working
+- ✅ Blog loading in < 1 second globally (Cloudflare is magic)
 
-- **📰 Weekly Blog + Newsletter:** Consistent cadence for regular content delivery.
-- **📚 Architecture Deep‑dives:** Publish detailed technical architecture content.
-- **🤖 AI Integrations:** Chatbots, automated analytics dashboards.
-- **⚙️ Edge Deployments:** Experiment with Cloudflare Workers, Fly.io.
-- **📈 Data‑First Playground:** Real metrics, dashboards, A/B testing.
+---
 
-## Final Thought
+## 🔧 Technical Deep-Dive
 
-"Not using AI now is like skipping the internet during the dot‑com boom. Learn it. Use it. Ship faster."
+### Architecture Overview
 
-Built with ❤️ and curiosity. Architecture deep‑dive coming soon.
+```
+┌─────────────────────────────────────────────────────────────┐
+│                        CLOUD PATH                            │
+│  User → Cloudflare CDN → Firebase Hosting → React SPA       │
+└─────────────────────────────────────────────────────────────┘
+
+┌─────────────────────────────────────────────────────────────┐
+│                       HOMELAB PATH                           │
+│  User → Cloudflare CDN → Tunnel → K8s Ingress → Blog Pod    │
+└─────────────────────────────────────────────────────────────┘
+```
+
+### DNS + Cloudflare Setup
+
+This was one of the trickiest parts. My DNS records:
+
+| Type | Name | Content | Proxied |
+|------|------|---------|---------|
+| A | @ | 104.21.x.x | ✓ (Cloudflare) |
+| CNAME | blog | tunnel.cfargotunnel.com | ✓ |
+| CNAME | www | sudharsana.dev | ✓ |
+
+**The DuckDNS disaster:** I originally used DuckDNS for dynamic DNS, but some VPNs flagged it as suspicious. Moving everything to Cloudflare fixed this completely.
+
+### GitOps with FluxCD
+
+Every change to my blog goes through Git:
+
+```bash
+# Push code → GitHub Actions builds image → FluxCD syncs to cluster
+git push origin main
+
+# FluxCD detects the new image automatically
+$ flux get kustomizations
+NAME    READY   STATUS
+blog    True    Applied revision: main@sha1:abc123
+```
+
+---
+
+## 💥 Things That Broke (And How I Fixed Them)
+
+### 1. The Mysterious 502 Errors
+
+**Symptom:** Random 502s during traffic spikes.
+
+**Root cause:** Ingress timeout was too low for Bun.js cold starts.
+
+**Fix:**
+```yaml
+# ingress.yaml
+annotations:
+  nginx.ingress.kubernetes.io/proxy-read-timeout: "300"
+  nginx.ingress.kubernetes.io/proxy-send-timeout: "300"
+```
+
+### 2. CSS Caching Nightmare
+
+**Symptom:** Deployed new styles, but users saw old CSS.
+
+**Root cause:** Browser caching + Cloudflare caching = stale assets.
+
+**Fix:** Cache-busting with version query strings:
+```html
+<link rel="stylesheet" href="/styles/main.css?v=2025010101">
+```
+
+### 3. Kubernetes Pod Evictions
+
+**Symptom:** Pods randomly dying on my mini-PC.
+
+**Root cause:** Memory limits too aggressive + system processes fighting for RAM.
+
+**Fix:** Set realistic limits and added a swap file:
+```bash
+sudo fallocate -l 4G /swapfile
+sudo chmod 600 /swapfile
+sudo mkswap /swapfile
+sudo swapon /swapfile
+```
+
+---
+
+## 💡 Key Lessons
+
+### For Cloud Deployments
+1. **Start with managed services** - They handle the boring stuff
+2. **Use a CDN from day one** - Performance is free
+3. **Automate everything** - `firebase deploy` beats manual uploads every time
+
+### For Self-Hosting
+1. **Learn Kubernetes basics** - Pods, Services, Ingress are your vocabulary
+2. **GitOps is worth it** - Even for a personal blog
+3. **Monitoring is not optional** - You can't fix what you can't see
+
+### For Both
+1. **Own your domain** - It's your identity on the internet
+2. **Iterate fast** - Ship something ugly, then make it pretty
+3. **Document as you go** - Your future self will thank you
+
+---
+
+## 🔮 What's Next?
+
+- [ ] **Architecture deep-dive post** - The full Kubernetes + FluxCD setup
+- [ ] **AI integrations** - Chatbot for site navigation?
+- [ ] **Edge deployments** - Experiment with Cloudflare Workers
+- [ ] **Weekly newsletter** - Consistent content cadence
+
+---
+
+## 🎯 Final Thought
+
+> "Not using AI now is like skipping the internet during the dot-com boom. Learn it. Use it. Ship faster."
+
+The internet is made of layers: code, servers, networks, and DNS. Understanding those layers—really understanding them—makes you a better engineer. Whether you go cloud-first or homelab-first, the key is to **build something real**.
+
+---
+
+*Built with ❤️ and curiosity. Architecture deep-dive coming soon.*
+
+**Have questions? Drop a comment below or find me on [GitHub](https://github.com/sudharsanarajasekaran) and [LinkedIn](https://www.linkedin.com/in/sudharsanarajasekaran/).**

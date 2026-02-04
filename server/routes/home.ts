@@ -2,24 +2,30 @@ import { layout } from "../templates/layout";
 import { getPostIndex } from "../lib/posts";
 
 export async function homeRoute(_req: Request): Promise<Response> {
-    const index = await getPostIndex();
+  const index = await getPostIndex();
 
-    const postCards = index.posts.map(post => {
-        const date = new Date(post.date).toLocaleDateString("en-US", {
-            month: "short",
-            day: "numeric",
-            year: "numeric"
-        });
+  const postCards = index.posts.map((post, idx) => {
+    const date = new Date(post.date).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric"
+    });
 
-        const tags = post.tags.map(t =>
-            `<a href="/tag/${encodeURIComponent(t)}" class="tag">${t}</a>`
-        ).join("");
+    // Estimate reading time (assuming average 200 words per minute)
+    const wordCount = post.excerpt.split(/\s+/).length * 10; // Rough estimate based on excerpt
+    const readingTime = Math.max(1, Math.ceil(wordCount / 200));
 
-        return `
-      <article class="post-card">
+    const tags = post.tags.map(t =>
+      `<a href="/tag/${encodeURIComponent(t)}" class="tag">${t}</a>`
+    ).join("");
+
+    return `
+      <article class="post-card" style="animation-delay: ${idx * 0.1}s">
+        <div class="post-card-accent"></div>
         <div class="post-content">
           <div class="post-meta">
-            <time datetime="${post.date}">${date}</time>
+            <span class="post-date"><i class="far fa-calendar"></i> ${date}</span>
+            <span class="post-reading-time"><i class="far fa-clock"></i> ${readingTime} min read</span>
           </div>
           <h2 class="post-title">
             <a href="/post/${post.slug}">${post.title}</a>
@@ -27,25 +33,40 @@ export async function homeRoute(_req: Request): Promise<Response> {
           <p class="post-excerpt">${post.excerpt}</p>
           <div class="post-footer">
             <div class="post-tags">${tags}</div>
-            <a href="/post/${post.slug}" class="read-more">Read more →</a>
+            <a href="/post/${post.slug}" class="read-more">Read more <i class="fas fa-arrow-right"></i></a>
           </div>
         </div>
       </article>
     `;
-    }).join("");
+  }).join("");
 
-    const tagList = Object.entries(index.tags)
-        .sort((a, b) => b[1] - a[1])
-        .map(([tag, count]) =>
-            `<a href="/tag/${encodeURIComponent(tag)}" class="sidebar-tag">${tag} <span>(${count})</span></a>`
-        ).join("");
+  const tagList = Object.entries(index.tags)
+    .sort((a, b) => b[1] - a[1])
+    .map(([tag, count]) =>
+      `<a href="/tag/${encodeURIComponent(tag)}" class="sidebar-tag">${tag} <span>(${count})</span></a>`
+    ).join("");
 
-    const content = `
+  const content = `
     <!-- Hero Section -->
     <section class="hero">
       <div class="hero-content">
-        <h1 class="hero-title">Resolving Dependencies,<br>One Idea at a Time.</h1>
+        <img src="/assets/images/author-potrait-small.png" alt="Sudharsana" class="hero-avatar">
+        <h1 class="hero-title">Resolving <span class="highlight">Dependencies</span>,<br>One Idea at a Time.</h1>
         <p class="hero-subtitle">Thoughts on software engineering, system design, and the craft of building things</p>
+        <div class="hero-stats">
+          <div class="hero-stat">
+            <span class="hero-stat-value">${index.posts.length}</span>
+            <span class="hero-stat-label">Posts</span>
+          </div>
+          <div class="hero-stat">
+            <span class="hero-stat-value">${Object.keys(index.tags).length}</span>
+            <span class="hero-stat-label">Topics</span>
+          </div>
+          <div class="hero-stat">
+            <span class="hero-stat-value">2025</span>
+            <span class="hero-stat-label">Started</span>
+          </div>
+        </div>
       </div>
     </section>
     
@@ -128,14 +149,14 @@ export async function homeRoute(_req: Request): Promise<Response> {
     </script>
   `;
 
-    const html = layout({
-        title: "Home",
-        description: "Thoughts on software engineering, system design, and the craft of building things. A collection of notes from the field.",
-        url: "/",
-        content
-    });
+  const html = layout({
+    title: "Home",
+    description: "Thoughts on software engineering, system design, and the craft of building things. A collection of notes from the field.",
+    url: "/",
+    content
+  });
 
-    return new Response(html, {
-        headers: { "Content-Type": "text/html; charset=utf-8" }
-    });
+  return new Response(html, {
+    headers: { "Content-Type": "text/html; charset=utf-8" }
+  });
 }
