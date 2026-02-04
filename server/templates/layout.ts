@@ -1,21 +1,21 @@
 export interface LayoutOptions {
-    title: string;
-    description: string;
-    url: string;
-    content: string;
-    ogType?: string;
-    ogImage?: string;
+  title: string;
+  description: string;
+  url: string;
+  content: string;
+  ogType?: string;
+  ogImage?: string;
 }
 
 const SITE_NAME = "Sudharsana's Tech Blog";
 const SITE_URL = "https://blog.sudharsana.dev";
 
 export function layout(options: LayoutOptions): string {
-    const { title, description, url, content, ogType = "website", ogImage } = options;
-    const fullTitle = title === "Home" ? `Resolving Dependencies, One Idea at a Time. | ${SITE_NAME}` : `${title} | ${SITE_NAME}`;
-    const canonicalUrl = url.startsWith("http") ? url : `${SITE_URL}${url}`;
+  const { title, description, url, content, ogType = "website", ogImage } = options;
+  const fullTitle = title === "Home" ? `Resolving Dependencies, One Idea at a Time. | ${SITE_NAME}` : `${title} | ${SITE_NAME}`;
+  const canonicalUrl = url.startsWith("http") ? url : `${SITE_URL}${url}`;
 
-    return `<!DOCTYPE html>
+  return `<!DOCTYPE html>
 <html lang="en" data-theme="light">
 <head>
   <meta charset="UTF-8">
@@ -107,6 +107,26 @@ export function layout(options: LayoutOptions): string {
     ${content}
   </main>
   
+  <!-- Feedback Button -->
+  <button class="feedback-btn" id="feedback-btn" aria-label="Send Feedback">
+    <i class="fas fa-comment-dots"></i>
+  </button>
+  
+  <!-- Feedback Modal -->
+  <div class="feedback-modal" id="feedback-modal">
+    <div class="feedback-content">
+      <button class="feedback-close" id="feedback-close">&times;</button>
+      <h3>Send Feedback</h3>
+      <p>Have a suggestion or found an issue? Let me know!</p>
+      <form class="feedback-form" id="feedback-form">
+        <input type="text" name="name" placeholder="Your name (optional)" class="feedback-input">
+        <textarea name="message" placeholder="Your feedback..." required class="feedback-textarea"></textarea>
+        <button type="submit" class="feedback-submit">Send Feedback</button>
+      </form>
+      <div id="feedback-message" class="feedback-message"></div>
+    </div>
+  </div>
+  
   <!-- Footer -->
   <footer class="site-footer">
     <div class="footer-container">
@@ -154,6 +174,47 @@ export function layout(options: LayoutOptions): string {
       const docHeight = document.documentElement.scrollHeight - window.innerHeight;
       const progress = (scrollTop / docHeight) * 100;
       progressBar.style.width = progress + '%';
+    });
+    
+    // Feedback Modal
+    const feedbackBtn = document.getElementById('feedback-btn');
+    const feedbackModal = document.getElementById('feedback-modal');
+    const feedbackClose = document.getElementById('feedback-close');
+    const feedbackForm = document.getElementById('feedback-form');
+    
+    feedbackBtn.addEventListener('click', () => {
+      feedbackModal.classList.add('open');
+    });
+    
+    feedbackClose.addEventListener('click', () => {
+      feedbackModal.classList.remove('open');
+    });
+    
+    feedbackModal.addEventListener('click', (e) => {
+      if (e.target === feedbackModal) feedbackModal.classList.remove('open');
+    });
+    
+    feedbackForm.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const msg = document.getElementById('feedback-message');
+      const formData = new FormData(feedbackForm);
+      
+      try {
+        const res = await fetch('/api/feedback', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            name: formData.get('name'),
+            message: formData.get('message')
+          })
+        });
+        msg.textContent = res.ok ? 'Thanks for your feedback!' : 'Error sending feedback';
+        msg.className = 'feedback-message ' + (res.ok ? 'success' : 'error');
+        if (res.ok) feedbackForm.reset();
+      } catch {
+        msg.textContent = 'Error sending feedback';
+        msg.className = 'feedback-message error';
+      }
     });
   </script>
 </body>

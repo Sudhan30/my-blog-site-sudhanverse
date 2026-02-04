@@ -107,6 +107,29 @@ export async function apiRouter(req: Request, path: string): Promise<Response> {
         }
     }
 
+    // Feedback
+    if (path === "/api/feedback" && method === "POST") {
+        try {
+            const body = await req.json() as { name?: string; message: string };
+            const message = body.message?.trim();
+
+            if (!message || message.length > 2000) {
+                return json({ error: "Invalid feedback" }, 400);
+            }
+
+            // For now, just log it (could store or email)
+            console.log("Feedback received:", {
+                name: body.name || "Anonymous",
+                message,
+                timestamp: new Date().toISOString()
+            });
+
+            return json({ message: "Feedback received! Thank you." }, 200);
+        } catch {
+            return json({ error: "Invalid request" }, 400);
+        }
+    }
+
     return json({ error: "Not found" }, 404);
 }
 
