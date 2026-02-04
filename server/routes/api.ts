@@ -3,14 +3,28 @@
 
 const BACKEND_URL = process.env.BACKEND_URL || 'http://blog-backend-service:3001';
 
-// Local in-memory store for development/fallback
-const localStore: {
-    likes: Record<string, number>;
-    comments: Record<string, any[]>;
-} = {
-    likes: {},
-    comments: {}
-};
+// Local file-based store for development/fallback persistence
+const DB_FILE = "db.json";
+
+async function getLocalData() {
+    const file = Bun.file(DB_FILE);
+    if (await file.exists()) {
+        try {
+            return await file.json();
+        } catch (e) {
+            return { likes: {}, comments: {} };
+        }
+    }
+    return { likes: {}, comments: {} };
+}
+
+async function saveLocalData(data: any) {
+    try {
+        await Bun.write(DB_FILE, JSON.stringify(data, null, 2));
+    } catch (e) {
+        console.warn("Failed to write local DB fallback:", e);
+    }
+}
 
 export async function apiRouter(req: Request, path: string): Promise<Response> {
     const method = req.method;
@@ -18,19 +32,26 @@ export async function apiRouter(req: Request, path: string): Promise<Response> {
     // Helper to fetch from backend with fallback
     async function fetchWithFallback(url: string, options?: RequestInit, type: 'likes' | 'comments' = 'likes', id: string = ''): Promise<any> {
         try {
+            // Try backend first
             const res = await fetch(url, options);
             if (!res.ok) throw new Error(`Backend returned ${res.status}`);
             return await res.json();
         } catch (error) {
-            console.warn(`Backend unreachable (${url}), using local fallback.`);
+            console.warn(`Backend unreachable (${url}), using local file fallback.`);
+
+            const localStore = await getLocalData();
+            let changed = false;
 
             // Fallback logic
             if (type === 'likes') {
                 if (options?.method === 'POST') {
                     localStore.likes[id] = (localStore.likes[id] || 0) + 1;
+                    changed = true;
                 } else if (options?.method === 'DELETE') {
                     localStore.likes[id] = Math.max((localStore.likes[id] || 0) - 1, 0);
+                    changed = true;
                 }
+                if (changed) await saveLocalData(localStore);
                 return { count: localStore.likes[id] || 0, likes: localStore.likes[id] || 0 };
             }
 
@@ -44,6 +65,7 @@ export async function apiRouter(req: Request, path: string): Promise<Response> {
                         created_at: new Date().toISOString()
                     };
                     localStore.comments[id] = [newComment, ...(localStore.comments[id] || [])];
+                    await saveLocalData(localStore);
                     return newComment;
                 }
                 return {
