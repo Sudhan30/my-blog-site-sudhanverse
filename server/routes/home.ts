@@ -50,7 +50,7 @@ export async function homeRoute(_req: Request): Promise<Response> {
     <!-- Hero Section -->
     <section class="hero">
       <div class="hero-content">
-        <img src="/assets/images/author-potrait-small.png" alt="Sudharsana" class="hero-avatar">
+        <img src="/assets/images/author-potrait-small.png" alt="Sudharsana" class="hero-avatar" fetchpriority="high">
         <h1 class="hero-title">Resolving <span class="highlight">Dependencies</span>,<br>One Idea at a Time.</h1>
         <p class="hero-subtitle">Thoughts on software engineering, system design, and the craft of building things</p>
         <div class="hero-stats">
@@ -157,6 +157,9 @@ export async function homeRoute(_req: Request): Promise<Response> {
   });
 
   return new Response(html, {
-    headers: { "Content-Type": "text/html; charset=utf-8" }
+    headers: {
+      "Content-Type": "text/html; charset=utf-8",
+      "Cache-Control": "public, max-age=3600"
+    }
   });
 }

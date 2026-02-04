@@ -50,7 +50,7 @@ export async function postRoute(slug: string): Promise<Response> {
         <!-- Article Footer -->
         <footer class="article-footer">
           <div class="interaction-buttons">
-            <button class="like-btn" id="like-btn" data-slug="${post.slug}">
+            <button class="like-btn" id="like-btn" data-slug="${post.slug}" aria-label="Like this post">
               <i class="far fa-thumbs-up"></i>
               <span id="like-count">0</span>
             </button>
@@ -186,6 +186,9 @@ export async function postRoute(slug: string): Promise<Response> {
   });
 
   return new Response(html, {
-    headers: { "Content-Type": "text/html; charset=utf-8" }
+    headers: {
+      "Content-Type": "text/html; charset=utf-8",
+      "Cache-Control": "public, max-age=3600"
+    }
   });
 }
