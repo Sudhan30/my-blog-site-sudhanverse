@@ -34,9 +34,25 @@ This leads to a design where memory is **curated, not hoarded**, and where conte
 
 Before diving into the details, here's a visual overview of how all the pieces fit together:
 
-![Chat System Architecture](/assets/images/chat-architecture.svg)
+![Chat System Infrastructure & CI/CD](/assets/images/chat-architecture.svg)
 
-The diagram shows how a user message flows through the system: from the browser through authentication, context assembly (pulling from database and optionally web search), to the LLM, and back via streaming. Background jobs handle summarization asynchronously to keep responses fast.
+The diagram shows the complete infrastructure:
+
+**Runtime Flow (Top Section):**
+- User requests flow through **Cloudflare** (DNS, CDN, SSL, DDoS protection) to the **Kubernetes cluster**
+- Inside the cluster, the **Ingress Controller** routes traffic to the **Chat App Pod** running Bun/Hono
+- The app communicates with the **Ollama Pod** (Gemma 3 12B model, GPU-accelerated) for LLM inference
+- **PostgreSQL** stores messages, summaries, sessions, and users
+- **Brave Search API** provides real-time web data when needed
+- Background jobs handle async summarization
+
+**CI/CD Pipeline (Bottom Section):**
+- Code pushed to **GitHub** triggers **GitHub Actions**
+- Actions build and push Docker images to **Docker Hub**
+- The workflow updates the image tag in the **cluster-infra** repo (K8s manifests)
+- **FluxCD** watches the repo and automatically deploys changes to the cluster
+
+This GitOps approach ensures the cluster state always matches what's defined in Git.
 
 ---
 
