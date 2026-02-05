@@ -34,7 +34,7 @@ This leads to a design where memory is **curated, not hoarded**, and where conte
 
 Before diving into the details, here's a visual overview of how all the pieces fit together:
 
-![Chat System Infrastructure & CI/CD](/assets/images/chat-architecture.svg)
+![Chat System Infrastructure & CI/CD](/assets/images/chat-architecture.svg?v=2)
 
 The diagram shows the complete infrastructure:
 
