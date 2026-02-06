@@ -19,9 +19,9 @@ marked.use({
 // Custom extensions for code blocks
 marked.use({
     renderer: {
-        code({ text, lang }: { text?: string; lang?: string }) {
-            const language = lang || "text";
-            return `<pre class="code-block"><code class="language-${language}">${escapeHtml(text)}</code></pre>\n`;
+        code(code: string, infostring: string | undefined): string {
+            const language = infostring || "text";
+            return `<pre class="code-block"><code class="language-${language}">${escapeHtml(code)}</code></pre>\n`;
         }
     }
 });
