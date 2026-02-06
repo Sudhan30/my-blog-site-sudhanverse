@@ -903,35 +903,22 @@ img {
 .article-content ul,
 .article-content ol {
   margin-bottom: var(--space-lg);
-  padding-left: var(--space-lg);
+  padding-left: var(--space-xl);
 }
 
 .article-content ul {
-  list-style: none;
+  list-style: disc;
+  list-style-position: outside;
 }
 
 .article-content ul li {
-  margin-bottom: var(--space-md);
-  position: relative;
-  padding-left: var(--space-lg);
+  margin-bottom: var(--space-sm);
+  padding-left: var(--space-xs);
 }
 
-.article-content ul li::before {
-  content: '•';
-  position: absolute;
-  left: 0;
-  color: var(--color-primary);
-  font-weight: bold;
-  font-size: 1.2em;
-}
-
-/* Special styling for lists with emojis */
-.article-content ul li:has(:first-child) {
-  padding-left: 0;
-}
-
-.article-content ul li:first-letter {
-  font-size: 1em;
+.article-content ol li {
+  margin-bottom: var(--space-sm);
+  padding-left: var(--space-xs);
 }
 
 .article-content ol li {
@@ -1017,6 +1004,30 @@ img {
 }
 
 /* Code Blocks */
+.article-content pre {
+  background: #1e293b;
+  border-radius: var(--radius-md);
+  padding: var(--space-lg);
+  overflow-x: auto;
+  margin-bottom: var(--space-lg);
+  margin-top: var(--space-md);
+}
+
+[data-theme="dark"] .article-content pre {
+  background: #0d1117;
+}
+
+.article-content pre code {
+  font-family: 'JetBrains Mono', 'Fira Code', monospace;
+  font-size: 0.875rem;
+  color: #e2e8f0;
+  line-height: 1.6;
+  background: transparent;
+  padding: 0;
+  white-space: pre;
+  display: block;
+}
+
 .code-block {
   background: #1e293b;
   border-radius: var(--radius-md);
@@ -1036,7 +1047,7 @@ img {
   line-height: 1.6;
 }
 
-.article-content code:not(.code-block code) {
+.article-content code:not(pre code) {
   background: var(--color-bg-tertiary);
   padding: 2px 6px;
   border-radius: var(--radius-sm);
