@@ -34,7 +34,7 @@ This leads to a design where memory is **curated, not hoarded**, and where conte
 
 Before diving into the details, here's a visual overview of how all the pieces fit together:
 
-![Chat System Infrastructure & CI/CD](/assets/images/chat-architecture.svg?v=2)
+![Chat System Infrastructure & CI/CD](/assets/images/chat-architecture.svg?v=3)
 
 The diagram shows the complete infrastructure:
 
@@ -44,6 +44,7 @@ The diagram shows the complete infrastructure:
 - The app communicates with the **Ollama Pod** (Gemma 3 12B model, GPU-accelerated) for LLM inference
 - **PostgreSQL** stores messages, summaries, sessions, and users
 - **Brave Search API** provides real-time web data when needed
+- **Gotify** handles push notifications for user signups and admin approvals
 - Background jobs handle async summarization
 
 **CI/CD Pipeline (Bottom Section):**
@@ -277,6 +278,106 @@ Background jobs handle summarization and cleanup. Retries and timeouts are built
 
 ---
 
+## User Approval and Push Notifications
+
+For a private chat system, user access needs to be controlled. New signups require admin approval before gaining full access. The challenge: how do you get notified instantly when someone signs up?
+
+### The Problem with Third-Party Services
+
+Initially, Slack webhooks seemed like the obvious choice. But rate limits quickly became a problem:
+
+```
+HTTP 429 Too Many Requests
+"You are sending too many requests. Please relax."
+```
+
+Third-party notification services introduce dependencies that can fail or throttle at inconvenient times.
+
+### Self-Hosted Solution: Gotify
+
+**Gotify** is a self-hosted push notification server. It runs as a lightweight container in the same Kubernetes cluster:
+
+```
+User Signup → Chat App → Gotify Server → Mobile Push + Web UI
+                              ↓
+                    Admin clicks approve link
+                              ↓
+                    Chat App /api/admin/approve
+```
+
+### Why Gotify Works
+
+| Benefit | Description |
+|---------|-------------|
+| **No rate limits** | Self-hosted means unlimited notifications |
+| **Mobile push** | Android app receives instant alerts |
+| **Web dashboard** | View and manage notifications in browser |
+| **Simple API** | Single HTTP POST to send messages |
+| **Lightweight** | ~50MB container, minimal resources |
+
+### Implementation
+
+Notifications are sent with markdown formatting for clean, actionable messages:
+
+```typescript
+const message = {
+  title: "🔔 New User Signup",
+  message: `**Email:** ${email}
+**Name:** ${name || "Not provided"}
+**Time:** ${createdAt.toLocaleString()}
+
+---
+
+[✅ **APPROVE**](${approveUrl})
+
+[❌ **DECLINE**](${declineUrl})`,
+  priority: 8,
+  extras: {
+    "client::display": { contentType: "text/markdown" }
+  }
+};
+
+await fetch(`${GOTIFY_URL}/message?token=${token}`, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify(message),
+});
+```
+
+The admin receives a push notification, taps it, and the user is approved—all within seconds.
+
+### Infrastructure Integration
+
+Gotify runs alongside the chat app in Kubernetes:
+
+```yaml
+# gotify-deployment.yaml
+containers:
+- name: gotify
+  image: gotify/server:latest
+  ports:
+  - containerPort: 80
+  volumeMounts:
+  - name: gotify-data
+    mountPath: /app/data  # Persistent storage for messages
+```
+
+The chat app references Gotify via internal service DNS:
+
+```yaml
+- name: GOTIFY_URL
+  value: "http://gotify-service:80"
+- name: GOTIFY_TOKEN
+  valueFrom:
+    secretKeyRef:
+      name: gotify-secret
+      key: app-token
+```
+
+This keeps notification traffic internal to the cluster—fast and free.
+
+---
+
 ## Why This Architecture
 
 Every major decision ties back to **scalability**, **cost control**, and **user experience**:
@@ -286,6 +387,7 @@ Every major decision ties back to **scalability**, **cost control**, and **user 
 | Summarization | Controls token growth for long conversations |
 | Structured rendering | Improves clarity and perceived quality |
 | Tool-based augmentation | Enables capabilities without bloating every request |
+| Self-hosted notifications | Eliminates rate limits and external dependencies |
 | Separation of concerns | The data model enables iteration and evolution |
 
 The system is designed to evolve. Prompts can change. Models can be swapped. Summaries can be regenerated. The architecture supports this flexibility.

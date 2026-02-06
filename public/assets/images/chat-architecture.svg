@@ -41,6 +41,10 @@
       <stop offset="0%" style="stop-color:#5468ff"/>
       <stop offset="100%" style="stop-color:#316ce4"/>
     </linearGradient>
+    <linearGradient id="gotifyGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4ade80"/>
+      <stop offset="100%" style="stop-color:#22c55e"/>
+    </linearGradient>
     <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" style="stop-color:#0f172a"/>
       <stop offset="100%" style="stop-color:#1e293b"/>
@@ -246,6 +250,18 @@
       <text x="390" y="352" fill="#94a3b8" font-size="8">Summarization Worker</text>
     </g>
 
+    <!-- ===== GOTIFY POD ===== -->
+    <g filter="url(#shadow)">
+      <rect x="550" y="310" width="140" height="55" rx="10" fill="url(#gotifyGrad)"/>
+      <!-- Bell notification icon -->
+      <g transform="translate(560, 318)">
+        <path d="M 10 4 C 6 4 3 7 3 11 L 3 16 L 0 19 L 20 19 L 17 16 L 17 11 C 17 7 14 4 10 4 Z" fill="#ffffff"/>
+        <circle cx="10" cy="22" r="2.5" fill="#ffffff"/>
+      </g>
+      <text x="590" y="335" fill="#ffffff" font-size="10" font-weight="600">Gotify</text>
+      <text x="590" y="352" fill="#dcfce7" font-size="8">Push Notifications</text>
+    </g>
+
     <!-- ===== INGRESS ===== -->
     <g filter="url(#shadow)">
       <rect x="350" y="380" width="170" height="40" rx="8" fill="#1e40af"/>
@@ -276,7 +292,12 @@
   <path d="M 520 200 L 650 200 L 650 180 L 740 180" stroke="#34d399" stroke-width="2" fill="none" marker-end="url(#arrowGreen)"/>
 
   <!-- Arrow: Background Jobs to PostgreSQL -->
-  <path d="M 520 337 L 720 337 L 720 260 L 750 240" stroke="#6b7280" stroke-width="1.5" stroke-dasharray="4,3" fill="none" marker-end="url(#arrowWhite)"/>
+  <path d="M 520 337 L 530 337 L 530 280 L 720 280 L 720 260 L 750 240" stroke="#6b7280" stroke-width="1.5" stroke-dasharray="4,3" fill="none" marker-end="url(#arrowWhite)"/>
+
+  <!-- Arrow: Chat to Gotify -->
+  <defs><marker id="arrowGotify" markerWidth="8" markerHeight="6" refX="7" refY="3" orient="auto"><polygon points="0 0, 8 3, 0 6" fill="#4ade80"/></marker></defs>
+  <path d="M 460 260 L 460 295 L 580 295 L 580 305" stroke="#4ade80" stroke-width="1.5" fill="none" marker-end="url(#arrowGotify)"/>
+  <text x="520" y="288" text-anchor="middle" fill="#4ade80" font-size="7">notify</text>
 
   <!-- ========== EXTERNAL SERVICES ========== -->
   <!-- Brave Search -->
@@ -427,22 +448,25 @@
     <rect x="265" y="-10" width="14" height="14" rx="2" fill="url(#searchGrad)"/>
     <text x="285" y="0" fill="#94a3b8" font-size="8">External API</text>
 
-    <rect x="360" y="-10" width="14" height="14" rx="2" fill="url(#githubGrad)"/>
-    <text x="380" y="0" fill="#94a3b8" font-size="8">Git Repo</text>
+    <rect x="355" y="-10" width="14" height="14" rx="2" fill="url(#gotifyGrad)"/>
+    <text x="375" y="0" fill="#94a3b8" font-size="8">Notify</text>
 
-    <rect x="435" y="-10" width="14" height="14" rx="2" fill="url(#dockerGrad)"/>
-    <text x="455" y="0" fill="#94a3b8" font-size="8">Registry</text>
+    <rect x="420" y="-10" width="14" height="14" rx="2" fill="url(#githubGrad)"/>
+    <text x="440" y="0" fill="#94a3b8" font-size="8">Git Repo</text>
 
-    <rect x="510" y="-10" width="14" height="14" rx="2" fill="url(#fluxGrad)"/>
-    <text x="530" y="0" fill="#94a3b8" font-size="8">GitOps</text>
+    <rect x="495" y="-10" width="14" height="14" rx="2" fill="url(#dockerGrad)"/>
+    <text x="515" y="0" fill="#94a3b8" font-size="8">Registry</text>
 
-    <line x1="585" y1="-3" x2="615" y2="-3" stroke="#22d3ee" stroke-width="2"/>
-    <text x="630" y="0" fill="#94a3b8" font-size="8">Data Flow</text>
+    <rect x="565" y="-10" width="14" height="14" rx="2" fill="url(#fluxGrad)"/>
+    <text x="585" y="0" fill="#94a3b8" font-size="8">GitOps</text>
 
-    <line x1="690" y1="-3" x2="720" y2="-3" stroke="#60a5fa" stroke-width="2" stroke-dasharray="4,3"/>
-    <text x="735" y="0" fill="#94a3b8" font-size="8">Response</text>
+    <line x1="635" y1="-3" x2="665" y2="-3" stroke="#22d3ee" stroke-width="2"/>
+    <text x="680" y="0" fill="#94a3b8" font-size="8">Data Flow</text>
 
-    <rect x="790" y="-10" width="14" height="14" rx="2" fill="#326ce5"/>
-    <text x="810" y="0" fill="#94a3b8" font-size="8">K8s Cluster</text>
+    <line x1="740" y1="-3" x2="770" y2="-3" stroke="#60a5fa" stroke-width="2" stroke-dasharray="4,3"/>
+    <text x="785" y="0" fill="#94a3b8" font-size="8">Response</text>
+
+    <rect x="840" y="-10" width="14" height="14" rx="2" fill="#326ce5"/>
+    <text x="860" y="0" fill="#94a3b8" font-size="8">K8s</text>
   </g>
 </svg>
