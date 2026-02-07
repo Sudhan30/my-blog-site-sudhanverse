@@ -105,7 +105,7 @@ export async function apiRouter(req: Request, path: string): Promise<Response> {
 
                 await pool.query(
                     `INSERT INTO likes (post_id, client_id) VALUES ($1, $2::uuid)
-                     ON CONFLICT (post_id, client_id) DO NOTHING`,
+                     ON CONFLICT ON CONSTRAINT ux_likes_post_client DO NOTHING`,
                     [postId, clientId]
                 );
 
