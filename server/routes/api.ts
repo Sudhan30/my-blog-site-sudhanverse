@@ -1,165 +1,123 @@
-// Proxy API requests to the blog-backend service
-// The blog-backend handles likes, comments, newsletter with PostgreSQL + Redis
+// API routes for likes, comments, newsletter, and feedback
+// Uses PostgreSQL directly for persistence
 
-const BACKEND_URL = process.env.BACKEND_URL || 'http://blog-backend-service:3001';
+import { Pool } from 'pg';
 
-// Local file-based store for development/fallback persistence
-const DB_FILE = "db.json";
+const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://blog_user:piVdLYWqbtZyfWo2VkcY2QFC9lVjXbde@localhost:5432/blog_db';
 
-async function getLocalData() {
-    const file = Bun.file(DB_FILE);
-    if (await file.exists()) {
-        try {
-            return await file.json();
-        } catch (e) {
-            return { likes: {}, comments: {} };
-        }
-    }
-    return { likes: {}, comments: {} };
-}
+const pool = new Pool({
+    connectionString: DATABASE_URL,
+    max: 10,
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: 5000,
+});
 
-async function saveLocalData(data: any) {
-    try {
-        await Bun.write(DB_FILE, JSON.stringify(data, null, 2));
-    } catch (e) {
-        console.warn("Failed to write local DB fallback:", e);
-    }
-}
+// Test connection on startup
+pool.query('SELECT NOW()')
+    .then(() => console.log('Blog API: PostgreSQL connected'))
+    .catch(err => console.error('Blog API: PostgreSQL connection failed:', err.message));
 
 export async function apiRouter(req: Request, path: string): Promise<Response> {
     const method = req.method;
 
-    // Helper to fetch from backend with fallback
-    async function fetchWithFallback(url: string, options?: RequestInit, type: 'likes' | 'comments' = 'likes', id: string = ''): Promise<any> {
-        try {
-            // Try backend first
-            const res = await fetch(url, options);
-            if (!res.ok) throw new Error(`Backend returned ${res.status}`);
-            return await res.json();
-        } catch (error) {
-            console.warn(`Backend unreachable (${url}), using local file fallback.`);
-
-            const localStore = await getLocalData();
-            let changed = false;
-
-            // Fallback logic
-            if (type === 'likes') {
-                if (options?.method === 'POST') {
-                    localStore.likes[id] = (localStore.likes[id] || 0) + 1;
-                    changed = true;
-                } else if (options?.method === 'DELETE') {
-                    localStore.likes[id] = Math.max((localStore.likes[id] || 0) - 1, 0);
-                    changed = true;
-                }
-                if (changed) await saveLocalData(localStore);
-                return { count: localStore.likes[id] || 0, likes: localStore.likes[id] || 0 };
-            }
-
-            if (type === 'comments') {
-                if (options?.method === 'POST') {
-                    const body = JSON.parse(options.body as string);
-                    const newComment = {
-                        id: Date.now().toString(),
-                        display_name: body.name || 'Anonymous',
-                        content: body.comment,
-                        created_at: new Date().toISOString()
-                    };
-                    localStore.comments[id] = [newComment, ...(localStore.comments[id] || [])];
-                    await saveLocalData(localStore);
-                    return newComment;
-                }
-                return {
-                    total: (localStore.comments[id] || []).length,
-                    comments: localStore.comments[id] || []
-                };
-            }
-
-            return {};
-        }
-    }
-
-    // Newsletter subscription - proxy to backend
+    // Newsletter subscription
     if (path === "/api/newsletter" && method === "POST") {
         try {
             const body = await req.json() as { email: string };
-            const backendRes = await fetch(`${BACKEND_URL}/api/newsletter/subscribe`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(body)
-            });
-            const data = await backendRes.json();
-            return json(data, backendRes.status);
+            // For now, just log it - can add newsletter table later
+            console.log('Newsletter signup:', body.email);
+            return json({ message: 'Subscribed successfully!' });
         } catch (error) {
-            console.error('Newsletter proxy error:', error);
-            return json({ error: 'Failed to connect to backend' }, 502);
+            console.error('Newsletter error:', error);
+            return json({ error: 'Failed to subscribe' }, 500);
         }
     }
 
     // Post likes - match path pattern
-    const likesMatch = path.match(/^\/api\/posts\/([^/]+)\/likes$/) ||
-        path.match(/^\/posts\/([^/]+)\/likes$/);
+    const likesMatch = path.match(/^\/api\/posts\/([^/]+)\/likes$/);
     if (likesMatch) {
         const postId = likesMatch[1];
 
         if (method === "GET") {
             try {
-                const data = await fetchWithFallback(`${BACKEND_URL}/api/posts/${postId}/likes`, { method: 'GET' }, 'likes', postId);
-                return json({ count: data.likes || 0 });
+                const result = await pool.query(
+                    'SELECT COUNT(*) as count FROM likes WHERE post_id = $1',
+                    [postId]
+                );
+                return json({ count: parseInt(result.rows[0]?.count || '0', 10) });
             } catch (error) {
-                console.error('Likes GET proxy error:', error);
+                console.error('Likes GET error:', error);
                 return json({ count: 0 });
             }
         }
 
         if (method === "POST") {
             try {
-                // Get clientId from localStorage (sent in body or generate new)
                 const body = await req.json().catch(() => ({})) as { clientId?: string };
-                console.log(`[Proxy] POSTing like for ${postId}`);
-                const data = await fetchWithFallback(`${BACKEND_URL}/api/posts/${postId}/like`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ clientId: body.clientId })
-                }, 'likes', postId);
-                return json({ count: data.likes || 0, liked: true, clientId: data.clientId });
+                const clientId = body.clientId || 'anonymous';
+
+                // Insert like (ignore if already exists due to unique constraint)
+                await pool.query(
+                    `INSERT INTO likes (post_id, user_id) VALUES ($1, $2)
+                     ON CONFLICT (post_id, user_id) DO NOTHING`,
+                    [postId, clientId]
+                );
+
+                // Get updated count
+                const result = await pool.query(
+                    'SELECT COUNT(*) as count FROM likes WHERE post_id = $1',
+                    [postId]
+                );
+                return json({ count: parseInt(result.rows[0]?.count || '0', 10), liked: true });
             } catch (error) {
-                console.error('Likes POST proxy error:', error);
-                return json({ error: 'Failed to like post' }, 502);
+                console.error('Likes POST error:', error);
+                return json({ error: 'Failed to like post' }, 500);
             }
         }
 
         if (method === "DELETE") {
             try {
                 const body = await req.json().catch(() => ({})) as { clientId?: string };
-                console.log(`[Proxy] DELETing like for ${postId}`);
-                const data = await fetchWithFallback(`${BACKEND_URL}/api/posts/${postId}/unlike`, {
-                    method: 'DELETE',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ clientId: body.clientId })
-                }, 'likes', postId);
-                return json({ count: data.likes || 0, liked: false });
+                const clientId = body.clientId || 'anonymous';
+
+                // Remove like
+                await pool.query(
+                    'DELETE FROM likes WHERE post_id = $1 AND user_id = $2',
+                    [postId, clientId]
+                );
+
+                // Get updated count
+                const result = await pool.query(
+                    'SELECT COUNT(*) as count FROM likes WHERE post_id = $1',
+                    [postId]
+                );
+                return json({ count: parseInt(result.rows[0]?.count || '0', 10), liked: false });
             } catch (error) {
-                console.error('Unlike proxy error:', error);
-                return json({ error: 'Failed to unlike post' }, 502);
+                console.error('Unlike error:', error);
+                return json({ error: 'Failed to unlike post' }, 500);
             }
         }
     }
 
     // Post comments - match path pattern
-    const commentsMatch = path.match(/^\/api\/posts\/([^/]+)\/comments$/) ||
-        path.match(/^\/posts\/([^/]+)\/comments$/);
+    const commentsMatch = path.match(/^\/api\/posts\/([^/]+)\/comments$/);
     if (commentsMatch) {
         const postId = commentsMatch[1];
 
         if (method === "GET") {
             try {
-                const data = await fetchWithFallback(`${BACKEND_URL}/api/posts/${postId}/comments`, { method: 'GET' }, 'comments', postId);
+                const result = await pool.query(
+                    `SELECT id, content, author_name as display_name, created_at
+                     FROM comments WHERE post_id = $1
+                     ORDER BY created_at DESC`,
+                    [postId]
+                );
                 return json({
-                    comments: data.comments || [],
-                    total: data.pagination?.total || data.comments?.length || 0
+                    comments: result.rows,
+                    total: result.rows.length
                 });
             } catch (error) {
-                console.error('Comments GET proxy error:', error);
+                console.error('Comments GET error:', error);
                 return json({ comments: [], total: 0 });
             }
         }
@@ -167,45 +125,38 @@ export async function apiRouter(req: Request, path: string): Promise<Response> {
         if (method === "POST") {
             try {
                 const body = await req.json() as { name?: string; comment: string };
-                const data = await fetchWithFallback(`${BACKEND_URL}/api/posts/${postId}/comments`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        displayName: body.name || 'Anonymous',
-                        content: body.comment
-                    })
-                }, 'comments', postId);
-                return json(data, 201);
+                const authorName = body.name?.trim() || 'Anonymous';
+                const content = body.comment?.trim();
+
+                if (!content) {
+                    return json({ error: 'Comment content is required' }, 400);
+                }
+
+                const result = await pool.query(
+                    `INSERT INTO comments (post_id, content, author_name)
+                     VALUES ($1, $2, $3)
+                     RETURNING id, content, author_name as display_name, created_at`,
+                    [postId, content, authorName]
+                );
+
+                return json(result.rows[0], 201);
             } catch (error) {
-                console.error('Comments POST proxy error:', error);
-                return json({ error: 'Failed to post comment' }, 502);
+                console.error('Comments POST error:', error);
+                return json({ error: 'Failed to post comment' }, 500);
             }
         }
     }
 
-    // Feedback - proxy to backend
+    // Feedback
     if (path === "/api/feedback" && method === "POST") {
         try {
             const body = await req.json() as { name?: string; message: string; feedbackType?: string; rating?: number };
-            const backendRes = await fetch(`${BACKEND_URL}/api/feedback`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    displayName: body.name || 'Anonymous',
-                    feedbackType: body.feedbackType || 'general',
-                    message: body.message,
-                    rating: body.rating || 5
-                })
-            });
-            const data = await backendRes.json();
-            if (backendRes.ok) {
-                return json({ message: 'Feedback received! Thank you.' }, 200);
-            }
-            return json(data, backendRes.status);
+            // Log feedback for now
+            console.log('Feedback received:', body);
+            return json({ message: 'Feedback received! Thank you.' });
         } catch (error) {
-            console.error('Feedback proxy error:', error);
-            // Fallback to logging if backend is unavailable
-            return json({ message: 'Feedback received! Thank you.' }, 200);
+            console.error('Feedback error:', error);
+            return json({ error: 'Failed to submit feedback' }, 500);
         }
     }
 
