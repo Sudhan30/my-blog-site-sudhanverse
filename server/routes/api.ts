@@ -104,8 +104,8 @@ export async function apiRouter(req: Request, path: string): Promise<Response> {
                 const clientId = body.clientId || 'anonymous';
 
                 await pool.query(
-                    `INSERT INTO likes (post_id, user_id) VALUES ($1, $2)
-                     ON CONFLICT (post_id, user_id) DO NOTHING`,
+                    `INSERT INTO likes (post_id, client_id) VALUES ($1, $2::uuid)
+                     ON CONFLICT (post_id, client_id) DO NOTHING`,
                     [postId, clientId]
                 );
 
@@ -126,7 +126,7 @@ export async function apiRouter(req: Request, path: string): Promise<Response> {
                 const clientId = body.clientId || 'anonymous';
 
                 await pool.query(
-                    'DELETE FROM likes WHERE post_id = $1 AND user_id = $2',
+                    'DELETE FROM likes WHERE post_id = $1 AND client_id = $2::uuid',
                     [postId, clientId]
                 );
 
@@ -175,9 +175,9 @@ export async function apiRouter(req: Request, path: string): Promise<Response> {
             try {
                 // Only return approved comments
                 const result = await pool.query(
-                    `SELECT id, content, author_name as display_name, created_at
+                    `SELECT id, content, display_name, created_at
                      FROM comments
-                     WHERE post_id = $1 AND (approved = TRUE OR approved IS NULL)
+                     WHERE post_id = $1 AND status = 'approved'
                      ORDER BY created_at DESC`,
                     [postId]
                 );
@@ -203,9 +203,9 @@ export async function apiRouter(req: Request, path: string): Promise<Response> {
 
                 // Insert comment as approved initially
                 const result = await pool.query(
-                    `INSERT INTO comments (post_id, content, author_name, approved)
-                     VALUES ($1, $2, $3, TRUE)
-                     RETURNING id, content, author_name as display_name, created_at`,
+                    `INSERT INTO comments (post_id, content, display_name, status)
+                     VALUES ($1, $2, $3, 'approved')
+                     RETURNING id, content, display_name, created_at`,
                     [postId, content, authorName]
                 );
 
@@ -216,8 +216,8 @@ export async function apiRouter(req: Request, path: string): Promise<Response> {
                     if (modResult.isHarmful) {
                         console.log(`Comment ${commentId} flagged as harmful: ${modResult.reason}`);
                         await pool.query(
-                            `UPDATE comments SET approved = FALSE, moderation_reason = $1 WHERE id = $2`,
-                            [modResult.reason, commentId]
+                            `UPDATE comments SET status = 'rejected' WHERE id = $1`,
+                            [commentId]
                         );
                     }
                 }).catch(err => console.error('Async moderation failed:', err));
