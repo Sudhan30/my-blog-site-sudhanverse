@@ -6,8 +6,6 @@ excerpt: "A behind-the-scenes engineering deep dive into building a production A
 slug: building-ai-chat-system
 ---
 
-# Building an AI Chat System with Practical Memory, Search, and Multimodal Intelligence
-
 > "Building AI products is less about a single model and more about the system around it."
 
 Modern AI chat systems look simple on the surface. A text box, a response, maybe some formatting. Under the hood, a reliable production system is a careful orchestration of memory management, retrieval, rendering, and infrastructure decisions.
@@ -76,17 +74,17 @@ This summary is stored in a `conversation_summaries` table and becomes the canon
 ### Context Composition
 
 ```
-┌─────────────────┐   ┌──────────────────┐   ┌───────────────────┐
-│  Recent Window  │ + │ Summary Snapshot │ + │ System Instructions│
-│  (last 5-10 msgs)   │   (compressed past)   │   (personality/rules) │
-└────────┬────────┘   └────────┬─────────┘   └─────────┬─────────┘
-         │                     │                       │
-         └─────────────────────┼───────────────────────┘
-                               ▼
-                    ┌──────────────────┐
-                    │   Final Context   │
-                    │  (sent to model)  │
-                    └──────────────────┘
+┌────────────────────┐   ┌─────────────────────┐   ┌───────────────────────┐
+│   Recent Window    │ + │  Summary Snapshot   │ + │  System Instructions  │
+│ (last 5-10 msgs)   │   │  (compressed past)  │   │ (personality/rules)   │
+└─────────┬──────────┘   └──────────┬──────────┘   └───────────┬───────────┘
+          │                         │                          │
+          └─────────────────────────┼──────────────────────────┘
+                                    ▼
+                         ┌──────────────────────┐
+                         │    Final Context     │
+                         │   (sent to model)    │
+                         └──────────────────────┘
 ```
 
 This reduces token usage dramatically while preserving continuity. Instead of pretending to have infinite memory, the system maintains **useful** memory.
