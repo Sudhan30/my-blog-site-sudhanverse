@@ -1123,6 +1123,7 @@ img {
 /* Author Section */
 .author-section {
   display: flex;
+  align-items: flex-start;
   gap: var(--space-lg);
   padding: var(--space-xl);
   background: var(--color-bg-secondary);
@@ -1137,6 +1138,10 @@ img {
   border-radius: var(--radius-full);
   object-fit: cover;
   flex-shrink: 0;
+}
+
+.author-info {
+  flex: 1;
 }
 
 .author-info h3 {
@@ -1164,6 +1169,11 @@ img {
 .author-links a:hover {
   color: var(--color-primary);
   transform: scale(1.15);
+}
+
+.author-section .like-btn {
+  flex-shrink: 0;
+  align-self: center;
 }
 
 /* Comments Section */
@@ -1448,6 +1458,10 @@ img {
     flex-direction: column;
     align-items: center;
     text-align: center;
+  }
+
+  .author-section .like-btn {
+    margin-top: var(--space-md);
   }
 
   .author-links {

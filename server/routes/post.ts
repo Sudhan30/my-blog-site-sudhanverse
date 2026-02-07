@@ -47,17 +47,7 @@ export async function postRoute(slug: string): Promise<Response> {
           ${htmlContent}
         </div>
         
-        <!-- Article Footer -->
-        <footer class="article-footer">
-          <div class="interaction-buttons">
-            <button class="like-btn" id="like-btn" data-slug="${post.slug}" aria-label="Like this post">
-              <i class="far fa-thumbs-up"></i>
-              <span id="like-count">0</span>
-            </button>
-          </div>
-        </footer>
-        
-        <!-- Author Section -->
+        <!-- Author Section with Like Button -->
         <section class="author-section">
           <img src="/assets/images/author-potrait-small.png" alt="Sudharsana" class="author-avatar">
           <div class="author-info">
@@ -69,6 +59,10 @@ export async function postRoute(slug: string): Promise<Response> {
               <a href="https://www.linkedin.com/in/sudharsanarajasekaran/" target="_blank" rel="noopener" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
             </div>
           </div>
+          <button class="like-btn" id="like-btn" data-slug="${post.slug}" aria-label="Like this post">
+            <i class="far fa-thumbs-up"></i>
+            <span id="like-count">0</span>
+          </button>
         </section>
         
         <!-- Comments Section -->
