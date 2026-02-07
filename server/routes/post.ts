@@ -68,7 +68,20 @@ export async function postRoute(slug: string): Promise<Response> {
         <!-- Comments Section -->
         <section class="comments-section">
           <h3>Comments <span id="comment-count">(0)</span></h3>
-          
+
+          <!-- AI-Generated Comment Summary (hidden if no summary) -->
+          <div id="comment-summary" class="comment-summary" style="display: none;">
+            <div class="summary-header">
+              <i class="fas fa-robot"></i>
+              <span>What readers are saying</span>
+            </div>
+            <p id="summary-text"></p>
+            <div class="summary-meta">
+              <span id="summary-comment-count"></span>
+              <span id="summary-date"></span>
+            </div>
+          </div>
+
           <form class="comment-form" id="comment-form">
             <input type="hidden" name="postSlug" value="${post.slug}">
             <input type="text" name="name" placeholder="Your name (optional)" class="comment-input">
@@ -180,7 +193,7 @@ export async function postRoute(slug: string): Promise<Response> {
       commentForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const formData = new FormData(commentForm);
-        
+
         const res = await fetch('/api/posts/' + slug + '/comments', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
@@ -189,15 +202,41 @@ export async function postRoute(slug: string): Promise<Response> {
             comment: formData.get('comment')
           })
         });
-        
+
         if (res.ok) {
           commentForm.reset();
-          alert('Comment submitted! It will appear after approval.');
+          alert('Comment posted!');
           loadComments();
         }
       });
-      
+
+      // Comment summary functionality
+      const summarySection = document.getElementById('comment-summary');
+      const summaryText = document.getElementById('summary-text');
+      const summaryCommentCount = document.getElementById('summary-comment-count');
+      const summaryDate = document.getElementById('summary-date');
+
+      async function loadSummary() {
+        try {
+          const res = await fetch('/api/posts/' + slug + '/summary');
+          const data = await res.json();
+
+          if (data.summary) {
+            summaryText.textContent = data.summary;
+            summaryCommentCount.textContent = 'Based on ' + data.commentCount + ' comments';
+            summaryDate.textContent = 'Updated ' + new Date(data.updatedAt).toLocaleDateString();
+            summarySection.style.display = 'block';
+          } else {
+            summarySection.style.display = 'none';
+          }
+        } catch (err) {
+          console.error('Failed to load summary:', err);
+          summarySection.style.display = 'none';
+        }
+      }
+
       loadComments();
+      loadSummary();
     </script>
   `;
 
