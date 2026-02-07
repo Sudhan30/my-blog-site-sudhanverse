@@ -103,11 +103,17 @@ export async function apiRouter(req: Request, path: string): Promise<Response> {
                 const body = await req.json().catch(() => ({})) as { clientId?: string };
                 const clientId = body.clientId || 'anonymous';
 
-                await pool.query(
-                    `INSERT INTO likes (post_id, client_id) VALUES ($1, $2::uuid)
-                     ON CONFLICT ON CONSTRAINT ux_likes_post_client DO NOTHING`,
+                // Check if already liked, then insert
+                const existing = await pool.query(
+                    'SELECT id FROM likes WHERE post_id = $1 AND client_id = $2::uuid',
                     [postId, clientId]
                 );
+                if (existing.rows.length === 0) {
+                    await pool.query(
+                        'INSERT INTO likes (post_id, client_id) VALUES ($1, $2::uuid)',
+                        [postId, clientId]
+                    );
+                }
 
                 const result = await pool.query(
                     'SELECT COUNT(*) as count FROM likes WHERE post_id = $1',
