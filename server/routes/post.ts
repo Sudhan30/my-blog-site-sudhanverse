@@ -84,7 +84,7 @@ export async function postRoute(slug: string): Promise<Response> {
 
           <form class="comment-form" id="comment-form">
             <input type="hidden" name="postSlug" value="${post.slug}">
-            <input type="text" name="name" placeholder="Your name (optional)" class="comment-input">
+            <input type="text" name="name" placeholder="Your name" class="comment-input" id="comment-name">
             <textarea name="comment" placeholder="Share your thoughts..." required class="comment-textarea" maxlength="2000"></textarea>
             <button type="submit" class="comment-submit">Post Comment</button>
           </form>
@@ -117,7 +117,39 @@ export async function postRoute(slug: string): Promise<Response> {
         return id;
       }
 
+      // Relative time formatting
+      function timeAgo(dateStr) {
+        const now = new Date();
+        const date = new Date(dateStr);
+        const seconds = Math.floor((now - date) / 1000);
+        if (seconds < 60) return seconds <= 5 ? 'just now' : seconds + ' seconds ago';
+        const minutes = Math.floor(seconds / 60);
+        if (minutes < 60) return minutes === 1 ? '1 minute ago' : minutes + ' minutes ago';
+        const hours = Math.floor(minutes / 60);
+        if (hours < 24) return hours === 1 ? '1 hour ago' : hours + ' hours ago';
+        const days = Math.floor(hours / 24);
+        if (days < 7) return days === 1 ? '1 day ago' : days + ' days ago';
+        if (days < 30) { const w = Math.floor(days / 7); return w === 1 ? '1 week ago' : w + ' weeks ago'; }
+        return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+      }
+
+      // Auto-generated display name
+      function getDisplayName() {
+        let name = localStorage.getItem('blog-display-name');
+        if (!name) {
+          const animals = ['Fox','Owl','Bear','Wolf','Hawk','Lynx','Deer','Seal','Puma','Crow',
+            'Orca','Ibis','Wren','Dove','Hare','Newt','Frog','Moth','Pike','Swan',
+            'Koala','Panda','Otter','Eagle','Raven','Bison','Cobra','Finch','Crane','Viper'];
+          const animal = animals[Math.floor(Math.random() * animals.length)];
+          const hash = String(Date.now() % 100000).padStart(5, '0');
+          name = animal + '-' + hash;
+          localStorage.setItem('blog-display-name', name);
+        }
+        return name;
+      }
+
       const clientId = getClientId();
+      const displayName = getDisplayName();
       let hasLiked = localStorage.getItem('liked-' + slug) === 'true';
       
       // Like functionality
@@ -183,7 +215,7 @@ export async function postRoute(slug: string): Promise<Response> {
           <div class="comment">
             <div class="comment-header">
               <span class="comment-author">\${c.display_name}</span>
-              <span class="comment-date">\${new Date(c.created_at).toLocaleDateString()}</span>
+              <span class="comment-date">\${timeAgo(c.created_at)}</span>
             </div>
             <p class="comment-text">\${c.content}</p>
           </div>
@@ -198,14 +230,13 @@ export async function postRoute(slug: string): Promise<Response> {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            name: formData.get('name'),
+            name: formData.get('name')?.trim() || displayName,
             comment: formData.get('comment')
           })
         });
 
         if (res.ok) {
           commentForm.reset();
-          alert('Comment posted!');
           loadComments();
         }
       });

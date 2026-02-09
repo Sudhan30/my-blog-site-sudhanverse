@@ -309,7 +309,7 @@ img {
   background-size: 400% 400%;
   animation: gradientShift 15s ease infinite;
   color: white;
-  padding: var(--space-3xl) var(--space-xl);
+  padding: 3rem var(--space-xl);
   text-align: center;
   position: relative;
   overflow: hidden;
@@ -1482,7 +1482,7 @@ img {
   }
 
   .hero {
-    padding: var(--space-2xl) var(--space-md);
+    padding: 2.4rem var(--space-md);
   }
 
   .container {

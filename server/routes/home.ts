@@ -52,7 +52,7 @@ export async function homeRoute(_req: Request): Promise<Response> {
       <div class="hero-content">
         <img src="/assets/images/author-potrait-small.png" alt="Sudharsana" class="hero-avatar" fetchpriority="high">
         <h1 class="hero-title">Resolving <span class="highlight">Dependencies</span>,<br>One Idea at a Time.</h1>
-        <p class="hero-subtitle">Thoughts on software engineering, system design, and the craft of building things</p>
+        <p class="hero-subtitle">A logbook of building and scaling data systems in the real world. I write about data engineering, distributed systems, analytics infrastructure, and the lessons that only show up in production.</p>
         <div class="hero-stats">
           <div class="hero-stat">
             <span class="hero-stat-value">${index.posts.length}</span>
@@ -76,8 +76,8 @@ export async function homeRoute(_req: Request): Promise<Response> {
         <div class="content-main">
           <!-- Welcome Section -->
           <section class="welcome-section">
-            <h2>Welcome to my Log File</h2>
-            <p class="welcome-description">Exploring modern technology and the journey of solving real-world problems. This blog is a collection of notes from the field, documenting the real-world tech challenges I encounter.</p>
+            <h2>Welcome</h2>
+            <p class="welcome-description">This is my running notebook from production—wins, failures, tradeoffs, and the thinking behind technical decisions. Less theory, more reality.</p>
           </section>
           
           <!-- Posts Grid -->
@@ -151,7 +151,7 @@ export async function homeRoute(_req: Request): Promise<Response> {
 
   const html = layout({
     title: "Home",
-    description: "Thoughts on software engineering, system design, and the craft of building things. A collection of notes from the field.",
+    description: "Real-world lessons in data engineering, distributed systems, and analytics infrastructure. Production insights, not theory.",
     url: "/",
     content
   });
