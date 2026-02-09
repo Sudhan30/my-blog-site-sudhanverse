@@ -1,144 +1,83 @@
 ---
 title: "Deploying to the Cloud: My Infrastructure Journey"
 date: 2024-02-20
-tags: [cloud, deployment, infrastructure, devops]
-excerpt: "From local development to production deployment. Exploring cloud platforms, CI/CD pipelines, and modern deployment strategies."
+tags: [cloud, deployment, infrastructure, devops, gcp, firebase]
+excerpt: "From GCS buckets and expensive load balancers to Firebase's serverless architecture. A journey through cost optimization, architecture decisions, and lessons learned deploying a production portfolio site."
 slug: my-cloud-site
 ---
 
-# Deploying to the Cloud: My Infrastructure Journey
+> "Cost optimization isn't about being cheap—it's about being smart with resources."
 
-Transitioning from local development to cloud deployment was a game-changer for my projects. This post explores my journey through modern infrastructure, CI/CD pipelines, and cloud deployment strategies.
+The journey from hosting a static website to building a production-ready, globally-distributed application taught me that cloud architecture is as much about economics as it is about engineering.
 
-## The Challenge
+## The Problem: A $20/Month Static Website
 
-After building my first website locally, I realized that making it accessible to the world required a completely different set of skills. The transition from development to production deployment introduced me to the world of DevOps and cloud infrastructure.
+My portfolio website started simple—HTML, CSS, JavaScript. Nothing fancy. But when it came time to deploy, I made a classic beginner mistake: over-engineering the infrastructure for what was essentially a static site.
 
-## Cloud Platform Exploration
+### Initial Architecture: GCS + Load Balancer
 
-### Starting with Simple Solutions
-- **GitHub Pages**: Perfect for static sites
-- **Netlify**: Great for JAMstack applications
-- **Vercel**: Excellent for modern web frameworks
+**The Setup:**
+- Google Cloud Storage bucket for static files
+- Cloud Load Balancer for HTTPS termination
+- Custom domain via Cloudflare DNS
 
-### Moving to More Advanced Platforms
-- **AWS**: Comprehensive cloud services
-- **Google Cloud Platform**: Machine learning and analytics
-- **Azure**: Enterprise-grade solutions
-
-## Infrastructure as Code
-
-Learning to manage infrastructure through code was a revelation:
-
-```yaml
-# Example Docker Compose
-version: '3.8'
-services:
-  web:
-    build: .
-    ports:
-      - "80:80"
-    environment:
-      - NODE_ENV=production
+**The Cost:**
+```
+Google Cloud Load Balancer:  $18.00/month (fixed minimum)
+Cloud Storage Bucket:         $0.50/month
+Data Transfer (egress):       $1.00/month
+──────────────────────────────────────────────
+Total:                       ~$21.50/month
 ```
 
-## CI/CD Pipeline Implementation
+**The Problem:** 97% of the cost was the load balancer doing almost nothing for a low-traffic site.
 
-### GitHub Actions Workflow
-```yaml
-name: Deploy to Production
-on:
-  push:
-    branches: [main]
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name: Deploy to Cloud
-        run: |
-          # Deployment commands
-```
+---
 
-## Key Technologies Learned
+## The Pivot: Discovering Firebase Free Tier
 
-### Containerization
-- **Docker**: Containerizing applications
-- **Kubernetes**: Orchestrating containers
-- **Docker Compose**: Local development environments
+After analyzing the bills, I realized I needed a platform that:
+1. Served static content globally via CDN
+2. Handled HTTPS automatically
+3. **Cost close to zero for low traffic**
+4. Could scale if needed
 
-### Infrastructure Management
-- **Terraform**: Infrastructure as code
-- **Ansible**: Configuration management
-- **CloudFormation**: AWS resource management
+Firebase Hosting checked all boxes.
 
-### Monitoring and Logging
-- **Prometheus**: Metrics collection
-- **Grafana**: Data visualization
-- **ELK Stack**: Log management
+### Firebase Architecture
 
-## Deployment Strategies
+![Firebase Portfolio Architecture](/assets/images/firebase-architecture.svg?v=1)
 
-### Blue-Green Deployment
-- Zero-downtime deployments
-- Instant rollback capabilities
-- Risk mitigation
+**Key Components:**
 
-### Canary Releases
-- Gradual feature rollouts
-- A/B testing capabilities
-- Performance monitoring
+| Component | Purpose | Cost (Free Tier) |
+|-----------|---------|------------------|
+| **Firebase Hosting** | Static site hosting + global CDN | Free up to 10GB/month |
+| **Cloudflare DNS** | Domain management + DDoS protection | Free |
+| **Cloud Functions** | Serverless backend APIs | Free 2M invocations/month |
+| **Firestore** | NoSQL database for forms/analytics | Free 50k reads/day |
+| **Secret Manager** | Secure credential storage | Free for < 6 secrets |
 
-## Security Considerations
+**Monthly Cost:** $0 (well within free tier limits)
 
-### SSL/TLS Certificates
-- Let's Encrypt for free certificates
-- Certificate automation
-- Security best practices
+**Traffic Capacity:** ~50k monthly visitors before exceeding free tier
 
-### Access Control
-- IAM policies and roles
-- Network security groups
-- API authentication
-
-## Cost Optimization
-
-### Resource Right-Sizing
-- Monitoring resource usage
-- Auto-scaling configurations
-- Reserved instance planning
-
-### Multi-Cloud Strategy
-- Avoiding vendor lock-in
-- Cost comparison across platforms
-- Disaster recovery planning
+---
 
 ## Lessons Learned
 
-1. **Start Simple**: Begin with managed services before building custom solutions
-2. **Automate Everything**: Manual processes are error-prone and time-consuming
-3. **Monitor Continuously**: Visibility into system performance is crucial
-4. **Plan for Scale**: Design systems that can grow with your needs
-5. **Security First**: Implement security measures from the beginning
+### 1. Right-Size Your Infrastructure
 
-## Current Setup
+Don't deploy Kubernetes for a static site. Don't use enterprise load balancers for hobby projects. Match your infrastructure to your actual needs.
 
-My current infrastructure includes:
-- **Kubernetes cluster** for container orchestration
-- **Traefik** for load balancing and SSL termination
-- **GitHub Actions** for CI/CD automation
-- **Prometheus + Grafana** for monitoring
-- **Automated backups** for data protection
+### 2. Free Tiers Are Production-Ready
 
-## Future Plans
+Firebase's free tier isn't a toy—it's genuinely production-capable for small-to-medium traffic sites.
 
-- Exploring **serverless architectures**
-- Implementing **GitOps** workflows
-- Advanced **monitoring and alerting**
-- **Multi-region** deployment strategies
+### 3. Serverless Reduces Operational Overhead
 
-## Conclusion
+No servers to patch. No SSH keys to manage. No uptime monitoring to configure.
 
-The journey from local development to cloud deployment has been incredibly rewarding. It's not just about deploying applications—it's about building reliable, scalable, and maintainable systems that can serve users around the world.
+---
 
-The cloud infrastructure landscape continues to evolve, and staying current with new technologies and best practices is essential for any modern developer.
+*Portfolio: [www.sudharsana.dev](https://www.sudharsana.dev)*

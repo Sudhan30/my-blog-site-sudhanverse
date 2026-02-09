@@ -1,0 +1,141 @@
+<svg viewBox="0 0 800 400" xmlns="http://www.w3.org/2000/svg" style="font-family: system-ui, -apple-system, sans-serif;">
+  <defs>
+    <!-- Gradients -->
+    <linearGradient id="recentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3b82f6"/>
+      <stop offset="100%" style="stop-color:#1d4ed8"/>
+    </linearGradient>
+    <linearGradient id="summaryGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#8b5cf6"/>
+      <stop offset="100%" style="stop-color:#6d28d9"/>
+    </linearGradient>
+    <linearGradient id="systemGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#10b981"/>
+      <stop offset="100%" style="stop-color:#059669"/>
+    </linearGradient>
+    <linearGradient id="finalGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f59e0b"/>
+      <stop offset="100%" style="stop-color:#d97706"/>
+    </linearGradient>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f172a"/>
+      <stop offset="100%" style="stop-color:#1e293b"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="800" height="400" rx="16" fill="url(#bgGrad)"/>
+
+  <!-- Grid pattern -->
+  <pattern id="grid" width="30" height="30" patternUnits="userSpaceOnUse">
+    <path d="M 30 0 L 0 0 0 30" fill="none" stroke="#ffffff" stroke-width="0.3" opacity="0.05"/>
+  </pattern>
+  <rect width="800" height="400" fill="url(#grid)"/>
+
+  <!-- Title -->
+  <text x="400" y="35" text-anchor="middle" fill="#ffffff" font-size="18" font-weight="700">Context Composition</text>
+  <text x="400" y="55" text-anchor="middle" fill="#94a3b8" font-size="11">How conversations maintain continuity without hoarding tokens</text>
+
+  <!-- ========== RECENT WINDOW ========== -->
+  <g filter="url(#shadow)">
+    <rect x="50" y="100" width="180" height="110" rx="12" fill="url(#recentGrad)"/>
+    <!-- Message bubble icon -->
+    <g transform="translate(65, 115)">
+      <rect width="24" height="18" rx="4" fill="#ffffff" opacity="0.9"/>
+      <rect y="6" width="24" height="18" rx="4" fill="#ffffff" opacity="0.7"/>
+      <rect y="12" width="24" height="18" rx="4" fill="#ffffff" opacity="0.5"/>
+    </g>
+    <text x="140" y="135" text-anchor="middle" fill="#ffffff" font-size="13" font-weight="600">Recent Window</text>
+    <text x="140" y="155" text-anchor="middle" fill="#bfdbfe" font-size="10">(last 5–10 msgs)</text>
+
+    <text x="75" y="178" fill="#dbeafe" font-size="9">• Full message text</text>
+    <text x="75" y="193" fill="#dbeafe" font-size="9">• Immediate context</text>
+  </g>
+
+  <!-- Plus sign -->
+  <text x="255" y="160" text-anchor="middle" fill="#94a3b8" font-size="28" font-weight="300">+</text>
+
+  <!-- ========== SUMMARY SNAPSHOT ========== -->
+  <g filter="url(#shadow)">
+    <rect x="310" y="100" width="180" height="110" rx="12" fill="url(#summaryGrad)"/>
+    <!-- Compress/archive icon -->
+    <g transform="translate(325, 115)">
+      <rect width="28" height="24" rx="3" fill="none" stroke="#ffffff" stroke-width="2" opacity="0.9"/>
+      <line x1="8" y1="8" x2="20" y2="8" stroke="#ffffff" stroke-width="2"/>
+      <line x1="8" y1="12" x2="20" y2="12" stroke="#ffffff" stroke-width="2"/>
+      <line x1="8" y1="16" x2="20" y2="16" stroke="#ffffff" stroke-width="2"/>
+    </g>
+    <text x="400" y="135" text-anchor="middle" fill="#ffffff" font-size="13" font-weight="600">Summary Snapshot</text>
+    <text x="400" y="155" text-anchor="middle" fill="#ddd6fe" font-size="10">(compressed past)</text>
+
+    <text x="335" y="178" fill="#ede9fe" font-size="9">• Key facts &amp; decisions</text>
+    <text x="335" y="193" fill="#ede9fe" font-size="9">• Unresolved topics</text>
+  </g>
+
+  <!-- Plus sign -->
+  <text x="515" y="160" text-anchor="middle" fill="#94a3b8" font-size="28" font-weight="300">+</text>
+
+  <!-- ========== SYSTEM INSTRUCTIONS ========== -->
+  <g filter="url(#shadow)">
+    <rect x="570" y="100" width="180" height="110" rx="12" fill="url(#systemGrad)"/>
+    <!-- Settings/gear icon -->
+    <g transform="translate(585, 115)">
+      <circle cx="12" cy="12" r="8" fill="none" stroke="#ffffff" stroke-width="2"/>
+      <circle cx="12" cy="12" r="3" fill="#ffffff"/>
+      <line x1="12" y1="0" x2="12" y2="4" stroke="#ffffff" stroke-width="2"/>
+      <line x1="12" y1="20" x2="12" y2="24" stroke="#ffffff" stroke-width="2"/>
+      <line x1="0" y1="12" x2="4" y2="12" stroke="#ffffff" stroke-width="2"/>
+      <line x1="20" y1="12" x2="24" y2="12" stroke="#ffffff" stroke-width="2"/>
+    </g>
+    <text x="660" y="135" text-anchor="middle" fill="#ffffff" font-size="13" font-weight="600">System Instructions</text>
+    <text x="660" y="155" text-anchor="middle" fill="#d1fae5" font-size="10">(personality/rules)</text>
+
+    <text x="595" y="178" fill="#d1fae5" font-size="9">• Behavior guidelines</text>
+    <text x="595" y="193" fill="#d1fae5" font-size="9">• Formatting rules</text>
+  </g>
+
+  <!-- ========== ARROWS TO FINAL CONTEXT ========== -->
+  <defs>
+    <marker id="arrowOrange" markerWidth="10" markerHeight="8" refX="9" refY="4" orient="auto">
+      <polygon points="0 0, 10 4, 0 8" fill="#fbbf24"/>
+    </marker>
+  </defs>
+
+  <!-- Arrow from Recent -->
+  <path d="M 140 210 L 140 240 L 270 240 L 270 270 L 305 270" stroke="#60a5fa" stroke-width="2.5" fill="none" marker-end="url(#arrowOrange)"/>
+
+  <!-- Arrow from Summary -->
+  <path d="M 400 210 L 400 260" stroke="#a78bfa" stroke-width="2.5" fill="none" marker-end="url(#arrowOrange)"/>
+
+  <!-- Arrow from System -->
+  <path d="M 660 210 L 660 240 L 530 240 L 530 270 L 495 270" stroke="#34d399" stroke-width="2.5" fill="none" marker-end="url(#arrowOrange)"/>
+
+  <!-- ========== FINAL CONTEXT ========== -->
+  <g filter="url(#shadow)">
+    <rect x="270" y="260" width="260" height="100" rx="12" fill="url(#finalGrad)"/>
+    <!-- Document/paper icon -->
+    <g transform="translate(285, 275)">
+      <rect width="22" height="28" rx="3" fill="#ffffff" opacity="0.9"/>
+      <rect x="4" y="6" width="14" height="2" rx="1" fill="#d97706"/>
+      <rect x="4" y="10" width="14" height="2" rx="1" fill="#d97706"/>
+      <rect x="4" y="14" width="10" height="2" rx="1" fill="#d97706"/>
+      <rect x="4" y="18" width="12" height="2" rx="1" fill="#d97706"/>
+      <rect x="4" y="22" width="8" height="2" rx="1" fill="#d97706"/>
+    </g>
+    <text x="400" y="300" text-anchor="middle" fill="#ffffff" font-size="14" font-weight="700">Final Context</text>
+    <text x="400" y="320" text-anchor="middle" fill="#fef3c7" font-size="10">(sent to model)</text>
+
+    <text x="310" y="342" fill="#fde68a" font-size="9">✓ Full continuity with minimal tokens</text>
+  </g>
+
+  <!-- ========== BENEFIT CALLOUT ========== -->
+  <g>
+    <rect x="550" y="285" width="220" height="60" rx="8" fill="#1e293b" stroke="#475569" stroke-width="1.5" opacity="0.95"/>
+    <text x="660" y="305" text-anchor="middle" fill="#f59e0b" font-size="11" font-weight="600">Token Efficiency</text>
+    <text x="660" y="322" text-anchor="middle" fill="#94a3b8" font-size="9">10k msg thread → ~2k tokens</text>
+    <text x="660" y="336" text-anchor="middle" fill="#64748b" font-size="8">80% reduction vs full history</text>
+  </g>
+</svg>

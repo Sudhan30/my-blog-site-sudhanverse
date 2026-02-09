@@ -73,19 +73,7 @@ This summary is stored in a `conversation_summaries` table and becomes the canon
 
 ### Context Composition
 
-```
-┌────────────────────┐   ┌─────────────────────┐   ┌───────────────────────┐
-│   Recent Window    │ + │  Summary Snapshot   │ + │  System Instructions  │
-│ (last 5-10 msgs)   │   │  (compressed past)  │   │ (personality/rules)   │
-└─────────┬──────────┘   └──────────┬──────────┘   └───────────┬───────────┘
-          │                         │                          │
-          └─────────────────────────┼──────────────────────────┘
-                                    ▼
-                         ┌──────────────────────┐
-                         │    Final Context     │
-                         │   (sent to model)    │
-                         └──────────────────────┘
-```
+![Context Composition Diagram](/assets/images/context-composition.svg?v=1)
 
 This reduces token usage dramatically while preserving continuity. Instead of pretending to have infinite memory, the system maintains **useful** memory.
 
