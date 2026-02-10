@@ -1,0 +1,115 @@
+<svg viewBox="0 0 1000 350" xmlns="http://www.w3.org/2000/svg" style="font-family: system-ui, -apple-system, sans-serif;">
+  <defs>
+    <!-- Gradients -->
+    <linearGradient id="gitGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f05032"/>
+      <stop offset="100%" style="stop-color:#c9302c"/>
+    </linearGradient>
+    <linearGradient id="githubGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#24292f"/>
+      <stop offset="100%" style="stop-color:#1f2328"/>
+    </linearGradient>
+    <linearGradient id="buildGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#10b981"/>
+      <stop offset="100%" style="stop-color:#059669"/>
+    </linearGradient>
+    <linearGradient id="firebaseGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFA500"/>
+      <stop offset="100%" style="stop-color:#FF8C00"/>
+    </linearGradient>
+    <linearGradient id="cdnGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3b82f6"/>
+      <stop offset="100%" style="stop-color:#1d4ed8"/>
+    </linearGradient>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f172a"/>
+      <stop offset="100%" style="stop-color:#1e293b"/>
+    </linearGradient>
+
+    <!-- Shadow filter -->
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000" flood-opacity="0.3"/>
+    </filter>
+
+    <!-- Arrow markers -->
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#94a3b8"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1000" height="350" rx="16" fill="url(#bgGrad)"/>
+
+  <!-- Grid pattern -->
+  <pattern id="grid" width="30" height="30" patternUnits="userSpaceOnUse">
+    <path d="M 30 0 L 0 0 0 30" fill="none" stroke="#ffffff" stroke-width="0.3" opacity="0.05"/>
+  </pattern>
+  <rect width="1000" height="350" fill="url(#grid)"/>
+
+  <!-- Title -->
+  <text x="500" y="35" text-anchor="middle" fill="#ffffff" font-size="20" font-weight="700">Automated Deployment Pipeline</text>
+
+  <!-- Step 1: Git Push -->
+  <g filter="url(#shadow)">
+    <rect x="50" y="120" width="120" height="70" rx="8" fill="url(#gitGrad)"/>
+    <text x="110" y="145" text-anchor="middle" fill="white" font-size="13" font-weight="600">1. Git Push</text>
+    <text x="110" y="165" text-anchor="middle" fill="white" font-size="10">to main</text>
+  </g>
+
+  <!-- Step 2: GitHub Actions -->
+  <g filter="url(#shadow)">
+    <rect x="210" y="120" width="140" height="70" rx="8" fill="url(#githubGrad)"/>
+    <text x="280" y="145" text-anchor="middle" fill="white" font-size="13" font-weight="600">2. GitHub</text>
+    <text x="280" y="162" text-anchor="middle" fill="white" font-size="13" font-weight="600">Actions</text>
+  </g>
+
+  <!-- Step 3: Build -->
+  <g filter="url(#shadow)">
+    <rect x="390" y="120" width="130" height="70" rx="8" fill="url(#buildGrad)"/>
+    <text x="455" y="145" text-anchor="middle" fill="white" font-size="13" font-weight="600">3. React</text>
+    <text x="455" y="162" text-anchor="middle" fill="white" font-size="13" font-weight="600">Build</text>
+  </g>
+
+  <!-- Step 4: Firebase Deploy -->
+  <g filter="url(#shadow)">
+    <rect x="560" y="120" width="140" height="70" rx="8" fill="url(#firebaseGrad)"/>
+    <text x="630" y="145" text-anchor="middle" fill="white" font-size="13" font-weight="600">4. Firebase</text>
+    <text x="630" y="162" text-anchor="middle" fill="white" font-size="13" font-weight="600">Deploy</text>
+  </g>
+
+  <!-- Step 5: Global CDN -->
+  <g filter="url(#shadow)">
+    <rect x="740" y="120" width="140" height="70" rx="8" fill="url(#cdnGrad)"/>
+    <text x="810" y="145" text-anchor="middle" fill="white" font-size="13" font-weight="600">5. Global</text>
+    <text x="810" y="162" text-anchor="middle" fill="white" font-size="13" font-weight="600">CDN</text>
+  </g>
+
+  <!-- Arrows -->
+  <path d="M 170 155 L 210 155" stroke="#94a3b8" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <path d="M 350 155 L 390 155" stroke="#94a3b8" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <path d="M 520 155 L 560 155" stroke="#94a3b8" stroke-width="2.5" marker-end="url(#arrow)"/>
+  <path d="M 700 155 L 740 155" stroke="#94a3b8" stroke-width="2.5" marker-end="url(#arrow)"/>
+
+  <!-- Labels -->
+  <text x="190" y="145" text-anchor="middle" fill="#94a3b8" font-size="10">trigger</text>
+  <text x="370" y="145" text-anchor="middle" fill="#94a3b8" font-size="10">build</text>
+  <text x="540" y="145" text-anchor="middle" fill="#94a3b8" font-size="10">deploy</text>
+  <text x="720" y="145" text-anchor="middle" fill="#94a3b8" font-size="10">distribute</text>
+
+  <!-- Workflow Details Box -->
+  <rect x="50" y="230" width="420" height="90" fill="#1e293b" stroke="#10b981" stroke-width="2" rx="8"/>
+  <text x="260" y="255" text-anchor="middle" fill="#10b981" font-size="13" font-weight="600">Build Steps</text>
+  <text x="60" y="275" fill="#94a3b8" font-size="10">1. Checkout code from repository</text>
+  <text x="60" y="292" fill="#94a3b8" font-size="10">2. Install dependencies: <tspan fill="#64748b">npm ci</tspan></text>
+  <text x="60" y="309" fill="#94a3b8" font-size="10">3. Build production bundle: <tspan fill="#64748b">npm run build</tspan></text>
+
+  <!-- Deployment Details Box -->
+  <rect x="500" y="230" width="410" height="90" fill="#1e293b" stroke="#FFA500" stroke-width="2" rx="8"/>
+  <text x="705" y="255" text-anchor="middle" fill="#FFA500" font-size="13" font-weight="600">Deployment Features</text>
+  <text x="510" y="275" fill="#94a3b8" font-size="10">• Automatic HTTPS with SSL certificates</text>
+  <text x="510" y="292" fill="#94a3b8" font-size="10">• Global edge locations for fast loading</text>
+  <text x="510" y="309" fill="#94a3b8" font-size="10">• Instant rollbacks • Version history</text>
+
+  <!-- Timeline -->
+  <text x="500" y="345" text-anchor="middle" fill="#94a3b8" font-size="11">Total time: ~2 minutes from commit to live • Fully automated • Zero manual steps</text>
+</svg>

@@ -1,0 +1,137 @@
+<svg viewBox="0 0 1000 400" xmlns="http://www.w3.org/2000/svg" style="font-family: system-ui, -apple-system, sans-serif;">
+  <defs>
+    <!-- Gradients -->
+    <linearGradient id="formGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3b82f6"/>
+      <stop offset="100%" style="stop-color:#1d4ed8"/>
+    </linearGradient>
+    <linearGradient id="functionGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#10b981"/>
+      <stop offset="100%" style="stop-color:#059669"/>
+    </linearGradient>
+    <linearGradient id="secretGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ec4899"/>
+      <stop offset="100%" style="stop-color:#be185d"/>
+    </linearGradient>
+    <linearGradient id="smtpGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#6366f1"/>
+      <stop offset="100%" style="stop-color:#4f46e5"/>
+    </linearGradient>
+    <linearGradient id="firestoreGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ef4444"/>
+      <stop offset="100%" style="stop-color:#dc2626"/>
+    </linearGradient>
+    <linearGradient id="recipientGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f59e0b"/>
+      <stop offset="100%" style="stop-color:#d97706"/>
+    </linearGradient>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f172a"/>
+      <stop offset="100%" style="stop-color:#1e293b"/>
+    </linearGradient>
+
+    <!-- Shadow filter -->
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000" flood-opacity="0.3"/>
+    </filter>
+
+    <!-- Arrow markers -->
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#94a3b8"/>
+    </marker>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1000" height="400" rx="16" fill="url(#bgGrad)"/>
+
+  <!-- Grid pattern -->
+  <pattern id="grid" width="30" height="30" patternUnits="userSpaceOnUse">
+    <path d="M 30 0 L 0 0 0 30" fill="none" stroke="#ffffff" stroke-width="0.3" opacity="0.05"/>
+  </pattern>
+  <rect width="1000" height="400" fill="url(#grid)"/>
+
+  <!-- Title -->
+  <text x="500" y="35" text-anchor="middle" fill="#ffffff" font-size="20" font-weight="700">Email System Flow</text>
+
+  <!-- Step 1: Form Submission -->
+  <g filter="url(#shadow)">
+    <rect x="50" y="100" width="130" height="70" rx="8" fill="url(#formGrad)"/>
+    <text x="115" y="125" text-anchor="middle" fill="white" font-size="12" font-weight="600">1. Form</text>
+    <text x="115" y="142" text-anchor="middle" fill="white" font-size="12" font-weight="600">Submission</text>
+    <text x="115" y="160" text-anchor="middle" fill="#dbeafe" font-size="9">Contact/Feedback</text>
+  </g>
+
+  <!-- Step 2: Cloud Function -->
+  <g filter="url(#shadow)">
+    <rect x="220" y="100" width="130" height="70" rx="8" fill="url(#functionGrad)"/>
+    <text x="285" y="125" text-anchor="middle" fill="white" font-size="12" font-weight="600">2. Cloud</text>
+    <text x="285" y="142" text-anchor="middle" fill="white" font-size="12" font-weight="600">Function</text>
+    <text x="285" y="160" text-anchor="middle" fill="#d1fae5" font-size="9">Validate Input</text>
+  </g>
+
+  <!-- Step 3: Secret Manager -->
+  <g filter="url(#shadow)">
+    <rect x="220" y="200" width="130" height="70" rx="8" fill="url(#secretGrad)"/>
+    <text x="285" y="225" text-anchor="middle" fill="white" font-size="12" font-weight="600">3. Secret</text>
+    <text x="285" y="242" text-anchor="middle" fill="white" font-size="12" font-weight="600">Manager</text>
+    <text x="285" y="260" text-anchor="middle" fill="#fce7f3" font-size="9">Get Credentials</text>
+  </g>
+
+  <!-- Step 4: Firestore -->
+  <g filter="url(#shadow)">
+    <rect x="390" y="100" width="130" height="70" rx="8" fill="url(#firestoreGrad)"/>
+    <text x="455" y="125" text-anchor="middle" fill="white" font-size="12" font-weight="600">4. Firestore</text>
+    <text x="455" y="142" text-anchor="middle" fill="white" font-size="12" font-weight="600">Storage</text>
+    <text x="455" y="160" text-anchor="middle" fill="#fecaca" font-size="9">Save Submission</text>
+  </g>
+
+  <!-- Step 5: SMTP -->
+  <g filter="url(#shadow)">
+    <rect x="560" y="200" width="130" height="70" rx="8" fill="url(#smtpGrad)"/>
+    <text x="625" y="225" text-anchor="middle" fill="white" font-size="12" font-weight="600">5. SMTP</text>
+    <text x="625" y="242" text-anchor="middle" fill="white" font-size="12" font-weight="600">Provider</text>
+    <text x="625" y="260" text-anchor="middle" fill="#e0e7ff" font-size="9">Send Email</text>
+  </g>
+
+  <!-- Step 6: Recipients -->
+  <g filter="url(#shadow)">
+    <rect x="730" y="200" width="130" height="70" rx="8" fill="url(#recipientGrad)"/>
+    <text x="795" y="230" text-anchor="middle" fill="white" font-size="12" font-weight="600">6. Email</text>
+    <text x="795" y="247" text-anchor="middle" fill="white" font-size="12" font-weight="600">Recipients</text>
+  </g>
+
+  <!-- Arrows -->
+  <path d="M 180 135 L 220 135" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
+  <path d="M 285 170 L 285 200" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
+  <path d="M 285 200 L 285 170" stroke="#ec4899" stroke-width="1.5" stroke-dasharray="3,3" marker-end="url(#arrow)"/>
+  <path d="M 350 135 L 390 135" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
+  <path d="M 350 235 L 560 235" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
+  <path d="M 690 235 L 730 235" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
+
+  <!-- Labels -->
+  <text x="200" y="125" text-anchor="middle" fill="#94a3b8" font-size="9">POST</text>
+  <text x="370" y="125" text-anchor="middle" fill="#94a3b8" font-size="9">store</text>
+  <text x="450" y="225" text-anchor="middle" fill="#94a3b8" font-size="9">compose & send</text>
+  <text x="710" y="225" text-anchor="middle" fill="#94a3b8" font-size="9">deliver</text>
+
+  <!-- Info Box: Email Details -->
+  <rect x="50" y="310" width="280" height="60" fill="#1e293b" stroke="#6366f1" stroke-width="2" rx="6"/>
+  <text x="190" y="330" text-anchor="middle" fill="#6366f1" font-size="11" font-weight="600">Email Details</text>
+  <text x="60" y="347" fill="#94a3b8" font-size="9">• HTML formatted with inline styles</text>
+  <text x="60" y="362" fill="#94a3b8" font-size="9">• Primary + CC recipients support</text>
+
+  <!-- Info Box: Security -->
+  <rect x="350" y="310" width="280" height="60" fill="#1e293b" stroke="#ec4899" stroke-width="2" rx="6"/>
+  <text x="490" y="330" text-anchor="middle" fill="#ec4899" font-size="11" font-weight="600">Security Features</text>
+  <text x="360" y="347" fill="#94a3b8" font-size="9">• Credentials encrypted in Secret Manager</text>
+  <text x="360" y="362" fill="#94a3b8" font-size="9">• SSL/TLS encryption (port 465)</text>
+
+  <!-- Info Box: Rate Limiting -->
+  <rect x="650" y="310" width="300" height="60" fill="#1e293b" stroke="#10b981" stroke-width="2" rx="6"/>
+  <text x="800" y="330" text-anchor="middle" fill="#10b981" font-size="11" font-weight="600">Rate Limiting</text>
+  <text x="660" y="347" fill="#94a3b8" font-size="9">• Contact Form: 3 submissions/minute per IP</text>
+  <text x="660" y="362" fill="#94a3b8" font-size="9">• Feedback: 5 submissions/hour per IP</text>
+
+  <!-- Footer -->
+  <text x="500" y="393" text-anchor="middle" fill="#94a3b8" font-size="10">Automated Email Notifications • Secure SMTP • Multi-Recipient Support</text>
+</svg>
