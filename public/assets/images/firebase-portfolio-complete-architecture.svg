@@ -221,10 +221,34 @@
 
   <!-- Contact/Feedback to Secret Manager -->
   <path d="M 960 165 L 1020 165" stroke="#ec4899" stroke-width="1.5" stroke-dasharray="3,3"/>
-  <text x="990" y="158" text-anchor="middle" fill="#ec4899" font-size="7">credentials</text>
+  <text x="990" y="158" text-anchor="middle" fill="#ec4899" font-size="7">get credentials</text>
+
+  <!-- Secret Manager to SMTP Provider -->
+  <path d="M 1090 190 L 1090 210" stroke="#ec4899" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="1110" y="203" fill="#ec4899" font-size="7">auth</text>
 
   <!-- SMTP to Email Recipients -->
   <path d="M 1090 260 L 1090 280" stroke="#6366f1" stroke-width="1.5" marker-end="url(#arrow)"/>
   <text x="1105" y="273" fill="#6366f1" font-size="7">send</text>
-  
+
+  <!-- React SPA to OpenTelemetry -->
+  <path d="M 490 180 L 490 210" stroke="#14b8a6" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="505" y="198" fill="#14b8a6" font-size="7">track</text>
+
+  <!-- Cloud Functions to Data Layer -->
+  <!-- Firestore connections -->
+  <path d="M 670 260 L 670 350" stroke="#4ade80" stroke-width="1.5" stroke-dasharray="3,3" marker-end="url(#arrow-green)"/>
+  <path d="M 790 260 L 720 350" stroke="#4ade80" stroke-width="1.5" stroke-dasharray="3,3" marker-end="url(#arrow-green)"/>
+
+  <!-- BigQuery connections -->
+  <path d="M 790 260 L 805 350" stroke="#4ade80" stroke-width="1.5" stroke-dasharray="3,3" marker-end="url(#arrow-green)"/>
+  <path d="M 910 260 L 820 350" stroke="#4ade80" stroke-width="1.5" stroke-dasharray="3,3" marker-end="url(#arrow-green)"/>
+
+  <!-- Pub/Sub connections -->
+  <path d="M 790 260 L 805 425" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="3,3" marker-end="url(#arrow-orange)"/>
+  <path d="M 910 260 L 820 425" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="3,3" marker-end="url(#arrow-orange)"/>
+
+  <!-- Cloud Storage connections -->
+  <path d="M 910 260 L 730 425" stroke="#8b5cf6" stroke-width="1.5" stroke-dasharray="3,3"/>
+
 </svg>
