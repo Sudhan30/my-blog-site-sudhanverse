@@ -63,7 +63,7 @@ Rate limited to 5 requests per hour per IP.
 #### 4. Job Description Analyzer
 AI-powered job fit analysis. Paste a job description, and it analyzes the role against my resume data. Calculates match percentage, identifies relevant qualifications, and explains areas of interest or misalignment.
 
-This function integrates resume data stored as structured JSON. It performs keyword matching, skills comparison, and generates reasoning about role fit. All client-side processing—no external AI APIs needed.
+This function integrates resume data stored as structured JSON and connects to an Ollama LLM running on my self-hosted K3s cluster (the same mini PC that hosts this blog). The Cloud Function makes an API call to the LLM endpoint for intelligent analysis. Hybrid architecture—serverless frontend with self-hosted AI inference.
 
 Rate limited to 10 requests per hour per IP.
 
@@ -197,7 +197,7 @@ Cloud Functions deploy separately via `gcloud functions deploy`. Each function c
 
 **Optimize for your constraints.** Early on, I optimized for "looking professional." Load balancers, VPCs, multi-region setups. Cost me $20/month and hours of maintenance. Now I optimize for actual constraints: low cost, minimal ops, fast iteration. Firebase delivers all three.
 
-**AI integration doesn't require external APIs.** The job description analyzer runs entirely client-side. Resume data is structured JSON. Keyword matching and scoring algorithms run in the Cloud Function. No OpenAI API calls, no per-request costs, instant responses.
+**AI integration doesn't require commercial APIs.** The job description analyzer uses a self-hosted Ollama LLM running on my mini PC. The Cloud Function calls the LLM API endpoint on my local K3s cluster. Resume data is structured JSON. No OpenAI or commercial API costs, just electricity for the homelab. Hybrid cloud-homelab architecture.
 
 ## The Hidden Value
 

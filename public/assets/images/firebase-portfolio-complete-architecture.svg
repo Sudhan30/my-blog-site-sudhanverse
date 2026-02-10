@@ -298,29 +298,18 @@
   <text x="920" y="210" text-anchor="middle" fill="#6366f1" font-size="7">send email</text>
   <text x="200" y="640" text-anchor="middle" fill="#94a3b8" font-size="7">deploy</text>
 
-  <!-- Legend -->
-  <text x="50" y="750" fill="#94a3b8" font-size="11" font-weight="600">Key Features:</text>
-  <text x="50" y="770" fill="#64748b" font-size="9">• 6 Cloud Functions for backend logic</text>
-  <text x="50" y="785" fill="#64748b" font-size="9">• Rate limiting on all functions</text>
-  <text x="50" y="800" fill="#64748b" font-size="9">• CCPA-compliant observability</text>
-  <text x="50" y="815" fill="#64748b" font-size="9">• Secure SMTP via Secret Manager</text>
-  <text x="50" y="830" fill="#64748b" font-size="9">• OpenTelemetry dual-pipeline</text>
-  <text x="50" y="845" fill="#64748b" font-size="9">• GitHub Actions CI/CD automation</text>
+  <!-- Self-Hosted LLM (Mini PC) -->
+  <g filter="url(#shadow)">
+    <rect x="20" y="300" width="140" height="70" rx="8" fill="url(#ollamaGrad)"/>
+    <text x="90" y="325" text-anchor="middle" fill="white" font-size="11" font-weight="600">Mini PC K3s</text>
+    <text x="90" y="342" text-anchor="middle" fill="white" font-size="10">Ollama LLM</text>
+    <text x="90" y="359" text-anchor="middle" fill="#e9d5ff" font-size="8">API Endpoint</text>
+  </g>
 
-  <text x="400" y="750" fill="#94a3b8" font-size="11" font-weight="600">Free Tier Limits:</text>
-  <text x="400" y="770" fill="#64748b" font-size="9">• 10GB hosting bandwidth/month</text>
-  <text x="400" y="785" fill="#64748b" font-size="9">• 2M Cloud Function invocations/month</text>
-  <text x="400" y="800" fill="#64748b" font-size="9">• 50k Firestore document reads/day</text>
-  <text x="400" y="815" fill="#64748b" font-size="9">• 360MB BigQuery streaming inserts/day</text>
-  <text x="400" y="830" fill="#64748b" font-size="9">• 5GB Cloud Storage</text>
-
-  <text x="750" y="750" fill="#94a3b8" font-size="11" font-weight="600">Security Layers:</text>
-  <text x="750" y="770" fill="#64748b" font-size="9">• Cloudflare DDoS + WAF</text>
-  <text x="750" y="785" fill="#64748b" font-size="9">• CORS + Security Headers</text>
-  <text x="750" y="800" fill="#64748b" font-size="9">• Input validation + sanitization</text>
-  <text x="750" y="815" fill="#64748b" font-size="9">• Encrypted credentials (Secret Manager)</text>
-  <text x="750" y="830" fill="#64748b" font-size="9">• IAM-based access control</text>
+  <!-- Job Analyzer to LLM connection -->
+  <path d="M 160 335 L 620 235" stroke="#8b5cf6" stroke-width="1.5" stroke-dasharray="3,3" fill="none"/>
+  <text x="350" y="280" text-anchor="middle" fill="#8b5cf6" font-size="8">API call</text>
 
   <!-- Footer -->
-  <text x="600" y="885" text-anchor="middle" fill="#94a3b8" font-size="10">Production Architecture • Zero Monthly Cost • www.sudharsana.dev</text>
+  <text x="600" y="885" text-anchor="middle" fill="#94a3b8" font-size="10">Production Architecture • www.sudharsana.dev</text>
 </svg>
