@@ -1,50 +1,120 @@
-<svg viewBox="0 0 800 350" xmlns="http://www.w3.org/2000/svg">
+<svg viewBox="0 0 800 350" xmlns="http://www.w3.org/2000/svg" style="font-family: system-ui, -apple-system, sans-serif;">
   <defs>
+    <!-- Gradients -->
+    <linearGradient id="userGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3b82f6"/>
+      <stop offset="100%" style="stop-color:#1d4ed8"/>
+    </linearGradient>
+    <linearGradient id="firebaseGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFA500"/>
+      <stop offset="100%" style="stop-color:#FF8C00"/>
+    </linearGradient>
+    <linearGradient id="functionsGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#10b981"/>
+      <stop offset="100%" style="stop-color:#059669"/>
+    </linearGradient>
+    <linearGradient id="firestoreGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ef4444"/>
+      <stop offset="100%" style="stop-color:#dc2626"/>
+    </linearGradient>
+    <linearGradient id="bigqueryGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3b82f6"/>
+      <stop offset="100%" style="stop-color:#1d4ed8"/>
+    </linearGradient>
+    <linearGradient id="otelGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f59e0b"/>
+      <stop offset="100%" style="stop-color:#d97706"/>
+    </linearGradient>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f172a"/>
+      <stop offset="100%" style="stop-color:#1e293b"/>
+    </linearGradient>
+
+    <!-- Shadow filter -->
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000" flood-opacity="0.3"/>
+    </filter>
+
+    <!-- Arrow markers -->
     <marker id="arrowhead" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
-      <polygon points="0 0, 10 3.5, 0 7" fill="#444"/>
+      <polygon points="0 0, 10 3.5, 0 7" fill="#94a3b8"/>
     </marker>
     <marker id="arrowhead-dashed" markerWidth="10" markerHeight="7" refX="10" refY="3.5" orient="auto">
-      <polygon points="0 0, 10 3.5, 0 7" fill="#E6522C"/>
+      <polygon points="0 0, 10 3.5, 0 7" fill="#f59e0b"/>
     </marker>
   </defs>
 
-  <text x="400" y="40" text-anchor="middle" fill="#777" font-size="20" font-weight="bold" font-family="Arial, sans-serif">Serverless Architecture</text>
+  <!-- Background -->
+  <rect width="800" height="350" rx="16" fill="url(#bgGrad)"/>
 
-  <rect x="30" y="140" width="100" height="70" fill="#6196D9" rx="4"/>
-  <text x="80" y="180" text-anchor="middle" fill="white" font-size="16" font-weight="bold" font-family="Arial, sans-serif">User</text>
+  <!-- Grid pattern -->
+  <pattern id="grid" width="30" height="30" patternUnits="userSpaceOnUse">
+    <path d="M 30 0 L 0 0 0 30" fill="none" stroke="#ffffff" stroke-width="0.3" opacity="0.05"/>
+  </pattern>
+  <rect width="800" height="350" fill="url(#grid)"/>
 
-  <path d="M 130 175 L 200 175" stroke="#444" stroke-width="2.5" marker-end="url(#arrowhead)"/>
-  <text x="165" y="165" text-anchor="middle" fill="#444" font-size="12" font-family="Arial, sans-serif" font-weight="bold">HTTPS</text>
+  <!-- Title -->
+  <text x="400" y="35" text-anchor="middle" fill="#ffffff" font-size="20" font-weight="700">Serverless Architecture</text>
 
-  <rect x="200" y="140" width="150" height="70" fill="#F5A623" rx="4"/>
-  <text x="275" y="172" text-anchor="middle" fill="white" font-size="16" font-weight="bold" font-family="Arial, sans-serif">Firebase</text>
-  <text x="275" y="192" text-anchor="middle" fill="white" font-size="13" font-family="Arial, sans-serif">Hosting + CDN</text>
+  <!-- User -->
+  <g filter="url(#shadow)">
+    <rect x="30" y="140" width="100" height="70" rx="8" fill="url(#userGrad)"/>
+    <text x="80" y="180" text-anchor="middle" fill="white" font-size="15" font-weight="600">User</text>
+  </g>
 
-  <path d="M 350 175 L 420 120" stroke="#444" stroke-width="2.5" marker-end="url(#arrowhead)"/>
-  <path d="M 350 175 L 420 210" stroke="#444" stroke-width="2.5" marker-end="url(#arrowhead)"/>
+  <!-- Arrow: User to Firebase -->
+  <path d="M 130 175 L 200 175" stroke="#94a3b8" stroke-width="2.5" marker-end="url(#arrowhead)"/>
+  <text x="165" y="165" text-anchor="middle" fill="#94a3b8" font-size="11" font-weight="600">HTTPS</text>
 
-  <rect x="420" y="90" width="125" height="60" fill="#67AB6E" rx="4"/>
-  <text x="482" y="120" text-anchor="middle" fill="white" font-size="14" font-weight="bold" font-family="Arial, sans-serif">Cloud</text>
-  <text x="482" y="138" text-anchor="middle" fill="white" font-size="14" font-weight="bold" font-family="Arial, sans-serif">Functions</text>
+  <!-- Firebase Hosting -->
+  <g filter="url(#shadow)">
+    <rect x="200" y="140" width="150" height="70" rx="8" fill="url(#firebaseGrad)"/>
+    <text x="275" y="172" text-anchor="middle" fill="white" font-size="15" font-weight="600">Firebase</text>
+    <text x="275" y="192" text-anchor="middle" fill="white" font-size="12">Hosting + CDN</text>
+  </g>
 
-  <rect x="420" y="180" width="125" height="60" fill="#D9534F" rx="4"/>
-  <text x="482" y="215" text-anchor="middle" fill="white" font-size="14" font-weight="bold" font-family="Arial, sans-serif">Firestore</text>
+  <!-- Arrows: Firebase to Functions/Firestore -->
+  <path d="M 350 175 L 420 120" stroke="#94a3b8" stroke-width="2.5" marker-end="url(#arrowhead)"/>
+  <path d="M 350 175 L 420 210" stroke="#94a3b8" stroke-width="2.5" marker-end="url(#arrowhead)"/>
 
-  <path d="M 545 120 L 615 155" stroke="#444" stroke-width="2.5" marker-end="url(#arrowhead)"/>
-  <path d="M 545 210 L 615 185" stroke="#444" stroke-width="2.5" marker-end="url(#arrowhead)"/>
+  <!-- Cloud Functions -->
+  <g filter="url(#shadow)">
+    <rect x="420" y="90" width="125" height="60" rx="8" fill="url(#functionsGrad)"/>
+    <text x="482" y="118" text-anchor="middle" fill="white" font-size="13" font-weight="600">Cloud</text>
+    <text x="482" y="136" text-anchor="middle" fill="white" font-size="13" font-weight="600">Functions</text>
+  </g>
 
-  <rect x="615" y="135" width="125" height="70" fill="#4A90E2" rx="4"/>
-  <text x="677" y="165" text-anchor="middle" fill="white" font-size="14" font-weight="bold" font-family="Arial, sans-serif">BigQuery</text>
-  <text x="677" y="185" text-anchor="middle" fill="white" font-size="12" font-family="Arial, sans-serif">Analytics</text>
+  <!-- Firestore -->
+  <g filter="url(#shadow)">
+    <rect x="420" y="180" width="125" height="60" rx="8" fill="url(#firestoreGrad)"/>
+    <text x="482" y="215" text-anchor="middle" fill="white" font-size="13" font-weight="600">Firestore</text>
+  </g>
 
-  <rect x="200" y="250" width="150" height="50" fill="#E6522C" rx="4"/>
-  <text x="275" y="272" text-anchor="middle" fill="white" font-size="13" font-weight="bold" font-family="Arial, sans-serif">OpenTelemetry</text>
-  <text x="275" y="288" text-anchor="middle" fill="white" font-size="11" font-family="Arial, sans-serif">SDK (Client)</text>
+  <!-- Arrows: Functions/Firestore to BigQuery -->
+  <path d="M 545 120 L 615 155" stroke="#94a3b8" stroke-width="2.5" marker-end="url(#arrowhead)"/>
+  <path d="M 545 210 L 615 185" stroke="#94a3b8" stroke-width="2.5" marker-end="url(#arrowhead)"/>
 
-  <path d="M 350 275 L 677 275 L 677 215" stroke="#E6522C" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrowhead-dashed)" fill="none"/>
-  <text x="450" y="265" text-anchor="middle" fill="#E6522C" font-size="11" font-family="Arial, sans-serif" font-weight="bold">Traces/Metrics</text>
+  <!-- BigQuery -->
+  <g filter="url(#shadow)">
+    <rect x="615" y="135" width="125" height="70" rx="8" fill="url(#bigqueryGrad)"/>
+    <text x="677" y="165" text-anchor="middle" fill="white" font-size="13" font-weight="600">BigQuery</text>
+    <text x="677" y="185" text-anchor="middle" fill="white" font-size="11">Analytics</text>
+  </g>
 
-  <path d="M 275 210 L 275 250" stroke="#E6522C" stroke-width="1.5" stroke-dasharray="3,3"/>
+  <!-- OpenTelemetry -->
+  <g filter="url(#shadow)">
+    <rect x="200" y="250" width="150" height="50" rx="8" fill="url(#otelGrad)"/>
+    <text x="275" y="272" text-anchor="middle" fill="white" font-size="12" font-weight="600">OpenTelemetry</text>
+    <text x="275" y="288" text-anchor="middle" fill="white" font-size="10">SDK (Client)</text>
+  </g>
 
-  <text x="400" y="330" text-anchor="middle" fill="#777" font-size="14" font-family="Arial, sans-serif">Zero server management • Auto-scaling • Global CDN • Full observability</text>
+  <!-- Arrow: OpenTelemetry to BigQuery -->
+  <path d="M 350 275 L 677 275 L 677 215" stroke="#f59e0b" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrowhead-dashed)" fill="none"/>
+  <text x="480" y="265" text-anchor="middle" fill="#fbbf24" font-size="10" font-weight="600">Traces/Metrics</text>
+
+  <!-- Arrow: Firebase to OpenTelemetry -->
+  <path d="M 275 210 L 275 250" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="3,3"/>
+
+  <!-- Footer -->
+  <text x="400" y="330" text-anchor="middle" fill="#94a3b8" font-size="12">Zero server management • Auto-scaling • Global CDN • Full observability</text>
 </svg>
