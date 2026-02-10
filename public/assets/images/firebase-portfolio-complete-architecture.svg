@@ -1,6 +1,5 @@
-<svg viewBox="0 0 1200 620" xmlns="http://www.w3.org/2000/svg" style="font-family: system-ui, -apple-system, sans-serif;">
+<svg viewBox="0 0 1200 720" xmlns="http://www.w3.org/2000/svg" style="font-family: system-ui, -apple-system, sans-serif;">
   <defs>
-    <!-- Gradients -->
     <linearGradient id="userGrad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" style="stop-color:#3b82f6"/>
       <stop offset="100%" style="stop-color:#1d4ed8"/>
@@ -49,17 +48,19 @@
       <stop offset="0%" style="stop-color:#14b8a6"/>
       <stop offset="100%" style="stop-color:#0d9488"/>
     </linearGradient>
+    <linearGradient id="ollamaGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#a855f7"/>
+      <stop offset="100%" style="stop-color:#7e22ce"/>
+    </linearGradient>
     <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" style="stop-color:#0f172a"/>
       <stop offset="100%" style="stop-color:#1e293b"/>
     </linearGradient>
 
-    <!-- Shadow filter -->
     <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
       <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000" flood-opacity="0.3"/>
     </filter>
 
-    <!-- Arrow markers -->
     <marker id="arrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
       <polygon points="0 0, 10 3.5, 0 7" fill="#94a3b8"/>
     </marker>
@@ -71,253 +72,159 @@
     </marker>
   </defs>
 
-  <!-- Background -->
-  <rect width="1200" height="620" rx="16" fill="url(#bgGrad)"/>
+  <rect width="1200" height="720" rx="16" fill="url(#bgGrad)"/>
 
-  <!-- Grid pattern -->
   <pattern id="grid" width="30" height="30" patternUnits="userSpaceOnUse">
     <path d="M 30 0 L 0 0 0 30" fill="none" stroke="#ffffff" stroke-width="0.3" opacity="0.05"/>
   </pattern>
-  <rect width="1200" height="620" fill="url(#grid)"/>
+  <rect width="1200" height="720" fill="url(#grid)"/>
 
-  <!-- Title -->
   <text x="600" y="35" text-anchor="middle" fill="#ffffff" font-size="22" font-weight="700">Firebase Portfolio - Complete Architecture</text>
 
-  <!-- User -->
   <g filter="url(#shadow)">
     <rect x="20" y="120" width="90" height="60" rx="8" fill="url(#userGrad)"/>
     <text x="65" y="155" text-anchor="middle" fill="white" font-size="12" font-weight="600">User</text>
   </g>
 
-  <!-- Cloudflare -->
   <g filter="url(#shadow)">
     <rect x="150" y="120" width="100" height="60" rx="8" fill="url(#cloudflareGrad)"/>
     <text x="200" y="145" text-anchor="middle" fill="white" font-size="11" font-weight="600">Cloudflare</text>
     <text x="200" y="163" text-anchor="middle" fill="white" font-size="9">DNS + CDN</text>
   </g>
 
-  <!-- Firebase Hosting -->
   <g filter="url(#shadow)">
     <rect x="290" y="120" width="110" height="60" rx="8" fill="url(#firebaseGrad)"/>
     <text x="345" y="145" text-anchor="middle" fill="white" font-size="11" font-weight="600">Firebase</text>
     <text x="345" y="163" text-anchor="middle" fill="white" font-size="9">Hosting + CDN</text>
   </g>
 
-  <!-- React SPA -->
   <g filter="url(#shadow)">
     <rect x="440" y="120" width="100" height="60" rx="8" fill="url(#reactGrad)"/>
     <text x="490" y="145" text-anchor="middle" fill="white" font-size="11" font-weight="600">React SPA</text>
     <text x="490" y="163" text-anchor="middle" fill="white" font-size="9">Frontend</text>
   </g>
 
-  <!-- OpenTelemetry SDK -->
   <g filter="url(#shadow)">
     <rect x="440" y="210" width="100" height="45" rx="6" fill="url(#otelGrad)"/>
     <text x="490" y="237" text-anchor="middle" fill="white" font-size="10" font-weight="600">OpenTelemetry</text>
   </g>
 
-  <!-- Cloud Functions Box -->
   <rect x="600" y="95" width="380" height="480" fill="#1e293b" stroke="#4ade80" stroke-width="2" rx="8" stroke-dasharray="5,5"/>
   <text x="790" y="120" text-anchor="middle" fill="#4ade80" font-size="14" font-weight="700">Cloud Functions (Node.js 20)</text>
 
-  <!-- Cloud Functions -->
-  <!-- Page View -->
   <g filter="url(#shadow)">
     <rect x="620" y="140" width="100" height="50" rx="6" fill="url(#functionGrad)"/>
     <text x="670" y="162" text-anchor="middle" fill="white" font-size="9" font-weight="600">Page View</text>
     <text x="670" y="177" text-anchor="middle" fill="#d1fae5" font-size="8">Tracker</text>
   </g>
 
-  <!-- Contact Form -->
   <g filter="url(#shadow)">
     <rect x="740" y="140" width="100" height="50" rx="6" fill="url(#functionGrad)"/>
     <text x="790" y="162" text-anchor="middle" fill="white" font-size="9" font-weight="600">Contact Form</text>
     <text x="790" y="177" text-anchor="middle" fill="#d1fae5" font-size="8">Handler</text>
   </g>
 
-  <!-- Feedback -->
   <g filter="url(#shadow)">
     <rect x="860" y="140" width="100" height="50" rx="6" fill="url(#functionGrad)"/>
     <text x="910" y="162" text-anchor="middle" fill="white" font-size="9" font-weight="600">Feedback</text>
     <text x="910" y="177" text-anchor="middle" fill="#d1fae5" font-size="8">Handler</text>
   </g>
 
-  <!-- Job Analyzer -->
   <g filter="url(#shadow)">
     <rect x="620" y="210" width="100" height="50" rx="6" fill="url(#functionGrad)"/>
     <text x="670" y="232" text-anchor="middle" fill="white" font-size="9" font-weight="600">Job Analyzer</text>
     <text x="670" y="247" text-anchor="middle" fill="#d1fae5" font-size="8">AI-Powered</text>
   </g>
 
-  <!-- OTel Processor -->
   <g filter="url(#shadow)">
     <rect x="740" y="210" width="100" height="50" rx="6" fill="url(#functionGrad)"/>
     <text x="790" y="227" text-anchor="middle" fill="white" font-size="9" font-weight="600">OTel</text>
     <text x="790" y="240" text-anchor="middle" fill="white" font-size="9" font-weight="600">Processor</text>
   </g>
 
-  <!-- OTel Batch -->
   <g filter="url(#shadow)">
     <rect x="860" y="210" width="100" height="50" rx="6" fill="url(#functionGrad)"/>
     <text x="910" y="227" text-anchor="middle" fill="white" font-size="9" font-weight="600">OTel Batch</text>
     <text x="910" y="240" text-anchor="middle" fill="white" font-size="9" font-weight="600">Processor</text>
   </g>
 
-  <!-- Rate Limiting Info -->
-  <text x="620" y="285" fill="#94a3b8" font-size="7">Rate Limits:</text>
-  <text x="620" y="297" fill="#64748b" font-size="7">• Page View: 20/min</text>
-  <text x="620" y="309" fill="#64748b" font-size="7">• Contact: 3/min</text>
-  <text x="620" y="321" fill="#64748b" font-size="7">• Feedback: 5/hr</text>
-
-  <text x="790" y="285" fill="#94a3b8" font-size="7">Rate Limits:</text>
-  <text x="790" y="297" fill="#64748b" font-size="7">• Job Analyzer: 10/hr</text>
-  <text x="790" y="309" fill="#64748b" font-size="7">• OTel: 200/min</text>
-  <text x="790" y="321" fill="#64748b" font-size="7">• Batch: Pub/Sub</text>
-
-  <!-- Data Layer Box -->
   <rect x="600" y="350" width="380" height="210" fill="#1e293b" stroke="#60a5fa" stroke-width="2" rx="8" stroke-dasharray="5,5"/>
   <text x="790" y="375" text-anchor="middle" fill="#60a5fa" font-size="14" font-weight="700">Data Layer</text>
 
-  <!-- Firestore -->
   <g filter="url(#shadow)">
     <rect x="620" y="390" width="110" height="55" rx="6" fill="url(#firestoreGrad)"/>
     <text x="675" y="415" text-anchor="middle" fill="white" font-size="11" font-weight="600">Firestore</text>
-    <text x="675" y="432" text-anchor="middle" fill="#fecaca" font-size="8">NoSQL DB</text>
   </g>
-
-  <!-- BigQuery -->
   <g filter="url(#shadow)">
     <rect x="750" y="390" width="110" height="55" rx="6" fill="url(#bigqueryGrad)"/>
     <text x="805" y="415" text-anchor="middle" fill="white" font-size="11" font-weight="600">BigQuery</text>
-    <text x="805" y="432" text-anchor="middle" fill="#dbeafe" font-size="8">Analytics</text>
   </g>
-
-  <!-- Cloud Storage -->
   <g filter="url(#shadow)">
     <rect x="620" y="465" width="110" height="55" rx="6" fill="url(#storageGrad)"/>
-    <text x="675" y="487" text-anchor="middle" fill="white" font-size="11" font-weight="600">Cloud</text>
-    <text x="675" y="502" text-anchor="middle" fill="white" font-size="11" font-weight="600">Storage</text>
+    <text x="675" y="495" text-anchor="middle" fill="white" font-size="11" font-weight="600">Cloud Storage</text>
   </g>
-
-  <!-- Pub/Sub -->
   <g filter="url(#shadow)">
     <rect x="750" y="465" width="110" height="55" rx="6" fill="url(#pubsubGrad)"/>
-    <text x="805" y="490" text-anchor="middle" fill="white" font-size="11" font-weight="600">Pub/Sub</text>
-    <text x="805" y="505" text-anchor="middle" fill="#fef3c7" font-size="8">Queue</text>
+    <text x="805" y="495" text-anchor="middle" fill="white" font-size="11" font-weight="600">Pub/Sub</text>
   </g>
 
-  <!-- Collections Info -->
-  <text x="880" y="395" fill="#94a3b8" font-size="7">Collections:</text>
-  <text x="880" y="407" fill="#64748b" font-size="7">• pageViews</text>
-  <text x="880" y="419" fill="#64748b" font-size="7">• contactSubmissions</text>
-  <text x="880" y="431" fill="#64748b" font-size="7">• feedbackCollect</text>
-  <text x="880" y="443" fill="#64748b" font-size="7">• jobAnalyses</text>
+  <!-- Email Services Box -->
+  <rect x="1000" y="95" width="180" height="265" fill="#1e293b" stroke="#ec4899" stroke-width="2" rx="8" stroke-dasharray="5,5"/>
+  <text x="1090" y="120" text-anchor="middle" fill="#ec4899" font-size="12" font-weight="700">Email Services</text>
 
-  <text x="880" y="470" fill="#94a3b8" font-size="7">Tables:</text>
-  <text x="880" y="482" fill="#64748b" font-size="7">• traces</text>
-  <text x="880" y="494" fill="#64748b" font-size="7">• metrics</text>
-  <text x="880" y="506" fill="#64748b" font-size="7">• logs</text>
-
-  <!-- External Services -->
-  <!-- Secret Manager -->
   <g filter="url(#shadow)">
-    <rect x="1020" y="120" width="140" height="60" rx="8" fill="url(#secretGrad)"/>
-    <text x="1090" y="145" text-anchor="middle" fill="white" font-size="11" font-weight="600">Secret Manager</text>
-    <text x="1090" y="163" text-anchor="middle" fill="#fce7f3" font-size="8">SMTP Credentials</text>
+    <rect x="1020" y="140" width="140" height="50" rx="6" fill="url(#secretGrad)"/>
+    <text x="1090" y="170" text-anchor="middle" fill="white" font-size="10" font-weight="600">Secret Manager</text>
   </g>
-
-  <!-- SMTP Provider -->
   <g filter="url(#shadow)">
-    <rect x="1020" y="210" width="140" height="60" rx="8" fill="url(#smtpGrad)"/>
-    <text x="1090" y="235" text-anchor="middle" fill="white" font-size="11" font-weight="600">SMTP Provider</text>
-    <text x="1090" y="253" text-anchor="middle" fill="#e0e7ff" font-size="8">Email Delivery</text>
+    <rect x="1020" y="210" width="140" height="50" rx="6" fill="url(#smtpGrad)"/>
+    <text x="1090" y="240" text-anchor="middle" fill="white" font-size="10" font-weight="600">SMTP Provider</text>
   </g>
-
-  <!-- Email Recipients -->
   <g filter="url(#shadow)">
-    <rect x="1020" y="300" width="140" height="50" rx="8" fill="url(#userGrad)"/>
-    <text x="1090" y="330" text-anchor="middle" fill="white" font-size="11" font-weight="600">Email Recipients</text>
+    <rect x="1020" y="280" width="140" height="50" rx="6" fill="url(#userGrad)"/>
+    <text x="1090" y="310" text-anchor="middle" fill="white" font-size="10" font-weight="600">Email Recipients</text>
   </g>
 
-  <!-- GitHub Actions -->
-  <g filter="url(#shadow)">
-    <rect x="20" y="620" width="120" height="60" rx="8" fill="#24292f"/>
-    <text x="80" y="645" text-anchor="middle" fill="white" font-size="11" font-weight="600">GitHub</text>
-    <text x="80" y="663" text-anchor="middle" fill="#94a3b8" font-size="9">Actions CI/CD</text>
-  </g>
-
-  <!-- Arrows -->
-  <!-- User to Cloudflare -->
-  <path d="M 110 150 L 150 150" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
-
-  <!-- Cloudflare to Firebase -->
-  <path d="M 250 150 L 290 150" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
-
-  <!-- Firebase to React -->
-  <path d="M 400 150 L 440 150" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
-
-  <!-- React to Functions -->
-  <path d="M 540 150 L 610 165" stroke="#fb923c" stroke-width="1.5" stroke-dasharray="3,3" marker-end="url(#arrow-orange)"/>
-
-  <!-- OTel SDK to OTel Processor -->
-  <path d="M 540 232 L 740 232" stroke="#14b8a6" stroke-width="1.5" stroke-dasharray="3,3"/>
-
-  <!-- Functions to Firestore -->
-  <path d="M 670 260 L 670 390" stroke="#4ade80" stroke-width="1.5" marker-end="url(#arrow-green)"/>
-
-  <!-- Functions to BigQuery -->
-  <path d="M 790 260 L 805 390" stroke="#4ade80" stroke-width="1.5" marker-end="url(#arrow-green)"/>
-
-  <!-- OTel Processor to Pub/Sub -->
-  <path d="M 790 260 L 805 465" stroke="#fb923c" stroke-width="1.5" stroke-dasharray="3,3" marker-end="url(#arrow-orange)"/>
-
-  <!-- Pub/Sub to OTel Batch -->
-  <path d="M 860 492 L 910 260" stroke="#fb923c" stroke-width="1.5" stroke-dasharray="3,3" marker-end="url(#arrow-orange)"/>
-
-  <!-- OTel Batch to Cloud Storage -->
-  <path d="M 910 260 L 730 492" stroke="#4ade80" stroke-width="1.5" marker-end="url(#arrow-green)"/>
-
-  <!-- Contact/Feedback to Secret Manager -->
-  <path d="M 840 165 L 1020 150" stroke="#ec4899" stroke-width="1.5" stroke-dasharray="3,3" fill="none"/>
-
-  <!-- Contact/Feedback to SMTP -->
-  <path d="M 840 165 L 1020 240" stroke="#6366f1" stroke-width="1.5" marker-end="url(#arrow)" fill="none"/>
-
-  <!-- SMTP to Recipients -->
-  <path d="M 1090 270 L 1090 300" stroke="#6366f1" stroke-width="1.5" marker-end="url(#arrow)"/>
-
-  <!-- GitHub to Firebase Hosting -->
-  <path d="M 80 620 L 345 180" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="5,5" marker-end="url(#arrow)" fill="none"/>
-
-  <!-- Labels -->
-  <text x="130" y="140" text-anchor="middle" fill="#94a3b8" font-size="8">HTTPS</text>
-  <text x="270" y="140" text-anchor="middle" fill="#94a3b8" font-size="8">serve</text>
-  <text x="420" y="140" text-anchor="middle" fill="#94a3b8" font-size="8">load</text>
-  <text x="575" y="155" text-anchor="middle" fill="#fb923c" font-size="8">API calls</text>
-  <text x="920" y="140" text-anchor="middle" fill="#ec4899" font-size="7">credentials</text>
-  <text x="920" y="210" text-anchor="middle" fill="#6366f1" font-size="7">send email</text>
-  <text x="200" y="640" text-anchor="middle" fill="#94a3b8" font-size="7">deploy</text>
-
-  <!-- Self-Hosted LLM (Mini PC) - Structured Block -->
+  <!-- Mini PC Box -->
   <rect x="20" y="280" width="180" height="150" fill="#1e293b" stroke="#8b5cf6" stroke-width="2" rx="8" stroke-dasharray="5,5"/>
   <text x="110" y="305" text-anchor="middle" fill="#8b5cf6" font-size="12" font-weight="700">MINI PC</text>
-
-  <!-- K3s Pod Box -->
   <g filter="url(#shadow)">
     <rect x="35" y="320" width="150" height="45" rx="6" fill="url(#ollamaGrad)"/>
     <text x="110" y="338" text-anchor="middle" fill="white" font-size="10" font-weight="600">K3s Pod</text>
     <text x="110" y="353" text-anchor="middle" fill="#e9d5ff" font-size="9">Ollama LLM</text>
   </g>
-
-  <!-- API Endpoint -->
   <g filter="url(#shadow)">
     <rect x="35" y="375" width="150" height="40" rx="6" fill="#374151"/>
-    <text x="110" y="393" text-anchor="middle" fill="#a78bfa" font-size="9" font-weight="600">API Endpoint</text>
-    <text x="110" y="407" text-anchor="middle" fill="#94a3b8" font-size="8">:11434/api</text>
+    <text x="110" y="400" text-anchor="middle" fill="#a78bfa" font-size="9" font-weight="600">API Endpoint</text>
   </g>
 
-  <!-- Job Analyzer to LLM connection -->
-  <path d="M 200 395 L 620 235" stroke="#8b5cf6" stroke-width="1.5" stroke-dasharray="3,3" fill="none"/>
+  <!-- GitHub Actions (next to Firebase) -->
+  <g filter="url(#shadow)">
+    <rect x="290" y="210" width="110" height="55" rx="8" fill="#24292f"/>
+    <text x="345" y="233" text-anchor="middle" fill="white" font-size="10" font-weight="600">GitHub</text>
+    <text x="345" y="249" text-anchor="middle" fill="#94a3b8" font-size="8">Actions CI/CD</text>
+  </g>
+
+  <!-- Arrows -->
+  <path d="M 110 150 L 150 150" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
+  <path d="M 250 150 L 290 150" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
+  <path d="M 400 150 L 440 150" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
+  <path d="M 540 150 L 610 165" stroke="#fb923c" stroke-width="1.5" stroke-dasharray="3,3" marker-end="url(#arrow-orange)"/>
+
+  <!-- GitHub to Firebase deploy -->
+  <path d="M 345 210 L 345 180" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="5,5" marker-end="url(#arrow)"/>
+  <text x="355" y="198" fill="#94a3b8" font-size="8">deploy</text>
+
+  <!-- Mini PC to Job Analyzer -->
+  <path d="M 200 395 L 620 235" stroke="#8b5cf6" stroke-width="1.5" stroke-dasharray="3,3" fill="none" marker-end="url(#arrow)"/>
   <text x="380" y="310" text-anchor="middle" fill="#8b5cf6" font-size="8">HTTP API</text>
 
+  <!-- Contact/Feedback to Secret Manager -->
+  <path d="M 960 165 L 1020 165" stroke="#ec4899" stroke-width="1.5" stroke-dasharray="3,3"/>
+  <text x="990" y="158" text-anchor="middle" fill="#ec4899" font-size="7">credentials</text>
+
+  <!-- SMTP to Email Recipients -->
+  <path d="M 1090 260 L 1090 280" stroke="#6366f1" stroke-width="1.5" marker-end="url(#arrow)"/>
+  <text x="1105" y="273" fill="#6366f1" font-size="7">send</text>
+  
 </svg>
