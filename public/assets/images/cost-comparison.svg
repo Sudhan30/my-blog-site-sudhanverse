@@ -1,0 +1,42 @@
+<svg viewBox="0 0 800 350" xmlns="http://www.w3.org/2000/svg">
+  <!-- Title -->
+  <text x="400" y="30" text-anchor="middle" fill="#333" font-size="18" font-weight="bold">Monthly Operating Cost</text>
+
+  <!-- Firebase Column -->
+  <rect x="150" y="270" width="150" height="10" fill="#FFA500" rx="3"/>
+  <text x="225" y="300" text-anchor="middle" fill="#333" font-size="16" font-weight="bold">Firebase</text>
+  <text x="225" y="320" text-anchor="middle" fill="#666" font-size="14">~$0/month</text>
+  <text x="225" y="335" text-anchor="middle" fill="#999" font-size="11">(at current scale)</text>
+
+  <!-- Self-Hosted Column -->
+  <rect x="500" y="230" width="150" height="50" fill="#326CE5" rx="3"/>
+  <text x="575" y="300" text-anchor="middle" fill="#333" font-size="16" font-weight="bold">Self-Hosted</text>
+  <text x="575" y="320" text-anchor="middle" fill="#666" font-size="14">~$5/month</text>
+  <text x="575" y="335" text-anchor="middle" fill="#999" font-size="11">(electricity)</text>
+
+  <!-- Y-axis -->
+  <path d="M 100 280 L 100 80" stroke="#CCC" stroke-width="2"/>
+  <path d="M 95 80 L 100 70 L 105 80" fill="#CCC"/>
+  <text x="90" y="75" text-anchor="end" fill="#666" font-size="12">$</text>
+
+  <!-- Grid lines -->
+  <path d="M 100 230 L 700 230" stroke="#EEE" stroke-width="1" stroke-dasharray="5,5"/>
+  <path d="M 100 180 L 700 180" stroke="#EEE" stroke-width="1" stroke-dasharray="5,5"/>
+  <path d="M 100 130 L 700 130" stroke="#EEE" stroke-width="1" stroke-dasharray="5,5"/>
+
+  <!-- X-axis -->
+  <path d="M 100 280 L 700 280" stroke="#CCC" stroke-width="2"/>
+
+  <!-- Tradeoffs Box -->
+  <rect x="120" y="100" width="260" height="110" fill="#FFF5E6" stroke="#FFA500" stroke-width="2" rx="5"/>
+  <text x="250" y="125" text-anchor="middle" fill="#333" font-size="13" font-weight="bold">Firebase Tradeoffs</text>
+  <text x="135" y="148" fill="#666" font-size="11">✓ Free at low scale</text>
+  <text x="135" y="168" fill="#666" font-size="11">✓ Zero maintenance</text>
+  <text x="135" y="188" fill="#666" font-size="11">✗ Costs scale with usage</text>
+
+  <rect x="420" y="100" width="260" height="110" fill="#E6F2FF" stroke="#326CE5" stroke-width="2" rx="5"/>
+  <text x="550" y="125" text-anchor="middle" fill="#333" font-size="13" font-weight="bold">Self-Hosted Tradeoffs</text>
+  <text x="435" y="148" fill="#666" font-size="11">✓ Fixed cost</text>
+  <text x="435" y="168" fill="#666" font-size="11">✓ Full control + GPU</text>
+  <text x="435" y="188" fill="#666" font-size="11">✗ Manual maintenance</text>
+</svg>

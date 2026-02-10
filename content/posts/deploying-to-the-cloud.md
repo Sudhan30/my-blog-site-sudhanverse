@@ -1,6 +1,6 @@
 ---
 title: "Deploying to the Cloud: My Infrastructure Journey"
-date: 2024-02-20
+date: 2025-02-20
 tags: [cloud, deployment, infrastructure, devops, gcp, firebase]
 excerpt: "From GCS buckets and expensive load balancers to Firebase's serverless architecture. A journey through cost optimization, architecture decisions, and lessons learned deploying a production portfolio site."
 slug: my-cloud-site
@@ -8,75 +8,35 @@ slug: my-cloud-site
 
 > "Cost optimization isn't about being cheap—it's about being smart with resources."
 
-The journey from hosting a static website to building a production-ready, globally-distributed application taught me that cloud architecture is as much about economics as it is about engineering.
+Learning cloud architecture is as much about economics as it is about engineering. My portfolio website started simple—HTML, CSS, JavaScript. But when it came time to deploy, I made the classic beginner mistake: over-engineering the infrastructure for what was basically a static site.
 
-## The Problem: A $20/Month Static Website
+## The $20/Month Static Website Problem
 
-My portfolio website started simple—HTML, CSS, JavaScript. Nothing fancy. But when it came time to deploy, I made a classic beginner mistake: over-engineering the infrastructure for what was essentially a static site.
+I set up a Google Cloud Storage bucket for the static files and put a Cloud Load Balancer in front of it for HTTPS. Custom domain through Cloudflare DNS. Felt pretty professional.
 
-### Initial Architecture: GCS + Load Balancer
+Then the bill came. $18 a month for the load balancer alone. Another $0.50 for storage, $1 for data transfer. Total: ~$21.50/month. For a static site getting maybe 100 visitors a month.
 
-**The Setup:**
-- Google Cloud Storage bucket for static files
-- Cloud Load Balancer for HTTPS termination
-- Custom domain via Cloudflare DNS
+97% of my cost was the load balancer doing almost nothing.
 
-**The Cost:**
-```
-Google Cloud Load Balancer:  $18.00/month (fixed minimum)
-Cloud Storage Bucket:         $0.50/month
-Data Transfer (egress):       $1.00/month
-──────────────────────────────────────────────
-Total:                       ~$21.50/month
-```
+## Finding Firebase
 
-**The Problem:** 97% of the cost was the load balancer doing almost nothing for a low-traffic site.
+After a few months of those bills, I started looking for alternatives. What I needed was simple: serve static content globally, handle HTTPS automatically, cost close to zero for low traffic, and scale if needed.
 
----
-
-## The Pivot: Discovering Firebase Free Tier
-
-After analyzing the bills, I realized I needed a platform that:
-1. Served static content globally via CDN
-2. Handled HTTPS automatically
-3. **Cost close to zero for low traffic**
-4. Could scale if needed
-
-Firebase Hosting checked all boxes.
-
-### Firebase Architecture
+Firebase Hosting checked all those boxes.
 
 ![Firebase Portfolio Architecture](/assets/images/firebase-architecture.svg?v=1)
 
-**Key Components:**
+The free tier is genuinely generous. 10GB hosting per month, 2 million Cloud Function invocations, 50k Firestore reads per day. For a personal portfolio, that's more than enough. I've been running on Firebase's free tier for over a year now without hitting limits.
 
-| Component | Purpose | Cost (Free Tier) |
-|-----------|---------|------------------|
-| **Firebase Hosting** | Static site hosting + global CDN | Free up to 10GB/month |
-| **Cloudflare DNS** | Domain management + DDoS protection | Free |
-| **Cloud Functions** | Serverless backend APIs | Free 2M invocations/month |
-| **Firestore** | NoSQL database for forms/analytics | Free 50k reads/day |
-| **Secret Manager** | Secure credential storage | Free for < 6 secrets |
+Google handles the CDN, HTTPS certificates, and deployments. I just push code. The site loads fast from anywhere in the world, and my monthly bill is $0.
 
-**Monthly Cost:** $0 (well within free tier limits)
+## What I Learned
 
-**Traffic Capacity:** ~50k monthly visitors before exceeding free tier
+Don't deploy enterprise infrastructure for hobby projects. Kubernetes for a static site? Load balancers for low traffic? Match your infrastructure to your actual needs, not what you think production should look like.
 
----
+Firebase's free tier isn't a toy. It's production-capable for small to medium traffic. My portfolio has been running on it for years with zero issues. No 3am wake-up calls, no server patches, no SSH keys to manage.
 
-## Lessons Learned
-
-### 1. Right-Size Your Infrastructure
-
-Don't deploy Kubernetes for a static site. Don't use enterprise load balancers for hobby projects. Match your infrastructure to your actual needs.
-
-### 2. Free Tiers Are Production-Ready
-
-Firebase's free tier isn't a toy—it's genuinely production-capable for small-to-medium traffic sites.
-
-### 3. Serverless Reduces Operational Overhead
-
-No servers to patch. No SSH keys to manage. No uptime monitoring to configure.
+Serverless reduces operational overhead dramatically. When you're building side projects, that matters. The time you save not managing infrastructure is time you can spend building features or, you know, doing other things with your life.
 
 ---
 

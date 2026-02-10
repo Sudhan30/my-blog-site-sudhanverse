@@ -62,10 +62,6 @@ export async function homeRoute(_req: Request): Promise<Response> {
             <span class="hero-stat-value">${Object.keys(index.tags).length}</span>
             <span class="hero-stat-label">Topics</span>
           </div>
-          <div class="hero-stat">
-            <span class="hero-stat-value">2025</span>
-            <span class="hero-stat-label">Started</span>
-          </div>
         </div>
       </div>
     </section>
