@@ -1,7 +1,6 @@
 import { layout } from "../templates/layout";
 import { getPostBySlug } from "../lib/posts";
 import { renderMarkdown } from "../lib/markdown";
-import { getMyFirstSiteContent } from "../templates/posts/my-first-site";
 
 export async function postRoute(slug: string): Promise<Response> {
   const post = await getPostBySlug(slug);
@@ -16,11 +15,9 @@ export async function postRoute(slug: string): Promise<Response> {
     day: "numeric"
   });
 
-  // Use custom HTML templates for specific posts
-  const isCustomTemplate = slug === "my-first-site";
-  const htmlContent = isCustomTemplate
-    ? getMyFirstSiteContent()
-    : renderMarkdown(post.content);
+  // Use markdown rendering for all posts
+  const isCustomTemplate = false;
+  const htmlContent = renderMarkdown(post.content);
 
   const tags = post.tags.map(t =>
     `<a href="/tag/${encodeURIComponent(t)}" class="tag">${t}</a>`
