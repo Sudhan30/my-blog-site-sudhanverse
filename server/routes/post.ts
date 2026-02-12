@@ -265,6 +265,54 @@ export async function postRoute(slug: string): Promise<Response> {
 
       loadComments();
       loadSummary();
+
+      // Image lightbox functionality
+      (function() {
+        // Create lightbox modal HTML
+        const lightboxHTML = \`
+          <div id="lightbox" class="lightbox" style="display: none;">
+            <div class="lightbox-backdrop"></div>
+            <div class="lightbox-content">
+              <button class="lightbox-close" aria-label="Close">&times;</button>
+              <img class="lightbox-image" src="" alt="">
+            </div>
+          </div>
+        \`;
+        document.body.insertAdjacentHTML('beforeend', lightboxHTML);
+
+        const lightbox = document.getElementById('lightbox');
+        const lightboxImg = lightbox.querySelector('.lightbox-image');
+        const lightboxClose = lightbox.querySelector('.lightbox-close');
+        const lightboxBackdrop = lightbox.querySelector('.lightbox-backdrop');
+
+        // Make all images in article content clickable
+        const articleImages = document.querySelectorAll('.article-content img');
+        articleImages.forEach(img => {
+          img.style.cursor = 'pointer';
+          img.addEventListener('click', function() {
+            lightboxImg.src = this.src;
+            lightboxImg.alt = this.alt;
+            lightbox.style.display = 'flex';
+            document.body.style.overflow = 'hidden';
+          });
+        });
+
+        // Close lightbox functions
+        function closeLightbox() {
+          lightbox.style.display = 'none';
+          document.body.style.overflow = '';
+        }
+
+        lightboxClose.addEventListener('click', closeLightbox);
+        lightboxBackdrop.addEventListener('click', closeLightbox);
+
+        // Close on ESC key
+        document.addEventListener('keydown', function(e) {
+          if (e.key === 'Escape' && lightbox.style.display === 'flex') {
+            closeLightbox();
+          }
+        });
+      })();
     </script>
   `;
 
