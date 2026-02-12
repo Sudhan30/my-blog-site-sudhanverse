@@ -24,10 +24,19 @@ export function layout(options: LayoutOptions): string {
   
   <!-- SEO Meta Tags -->
   <meta name="description" content="${description}">
-  <meta name="author" content="Sudharsana">
+  <meta name="author" content="Sudharsana Rajasekaran">
   <meta name="robots" content="index, follow">
   <link rel="canonical" href="${canonicalUrl}">
-  
+
+  <!-- AI Citation Meta Tags (Generative Engine Optimization) -->
+  <meta name="citation_author" content="Sudharsana Rajasekaran">
+  <meta name="citation_title" content="${fullTitle}">
+  <meta name="citation_journal_title" content="${SITE_NAME}">
+  <meta name="DC.creator" content="Sudharsana Rajasekaran">
+  <meta name="DC.title" content="${fullTitle}">
+  <meta name="DC.publisher" content="${SITE_NAME}">
+  <meta name="DC.identifier" content="${canonicalUrl}">
+
   <!-- Open Graph -->
   <meta property="og:title" content="${fullTitle}">
   <meta property="og:description" content="${description}">
