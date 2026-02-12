@@ -1043,8 +1043,16 @@ img {
 .code-block code {
   font-family: 'JetBrains Mono', 'Fira Code', monospace;
   font-size: 0.875rem;
-  color: #e2e8f0;
+  color: #e2e8f0 !important;
   line-height: 1.6;
+  display: block;
+  white-space: pre;
+}
+
+/* Ensure code text is always visible */
+pre.code-block code {
+  color: #e2e8f0 !important;
+  background: transparent !important;
 }
 
 .article-content code:not(pre code) {
