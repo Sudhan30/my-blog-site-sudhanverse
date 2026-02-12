@@ -45,6 +45,10 @@
       <stop offset="0%" stop-color="#a855f7"/>
       <stop offset="100%" stop-color="#7e22ce"/>
     </linearGradient>
+    <linearGradient id="dagsterGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#fb923c"/>
+      <stop offset="100%" stop-color="#ea580c"/>
+    </linearGradient>
     <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
       <stop offset="0%" stop-color="#0f172a"/>
       <stop offset="100%" stop-color="#1e293b"/>
@@ -150,6 +154,15 @@
     <text x="1080" y="360" text-anchor="middle" fill="white" font-size="9" font-weight="600">Manager</text>
   </g>
 
+  <rect x="870" y="440" width="290" height="120" fill="#1e293b" stroke="#fb923c" stroke-width="2" rx="8" stroke-dasharray="5,5"/>
+  <text x="1015" y="465" text-anchor="middle" fill="#fb923c" font-size="13" font-weight="700">Namespace: orchestrator</text>
+
+  <g filter="url(#shadow)">
+    <rect x="890" y="485" width="250" height="50" rx="6" fill="url(#dagsterGrad)"/>
+    <text x="1015" y="507" text-anchor="middle" fill="white" font-size="10" font-weight="600">Dagster</text>
+    <text x="1015" y="523" text-anchor="middle" fill="white" font-size="8">Blog Summarization</text>
+  </g>
+
   <g filter="url(#shadow)">
     <rect x="320" y="460" width="240" height="60" rx="8" fill="url(#fluxGrad)"/>
     <text x="440" y="485" text-anchor="middle" fill="white" font-size="12" font-weight="600">FluxCD</text>
@@ -216,6 +229,10 @@
   <path d="M 1010 350 L 1020 350" stroke="#e6522c" stroke-width="1.5" stroke-dasharray="3,3" marker-end="url(#arrow)" fill="none"/>
   <path d="M 1080 325 L 1080 235" stroke="#e6522c" stroke-width="1.5" stroke-dasharray="3,3" marker-end="url(#arrow)" fill="none"/>
 
+  <!-- Dagster connections -->
+  <path d="M 890 510 L 850 510 L 850 360 L 640 360 L 640 310" stroke="#fb923c" stroke-width="1.5" stroke-dasharray="4,4" marker-end="url(#arrow)" fill="none"/>
+  <path d="M 890 495 L 820 495 L 820 395 L 740 395 L 740 235" stroke="#fb923c" stroke-width="1.5" stroke-dasharray="4,4" marker-end="url(#arrow)" fill="none"/>
+
   <text x="130" y="140" text-anchor="middle" fill="#94a3b8" font-size="8">HTTPS</text>
   <text x="280" y="170" text-anchor="middle" fill="#94a3b8" font-size="8">proxy</text>
   <text x="470" y="200" text-anchor="middle" fill="#94a3b8" font-size="8">route</text>
@@ -230,4 +247,6 @@
   <text x="1015" y="270" text-anchor="middle" fill="#8b5cf6" font-size="8">query</text>
   <text x="1015" y="340" text-anchor="middle" fill="#e6522c" font-size="8">alerts</text>
   <text x="1095" y="280" text-anchor="middle" fill="#e6522c" font-size="8">alerts</text>
+  <text x="745" y="360" text-anchor="middle" fill="#fb923c" font-size="8">summarize</text>
+  <text x="780" y="320" text-anchor="middle" fill="#fb923c" font-size="8">store</text>
 </svg>
