@@ -1,0 +1,164 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg viewBox="0 0 1200 600" xmlns="http://www.w3.org/2000/svg" font-family="system-ui, -apple-system, sans-serif">
+  <defs>
+    <linearGradient id="devGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#3b82f6"/>
+      <stop offset="100%" stop-color="#1d4ed8"/>
+    </linearGradient>
+    <linearGradient id="githubGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#24292f"/>
+      <stop offset="100%" stop-color="#1b1f23"/>
+    </linearGradient>
+    <linearGradient id="actionsGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2088FF"/>
+      <stop offset="100%" stop-color="#1a6fd3"/>
+    </linearGradient>
+    <linearGradient id="dockerGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#00ADD8"/>
+      <stop offset="100%" stop-color="#0099bd"/>
+    </linearGradient>
+    <linearGradient id="fluxGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#5468ff"/>
+      <stop offset="100%" stop-color="#316ce4"/>
+    </linearGradient>
+    <linearGradient id="k3sGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#326ce5"/>
+      <stop offset="100%" stop-color="#1d4ed8"/>
+    </linearGradient>
+    <linearGradient id="deployGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#10b981"/>
+      <stop offset="100%" stop-color="#059669"/>
+    </linearGradient>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#1e293b"/>
+    </linearGradient>
+
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000" flood-opacity="0.3"/>
+    </filter>
+
+    <marker id="arrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
+      <polygon points="0 0, 10 3.5, 0 7" fill="#94a3b8"/>
+    </marker>
+  </defs>
+
+  <rect width="1200" height="600" rx="16" fill="url(#bgGrad)"/>
+
+  <pattern id="grid" width="30" height="30" patternUnits="userSpaceOnUse">
+    <path d="M 30 0 L 0 0 0 30" fill="none" stroke="#ffffff" stroke-width="0.3" opacity="0.05"/>
+  </pattern>
+  <rect width="1200" height="600" fill="url(#grid)"/>
+
+  <text x="600" y="35" text-anchor="middle" fill="#ffffff" font-size="22" font-weight="700">GitOps Deployment Flow</text>
+
+  <g filter="url(#shadow)">
+    <rect x="50" y="120" width="120" height="70" rx="8" fill="url(#devGrad)"/>
+    <text x="110" y="145" text-anchor="middle" fill="white" font-size="12" font-weight="600">Developer</text>
+    <text x="110" y="163" text-anchor="middle" fill="#dbeafe" font-size="9">git push</text>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect x="220" y="120" width="140" height="70" rx="8" fill="url(#githubGrad)"/>
+    <text x="290" y="145" text-anchor="middle" fill="white" font-size="12" font-weight="600">GitHub</text>
+    <text x="290" y="163" text-anchor="middle" fill="#94a3b8" font-size="9">GitOps Repo</text>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect x="410" y="120" width="140" height="70" rx="8" fill="url(#actionsGrad)"/>
+    <text x="480" y="140" text-anchor="middle" fill="white" font-size="11" font-weight="600">GitHub</text>
+    <text x="480" y="155" text-anchor="middle" fill="white" font-size="11" font-weight="600">Actions</text>
+    <text x="480" y="173" text-anchor="middle" fill="#dbeafe" font-size="9">Build &amp; Test</text>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect x="600" y="120" width="140" height="70" rx="8" fill="url(#dockerGrad)"/>
+    <text x="670" y="145" text-anchor="middle" fill="white" font-size="12" font-weight="600">Docker Hub</text>
+    <text x="670" y="163" text-anchor="middle" fill="white" font-size="9">Image Registry</text>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect x="290" y="250" width="160" height="80" rx="8" fill="url(#fluxGrad)"/>
+    <text x="370" y="280" text-anchor="middle" fill="white" font-size="13" font-weight="600">FluxCD</text>
+    <text x="370" y="300" text-anchor="middle" fill="#e0e7ff" font-size="9">Source Controller</text>
+    <text x="370" y="315" text-anchor="middle" fill="#e0e7ff" font-size="9">Kustomize Controller</text>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect x="500" y="250" width="160" height="80" rx="8" fill="url(#k3sGrad)"/>
+    <text x="580" y="280" text-anchor="middle" fill="white" font-size="13" font-weight="600">K3s Cluster</text>
+    <text x="580" y="300" text-anchor="middle" fill="#dbeafe" font-size="9">Apply Manifests</text>
+    <text x="580" y="315" text-anchor="middle" fill="#dbeafe" font-size="9">Update Resources</text>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect x="710" y="250" width="160" height="80" rx="8" fill="url(#deployGrad)"/>
+    <text x="790" y="275" text-anchor="middle" fill="white" font-size="12" font-weight="600">Running Pods</text>
+    <text x="790" y="295" text-anchor="middle" fill="#d1fae5" font-size="9">Blog (Bun.js)</text>
+    <text x="790" y="310" text-anchor="middle" fill="#d1fae5" font-size="9">PostgreSQL</text>
+    <text x="790" y="325" text-anchor="middle" fill="#d1fae5" font-size="9">Ollama LLM</text>
+  </g>
+
+  <rect x="920" y="250" width="240" height="80" fill="#1e293b" stroke="#f59e0b" stroke-width="2" rx="8"/>
+  <text x="1040" y="275" text-anchor="middle" fill="#f59e0b" font-size="12" font-weight="600">Monitoring</text>
+  <text x="1040" y="295" text-anchor="middle" fill="#94a3b8" font-size="9">Prometheus metrics</text>
+  <text x="1040" y="310" text-anchor="middle" fill="#94a3b8" font-size="9">Grafana dashboards</text>
+  <text x="1040" y="325" text-anchor="middle" fill="#94a3b8" font-size="9">Loki log aggregation</text>
+
+  <rect x="50" y="400" width="220" height="140" fill="#1e293b" stroke="#2088FF" stroke-width="2" rx="8"/>
+  <text x="160" y="425" text-anchor="middle" fill="#2088FF" font-size="12" font-weight="600">1. Code Change</text>
+  <text x="60" y="445" fill="#94a3b8" font-size="9">• Developer commits code</text>
+  <text x="60" y="465" fill="#94a3b8" font-size="9">• Push to main branch</text>
+  <text x="60" y="485" fill="#94a3b8" font-size="9">• GitHub webhook triggers</text>
+  <text x="60" y="505" fill="#94a3b8" font-size="9">• CI/CD pipeline starts</text>
+  <text x="60" y="525" fill="#94a3b8" font-size="9">• Build Docker image</text>
+
+  <rect x="300" y="400" width="220" height="140" fill="#1e293b" stroke="#5468ff" stroke-width="2" rx="8"/>
+  <text x="410" y="425" text-anchor="middle" fill="#5468ff" font-size="12" font-weight="600">2. FluxCD Sync</text>
+  <text x="310" y="445" fill="#94a3b8" font-size="9">• Poll GitHub repo (1min)</text>
+  <text x="310" y="465" fill="#94a3b8" font-size="9">• Detect manifest changes</text>
+  <text x="310" y="485" fill="#94a3b8" font-size="9">• Pull new image tags</text>
+  <text x="310" y="505" fill="#94a3b8" font-size="9">• Validate K8s manifests</text>
+  <text x="310" y="525" fill="#94a3b8" font-size="9">• Apply to cluster</text>
+
+  <rect x="550" y="400" width="220" height="140" fill="#1e293b" stroke="#10b981" stroke-width="2" rx="8"/>
+  <text x="660" y="425" text-anchor="middle" fill="#10b981" font-size="12" font-weight="600">3. Deployment</text>
+  <text x="560" y="445" fill="#94a3b8" font-size="9">• Rolling update strategy</text>
+  <text x="560" y="465" fill="#94a3b8" font-size="9">• Pull new container image</text>
+  <text x="560" y="485" fill="#94a3b8" font-size="9">• Terminate old pods</text>
+  <text x="560" y="505" fill="#94a3b8" font-size="9">• Start new pods</text>
+  <text x="560" y="525" fill="#94a3b8" font-size="9">• Health checks pass</text>
+
+  <rect x="800" y="400" width="220" height="140" fill="#1e293b" stroke="#ec4899" stroke-width="2" rx="8"/>
+  <text x="910" y="425" text-anchor="middle" fill="#ec4899" font-size="12" font-weight="600">4. Verification</text>
+  <text x="810" y="445" fill="#94a3b8" font-size="9">• Prometheus scrapes metrics</text>
+  <text x="810" y="465" fill="#94a3b8" font-size="9">• Loki ingests logs</text>
+  <text x="810" y="485" fill="#94a3b8" font-size="9">• Grafana dashboards update</text>
+  <text x="810" y="505" fill="#94a3b8" font-size="9">• Alert on failures</text>
+  <text x="810" y="525" fill="#94a3b8" font-size="9">• Traffic routing verified</text>
+
+  <path d="M 170 155 L 220 155" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)" fill="none"/>
+  <path d="M 360 155 L 410 155" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)" fill="none"/>
+  <path d="M 550 155 L 600 155" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)" fill="none"/>
+
+  <path d="M 290 190 L 290 220 L 370 220 L 370 250" stroke="#5468ff" stroke-width="2" stroke-dasharray="5,5" marker-end="url(#arrow)" fill="none"/>
+  <path d="M 670 190 L 670 220 L 580 220 L 580 250" stroke="#00ADD8" stroke-width="2" stroke-dasharray="3,3" marker-end="url(#arrow)" fill="none"/>
+
+  <path d="M 450 290 L 500 290" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)" fill="none"/>
+  <path d="M 660 290 L 710 290" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)" fill="none"/>
+  <path d="M 870 290 L 920 290" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="3,3" marker-end="url(#arrow)" fill="none"/>
+
+  <text x="195" y="145" text-anchor="middle" fill="#94a3b8" font-size="8">commit</text>
+  <text x="385" y="145" text-anchor="middle" fill="#94a3b8" font-size="8">trigger</text>
+  <text x="575" y="145" text-anchor="middle" fill="#94a3b8" font-size="8">push</text>
+  <text x="330" y="210" text-anchor="middle" fill="#5468ff" font-size="8">reconcile</text>
+  <text x="625" y="210" text-anchor="middle" fill="#00ADD8" font-size="8">pull</text>
+  <text x="475" y="280" text-anchor="middle" fill="#94a3b8" font-size="8">apply</text>
+  <text x="685" y="280" text-anchor="middle" fill="#94a3b8" font-size="8">deploy</text>
+  <text x="895" y="280" text-anchor="middle" fill="#94a3b8" font-size="8">observe</text>
+
+  <text x="160" y="570" text-anchor="middle" fill="#2088FF" font-size="10" font-weight="600">~2 min</text>
+  <text x="410" y="570" text-anchor="middle" fill="#5468ff" font-size="10" font-weight="600">~1 min</text>
+  <text x="660" y="570" text-anchor="middle" fill="#10b981" font-size="10" font-weight="600">~30 sec</text>
+  <text x="910" y="570" text-anchor="middle" fill="#ec4899" font-size="10" font-weight="600">continuous</text>
+</svg>
