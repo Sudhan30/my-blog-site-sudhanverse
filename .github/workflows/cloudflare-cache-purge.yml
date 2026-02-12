@@ -18,13 +18,7 @@ jobs:
           response=$(curl -X POST "https://api.cloudflare.com/client/v4/zones/${{ secrets.CLOUDFLARE_ZONE_ID }}/purge_cache" \
             -H "Authorization: Bearer ${{ secrets.CLOUDFLARE_API_TOKEN }}" \
             -H "Content-Type: application/json" \
-            --data '{
-              "files": [
-                "https://blog.sudharsana.dev/",
-                "https://blog.sudharsana.dev/posts",
-                "https://blog.sudharsana.dev/tags"
-              ]
-            }' -s)
+            --data '{"purge_everything":true}' -s)
 
           echo "Response: $response"
 
