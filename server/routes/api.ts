@@ -262,6 +262,42 @@ export async function apiRouter(req: Request, path: string): Promise<Response> {
         }
     }
 
+    // Generate creative display name using Ollama
+    if (path === "/api/generate-name" && method === "GET") {
+        try {
+            const ollamaResponse = await fetch(`${OLLAMA_HOST}/api/generate`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    model: 'gemma3:12b',
+                    prompt: 'Generate a creative, unique username using an adjective and an animal name. Format: Adjective-Animal-5DigitNumber. Examples: Swift-Falcon-78294, Clever-Otter-23415, Brave-Lynx-91827, Mystic-Phoenix-45621, Silent-Leopard-64918. Output ONLY the username in that exact format, nothing else.',
+                    stream: false,
+                    options: { temperature: 0.9 }
+                })
+            });
+
+            if (!ollamaResponse.ok) {
+                console.error('Ollama name generation failed:', ollamaResponse.status);
+                return json({ error: 'Generation failed' }, 500);
+            }
+
+            const ollamaData = await ollamaResponse.json() as { response: string };
+            const generatedName = ollamaData.response.trim();
+
+            // Validate format (Adjective-Animal-Number)
+            const namePattern = /^[A-Z][a-z]+-[A-Z][a-z]+-\d{5}$/;
+            if (!namePattern.test(generatedName)) {
+                console.error('Invalid name format from Ollama:', generatedName);
+                return json({ error: 'Invalid format' }, 500);
+            }
+
+            return json({ name: generatedName });
+        } catch (error) {
+            console.error('Name generation error:', error);
+            return json({ error: 'Generation failed' }, 500);
+        }
+    }
+
     // Telemetry - In-house analytics
     if (path === "/api/telemetry" && method === "POST") {
         try {

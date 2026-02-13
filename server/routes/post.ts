@@ -130,23 +130,71 @@ export async function postRoute(slug: string): Promise<Response> {
         return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
       }
 
-      // Auto-generated display name
-      function getDisplayName() {
+      // Auto-generated display name with AI + fallback
+      async function generateDisplayName() {
         let name = localStorage.getItem('blog-display-name');
-        if (!name) {
-          const animals = ['Fox','Owl','Bear','Wolf','Hawk','Lynx','Deer','Seal','Puma','Crow',
-            'Orca','Ibis','Wren','Dove','Hare','Newt','Frog','Moth','Pike','Swan',
-            'Koala','Panda','Otter','Eagle','Raven','Bison','Cobra','Finch','Crane','Viper'];
-          const animal = animals[Math.floor(Math.random() * animals.length)];
-          const hash = String(Date.now() % 100000).padStart(5, '0');
-          name = animal + '-' + hash;
-          localStorage.setItem('blog-display-name', name);
+        if (name) {
+          return name;
         }
+
+        // Try Ollama-generated name first
+        try {
+          const response = await fetch('/api/generate-name', {
+            method: 'GET',
+            signal: AbortSignal.timeout(2000) // 2s timeout
+          });
+
+          if (response.ok) {
+            const data = await response.json();
+            if (data.name) {
+              name = data.name;
+              localStorage.setItem('blog-display-name', name);
+              console.log('✨ AI-generated name:', name);
+              return name;
+            }
+          }
+        } catch (error) {
+          console.log('⚠️  AI generation unavailable, using fallback');
+        }
+
+        // Fallback: Enhanced random generation
+        const adjectives = ['Swift','Clever','Brave','Silent','Noble','Wild','Cosmic',
+          'Ancient','Mystic','Golden','Silver','Crystal','Thunder','Shadow','Lunar',
+          'Solar','Arctic','Tropical','Desert','Ocean','Forest','Mountain','Storm',
+          'Blazing','Frozen','Radiant','Nimble','Fierce','Gentle','Majestic'];
+
+        const animals = ['Fox','Owl','Bear','Wolf','Hawk','Lynx','Deer','Seal','Puma','Crow',
+          'Orca','Ibis','Wren','Dove','Hare','Newt','Frog','Moth','Pike','Swan',
+          'Koala','Panda','Otter','Eagle','Raven','Bison','Cobra','Finch','Crane','Viper',
+          'Tiger','Lion','Leopard','Cheetah','Jaguar','Panther','Falcon','Sparrow','Robin',
+          'Dolphin','Whale','Shark','Penguin','Albatross','Pelican','Heron','Stork',
+          'Beaver','Badger','Marten','Weasel','Ferret','Mink','Mongoose','Raccoon',
+          'Phoenix','Dragon','Griffin','Pegasus','Unicorn','Sphinx','Hydra','Kraken'];
+
+        // Use crypto for better randomness
+        const randomIndex = (max) => {
+          const array = new Uint32Array(1);
+          crypto.getRandomValues(array);
+          return array[0] % max;
+        };
+
+        const adjective = adjectives[randomIndex(adjectives.length)];
+        const animal = animals[randomIndex(animals.length)];
+        const number = String(randomIndex(100000)).padStart(5, '0');
+
+        name = adjective + '-' + animal + '-' + number;
+        localStorage.setItem('blog-display-name', name);
+        console.log('🎲 Fallback name:', name);
         return name;
       }
 
       const clientId = getClientId();
-      const displayName = getDisplayName();
+      let displayName = localStorage.getItem('blog-display-name') || 'Anonymous';
+
+      // Generate display name async if needed
+      (async () => {
+        displayName = await generateDisplayName();
+      })();
       let hasLiked = localStorage.getItem('liked-' + slug) === 'true';
       
       // Like functionality
