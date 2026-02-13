@@ -72,7 +72,21 @@ export async function apiRouter(req: Request, path: string): Promise<Response> {
     if (path === "/api/newsletter" && method === "POST") {
         try {
             const body = await req.json() as { email: string };
-            console.log('Newsletter signup:', body.email);
+            const email = body.email?.trim().toLowerCase();
+
+            if (!email || !email.includes('@')) {
+                return json({ error: 'Valid email is required' }, 400);
+            }
+
+            // Insert email (ON CONFLICT DO NOTHING if already subscribed)
+            await pool.query(
+                `INSERT INTO newsletter_subscribers (email, status)
+                 VALUES ($1, 'active')
+                 ON CONFLICT (email) DO UPDATE SET status = 'active', subscribed_at = NOW()`,
+                [email]
+            );
+
+            console.log('Newsletter signup:', email);
             return json({ message: 'Subscribed successfully!' });
         } catch (error) {
             console.error('Newsletter error:', error);

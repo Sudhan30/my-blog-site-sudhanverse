@@ -1,5 +1,17 @@
 -- Telemetry schema for in-house analytics
 -- Track user sessions, page views, and events
+-- Also includes newsletter subscriptions
+
+-- Newsletter subscribers table
+CREATE TABLE IF NOT EXISTS newsletter_subscribers (
+    id SERIAL PRIMARY KEY,
+    email TEXT NOT NULL UNIQUE,
+    subscribed_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    status TEXT DEFAULT 'active' CHECK (status IN ('active', 'unsubscribed'))
+);
+
+CREATE INDEX idx_newsletter_email ON newsletter_subscribers(email);
+CREATE INDEX idx_newsletter_subscribed_at ON newsletter_subscribers(subscribed_at);
 
 -- User sessions table
 CREATE TABLE IF NOT EXISTS user_sessions (
