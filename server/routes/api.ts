@@ -213,20 +213,21 @@ export async function apiRouter(req: Request, path: string): Promise<Response> {
 
         if (method === "POST") {
             try {
-                const body = await req.json() as { name?: string; comment: string };
+                const body = await req.json() as { name?: string; comment: string; clientId?: string };
                 const authorName = body.name?.trim() || 'Anonymous';
                 const content = body.comment?.trim();
+                const clientId = body.clientId || null;
 
                 if (!content) {
                     return json({ error: 'Comment content is required' }, 400);
                 }
 
-                // Insert comment as approved initially
+                // Insert comment as approved initially with client_id for future updates
                 const result = await pool.query(
-                    `INSERT INTO comments (post_id, content, display_name, status)
-                     VALUES ($1, $2, $3, 'approved')
+                    `INSERT INTO comments (post_id, content, display_name, status, client_id)
+                     VALUES ($1, $2, $3, 'approved', $4::uuid)
                      RETURNING id, content, display_name, created_at`,
-                    [postId, content, authorName]
+                    [postId, content, authorName, clientId]
                 );
 
                 const commentId = result.rows[0].id;
@@ -247,6 +248,40 @@ export async function apiRouter(req: Request, path: string): Promise<Response> {
                 console.error('Comments POST error:', error);
                 return json({ error: 'Failed to post comment' }, 500);
             }
+        }
+    }
+
+    // Update display name for all user's comments
+    if (path === "/api/update-display-name" && method === "POST") {
+        try {
+            const body = await req.json() as { clientId: string; newDisplayName: string };
+            const clientId = body.clientId?.trim();
+            const newDisplayName = body.newDisplayName?.trim();
+
+            if (!clientId || !newDisplayName) {
+                return json({ error: 'clientId and newDisplayName are required' }, 400);
+            }
+
+            // Update all comments by this client_id to use the new display name
+            const result = await pool.query(
+                `UPDATE comments
+                 SET display_name = $1
+                 WHERE client_id = $2::uuid AND status = 'approved'
+                 RETURNING id`,
+                [newDisplayName, clientId]
+            );
+
+            const updatedCount = result.rows.length;
+            console.log(`Updated ${updatedCount} comments for client ${clientId} to "${newDisplayName}"`);
+
+            return json({
+                success: true,
+                updatedCount,
+                message: `Updated ${updatedCount} comment(s) to "${newDisplayName}"`
+            });
+        } catch (error) {
+            console.error('Update display name error:', error);
+            return json({ error: 'Failed to update display name' }, 500);
         }
     }
 
