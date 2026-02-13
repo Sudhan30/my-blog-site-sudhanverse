@@ -116,3 +116,21 @@ jobs:
         echo "🔄 Flux CD will now deploy the updated image to your cluster"
         echo "⏱️  Expected deployment time: 2-3 minutes"
         echo "🔍 Monitor with: kubectl get pods -n web"
+
+    - name: Purge Cloudflare Cache
+      run: |
+        echo "🧹 Purging Cloudflare cache for blog.sudharsana.dev..."
+        response=$(curl -X POST "https://api.cloudflare.com/client/v4/zones/${{ secrets.CLOUDFLARE_ZONE_ID }}/purge_cache" \
+          -H "Authorization: Bearer ${{ secrets.CLOUDFLARE_API_TOKEN }}" \
+          -H "Content-Type: application/json" \
+          --data '{"purge_everything":true}' -s)
+
+        echo "Response: $response"
+
+        # Check if purge was successful
+        if echo "$response" | grep -E -q '"success":\s*true'; then
+          echo "✅ Cloudflare cache purged successfully!"
+        else
+          echo "⚠️  Cache purge failed, but deployment continues"
+          echo "$response"
+        fi
