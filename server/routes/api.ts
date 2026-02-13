@@ -78,15 +78,35 @@ export async function apiRouter(req: Request, path: string): Promise<Response> {
                 return json({ error: 'Valid email is required' }, 400);
             }
 
-            // Insert email (ON CONFLICT DO NOTHING if already subscribed)
-            await pool.query(
-                `INSERT INTO newsletter_subscribers (email, status)
-                 VALUES ($1, 'active')
-                 ON CONFLICT (email) DO UPDATE SET status = 'active', subscribed_at = NOW()`,
+            // Check if email already exists
+            const existing = await pool.query(
+                'SELECT email, status FROM newsletter_subscribers WHERE email = $1',
                 [email]
             );
 
-            console.log('Newsletter signup:', email);
+            if (existing.rows.length > 0) {
+                const subscriber = existing.rows[0];
+                if (subscriber.status === 'active') {
+                    console.log('Newsletter: Already subscribed:', email);
+                    return json({ message: "You're already subscribed!" });
+                } else {
+                    // Reactivate if previously unsubscribed
+                    await pool.query(
+                        'UPDATE newsletter_subscribers SET status = $1, subscribed_at = NOW() WHERE email = $2',
+                        ['active', email]
+                    );
+                    console.log('Newsletter: Reactivated subscription:', email);
+                    return json({ message: 'Welcome back! Subscription reactivated.' });
+                }
+            }
+
+            // Insert new subscriber
+            await pool.query(
+                'INSERT INTO newsletter_subscribers (email, status) VALUES ($1, $2)',
+                [email, 'active']
+            );
+
+            console.log('Newsletter: New signup:', email);
             return json({ message: 'Subscribed successfully!' });
         } catch (error) {
             console.error('Newsletter error:', error);
