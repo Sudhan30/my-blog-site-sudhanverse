@@ -1050,9 +1050,14 @@ img {
 }
 
 /* Ensure code text is always visible */
-pre.code-block code {
+pre.code-block code,
+.article-content pre.code-block code,
+.article-content pre code {
   color: #e2e8f0 !important;
   background: transparent !important;
+  display: block !important;
+  opacity: 1 !important;
+  visibility: visible !important;
 }
 
 .article-content code:not(pre code) {
