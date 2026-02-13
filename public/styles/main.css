@@ -1285,6 +1285,39 @@ pre.code-block code,
   background: var(--color-primary-dark);
 }
 
+/* AI-Generated Name Badge */
+.name-badge {
+  margin-top: 0.5rem;
+  padding: 0.5rem 1rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  animation: slideInFromTop 0.3s ease-out;
+}
+
+.name-badge i {
+  font-size: 1rem;
+}
+
+.name-badge strong {
+  font-weight: 600;
+}
+
+@keyframes slideInFromTop {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
 .comments-list {
   display: flex;
   flex-direction: column;

@@ -191,9 +191,26 @@ export async function postRoute(slug: string): Promise<Response> {
       const clientId = getClientId();
       let displayName = localStorage.getItem('blog-display-name') || 'Anonymous';
 
-      // Generate display name async if needed
+      // Aggressively generate display name on page load and update UI
       (async () => {
         displayName = await generateDisplayName();
+
+        // Update comment form name input field with generated name
+        const nameInput = document.getElementById('comment-name');
+        if (nameInput && displayName !== 'Anonymous') {
+          nameInput.placeholder = displayName;
+          nameInput.value = displayName;
+
+          // Add visual indicator showing the AI-generated name
+          const existingBadge = document.querySelector('.name-badge');
+          if (!existingBadge) {
+            const badge = document.createElement('div');
+            badge.className = 'name-badge';
+            badge.innerHTML = '<i class="fas fa-robot"></i> Your username: <strong>' + displayName + '</strong>';
+            badge.style.cssText = 'margin-top: 0.5rem; padding: 0.5rem 1rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 8px; font-size: 0.875rem; display: inline-flex; align-items: center; gap: 0.5rem;';
+            nameInput.parentElement.appendChild(badge);
+          }
+        }
       })();
       let hasLiked = localStorage.getItem('liked-' + slug) === 'true';
       
