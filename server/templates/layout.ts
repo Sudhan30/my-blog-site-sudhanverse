@@ -253,12 +253,14 @@ export function layout(options: LayoutOptions): string {
       document.getElementById('cookie-consent').style.display = 'block';
     } else if (cookieConsent === 'accepted') {
       loadGoogleAnalytics();
+      initTelemetry();
     }
 
     function acceptCookies() {
       localStorage.setItem('cookieConsent', 'accepted');
       document.getElementById('cookie-consent').style.display = 'none';
       loadGoogleAnalytics();
+      initTelemetry();
     }
 
     function declineCookies() {
@@ -280,6 +282,120 @@ export function layout(options: LayoutOptions): string {
       });
 
       console.log('✅ Google Analytics loaded with user consent');
+    }
+
+    // In-House Telemetry Service for Blog
+    function initTelemetry() {
+      const telemetry = {
+        userId: localStorage.getItem('blog_user_id') || generateId(),
+        sessionId: sessionStorage.getItem('blog_session_id') || generateId(),
+        events: [],
+        pageLoadTime: Date.now(),
+
+        init() {
+          localStorage.setItem('blog_user_id', this.userId);
+          sessionStorage.setItem('blog_session_id', this.sessionId);
+
+          // Track page view
+          this.trackPageView();
+
+          // Track scroll depth
+          let maxScroll = 0;
+          window.addEventListener('scroll', () => {
+            const scrollPercent = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+            if (scrollPercent > maxScroll) {
+              maxScroll = Math.round(scrollPercent / 25) * 25;
+            }
+          });
+
+          // Track time on page and scroll depth on unload
+          window.addEventListener('beforeunload', () => {
+            const timeOnPage = Math.round((Date.now() - this.pageLoadTime) / 1000);
+            this.trackEvent('page_exit', {
+              timeOnPage,
+              maxScroll,
+              url: window.location.pathname
+            });
+            this.flush();
+          });
+
+          // Track link clicks
+          document.addEventListener('click', (e) => {
+            const link = e.target.closest('a');
+            if (link) {
+              this.trackEvent('link_click', {
+                url: link.href,
+                text: link.textContent.trim().substring(0, 50)
+              });
+            }
+          });
+
+          console.log('✅ In-house telemetry initialized with user consent');
+        },
+
+        trackPageView() {
+          this.trackEvent('page_view', {
+            url: window.location.pathname,
+            title: document.title,
+            referrer: document.referrer
+          });
+        },
+
+        trackEvent(eventName, data) {
+          this.events.push({
+            name: eventName,
+            timestamp: new Date().toISOString(),
+            data: {
+              ...data,
+              userAgent: navigator.userAgent,
+              viewport: { width: window.innerWidth, height: window.innerHeight }
+            }
+          });
+
+          // Auto-flush if we have 5+ events
+          if (this.events.length >= 5) {
+            this.flush();
+          }
+        },
+
+        flush() {
+          if (this.events.length === 0) return;
+
+          const data = {
+            sessionId: this.sessionId,
+            userId: this.userId,
+            userAgent: navigator.userAgent,
+            viewport: { width: window.innerWidth, height: window.innerHeight },
+            events: [...this.events]
+          };
+          this.events = [];
+
+          // Send to our in-house API endpoint
+          const url = '/api/telemetry';
+
+          // Use sendBeacon for reliability on page unload
+          if (navigator.sendBeacon) {
+            navigator.sendBeacon(url, JSON.stringify(data));
+          } else {
+            fetch(url, {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(data),
+              keepalive: true
+            }).catch(err => console.error('Telemetry error:', err));
+          }
+        }
+      };
+
+      telemetry.init();
+      window.telemetry = telemetry;
+    }
+
+    function generateId() {
+      return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, c => {
+        const r = Math.random() * 16 | 0;
+        return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+      });
     }
   </script>
 </body>

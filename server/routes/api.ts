@@ -248,6 +248,75 @@ export async function apiRouter(req: Request, path: string): Promise<Response> {
         }
     }
 
+    // Telemetry - In-house analytics
+    if (path === "/api/telemetry" && method === "POST") {
+        try {
+            const body = await req.json() as {
+                sessionId: string;
+                userId: string;
+                userAgent?: string;
+                viewport?: { width: number; height: number };
+                events: Array<{
+                    name: string;
+                    timestamp: string;
+                    data: Record<string, unknown>;
+                }>;
+            };
+
+            // Upsert session (create if not exists, update last_seen_at if exists)
+            await pool.query(
+                `INSERT INTO user_sessions (id, user_id, user_agent, viewport_width, viewport_height, last_seen_at)
+                 VALUES ($1::uuid, $2, $3, $4, $5, NOW())
+                 ON CONFLICT (id) DO UPDATE SET last_seen_at = NOW()`,
+                [
+                    body.sessionId,
+                    body.userId,
+                    body.userAgent || null,
+                    body.viewport?.width || null,
+                    body.viewport?.height || null
+                ]
+            );
+
+            // Insert events
+            if (body.events && body.events.length > 0) {
+                for (const event of body.events) {
+                    if (event.name === 'page_view') {
+                        // Insert into page_views table
+                        await pool.query(
+                            `INSERT INTO page_views (session_id, url, title, referrer, viewed_at)
+                             VALUES ($1::uuid, $2, $3, $4, $5::timestamp)`,
+                            [
+                                body.sessionId,
+                                event.data.url || '',
+                                event.data.title || '',
+                                event.data.referrer || '',
+                                event.timestamp
+                            ]
+                        );
+                    } else {
+                        // Insert into events table
+                        await pool.query(
+                            `INSERT INTO events (session_id, event_name, event_data, created_at)
+                             VALUES ($1::uuid, $2, $3, $4::timestamp)`,
+                            [
+                                body.sessionId,
+                                event.name,
+                                event.data,
+                                event.timestamp
+                            ]
+                        );
+                    }
+                }
+            }
+
+            return json({ success: true });
+        } catch (error) {
+            console.error('Telemetry error:', error);
+            // Fail silently - don't break user experience
+            return json({ success: false }, 200);
+        }
+    }
+
     return json({ error: "Not found" }, 404);
 }
 
