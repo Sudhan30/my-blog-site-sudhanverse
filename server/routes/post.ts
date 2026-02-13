@@ -430,17 +430,20 @@ export async function postRoute(slug: string): Promise<Response> {
         const lightboxClose = lightbox.querySelector('.lightbox-close');
         const lightboxBackdrop = lightbox.querySelector('.lightbox-backdrop');
 
-        // Make all images in article content clickable
-        const articleImages = document.querySelectorAll('.article-content img');
-        articleImages.forEach(img => {
-          img.style.cursor = 'pointer';
-          img.addEventListener('click', function() {
-            lightboxImg.src = this.src;
-            lightboxImg.alt = this.alt;
-            lightbox.style.display = 'flex';
-            document.body.style.overflow = 'hidden';
+        // Use event delegation for images (works even for images that load later)
+        const articleContent = document.querySelector('.article-content');
+        if (articleContent) {
+          articleContent.addEventListener('click', function(e) {
+            const target = e.target;
+            if (target.tagName === 'IMG') {
+              e.preventDefault();
+              lightboxImg.src = target.src;
+              lightboxImg.alt = target.alt;
+              lightbox.style.display = 'flex';
+              document.body.style.overflow = 'hidden';
+            }
           });
-        });
+        }
 
         // Close lightbox functions
         function closeLightbox() {

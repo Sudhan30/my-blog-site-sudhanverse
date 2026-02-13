@@ -56,7 +56,7 @@ For a personal portfolio, those tradeoffs are perfect.
 
 ## The Blog on Self Hosted Kubernetes
 
-The blog solves a different problem. I wanted server side rendering, background jobs, real time style features, and local LLM inference on a GPU. I also wanted a playground for infrastructure skills I do not get to fully exercise at work.
+The blog solves a different problem. I wanted server side rendering, background jobs, real time style features, and local LLM inference on a GPU. I also wanted a playground for infrastructure skills.
 
 So I built a small homelab.
 
