@@ -14,7 +14,7 @@ So I built a blog platform on a mini PC running K3s. This is the full technical 
 
 ## The Stack
 
-**Hardware**: AMD UM790 mini PC. Phoenix1 APU (gfx1103), Radeon 780M iGPU, 64GB RAM. Single-node K3s cluster. Lives under my desk. Draws about 35W idle, 65W under load.
+**Hardware**: Compact mini PC with integrated GPU, 64GB RAM. Single-node K3s cluster. Lives under my desk. Draws about 35W idle, 65W under load. Efficient enough to run 24/7 without breaking the bank.
 
 **Software**: K3s Kubernetes, FluxCD for GitOps, Bun.js for the blog application, PostgreSQL for data, Prometheus + Grafana + Loki for observability, Cloudflare for DNS and edge caching.
 
@@ -83,11 +83,13 @@ No manual kubectl apply. No imperative changes. If the cluster state drifts from
 
 PostgreSQL runs as a StatefulSet with a persistent volume. 50GB SSD-backed storage. Single replica. Not highly available, but the failure domain is acceptable. This is a blog, not a payment system.
 
-Database schema is simple:
+Database schema supports both content management and user engagement:
 - `posts` table for blog metadata
 - `tags` table for categories
-- `comments` table for reader interactions
-- `page_views` table for analytics
+- `comments` table with client tracking for identity persistence
+- `page_views`, `events`, `user_sessions` for in-house analytics
+- `newsletter_subscribers` for email collection
+- `comment_summaries` for AI-generated comment insights
 
 Automated backups run daily via a CronJob. Dumps to a local PVC, then rsyncs to an offsite location. Retention is 30 days local, 90 days offsite.
 
@@ -113,6 +115,19 @@ CREATE TABLE post_tags (
   tag_name TEXT REFERENCES tags(name),
   PRIMARY KEY (post_id, tag_name)
 );
+
+-- Comments with client tracking for name persistence
+CREATE TABLE comments (
+  id BIGSERIAL PRIMARY KEY,
+  post_id VARCHAR(50) NOT NULL,
+  display_name TEXT NOT NULL,
+  content TEXT NOT NULL,
+  client_id UUID,  -- Anonymous ID for cross-post identity
+  status comment_status NOT NULL DEFAULT 'approved',
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_comments_client_id ON comments(client_id);
 ```
 
 Connection pooling via PgBouncer keeps connections manageable. Blog pods hit PgBouncer, which maintains a pool to Postgres. Efficient, stable, no connection churn.
@@ -134,6 +149,42 @@ Observability is critical when you're the only ops person. I need to know when t
 ![Monitoring Stack Architecture](/assets/images/k3s-monitoring-stack.svg)
 
 Alerts go to Gotify (self-hosted notification server). Critical alerts hit my phone. Warning alerts batch to hourly summaries. I don't wake up for minor issues, but I know when the cluster is truly broken.
+
+## In-House Analytics
+
+The blog tracks user behavior with a custom analytics system. No Google Analytics API calls. No third-party trackers. Everything stored in PostgreSQL.
+
+**GDPR-Compliant Consent**: Cookie consent banner appears on first visit. Analytics only initialize after explicit acceptance. Users can decline, and the site works perfectly without tracking.
+
+**Tracked Events**:
+- Page views (URL, title, referrer, timestamp)
+- Link clicks (destination, link text)
+- Scroll depth (25%, 50%, 75%, 100%)
+- Time on page (measured on page exit)
+
+**Anonymous Identity**: Each visitor gets a random UUID stored in localStorage. Sessions are tracked with session IDs in sessionStorage. No IP addresses logged. No personal data collected.
+
+```typescript
+// Telemetry batching for efficiency
+trackEvent(name, data) {
+  this.events.push({ name, timestamp: new Date().toISOString(), data });
+  if (this.events.length >= 5) this.flush();
+}
+
+// Reliable delivery on page unload
+window.addEventListener('beforeunload', () => {
+  navigator.sendBeacon('/api/telemetry', JSON.stringify(data));
+});
+```
+
+The system batches events to reduce database writes. Events are flushed every 5 events or on page unload via `sendBeacon` for reliability.
+
+**Analytics Schema**:
+- `user_sessions`: Anonymous user tracking across visits
+- `page_views`: Every page load with referrer context
+- `events`: Custom events (clicks, scrolls, form submissions)
+
+Query performance is excellent. Indexed by session_id and timestamp. Retention is indefinite (disk is cheap). No sampling, no data loss.
 
 ## Ingress and Networking
 
@@ -163,22 +214,67 @@ Resource requests and limits on every container prevent one service from starvin
 
 Prometheus gets more resources. 1GB memory, 500m CPU. It stores 15 days of high-cardinality metrics. Grafana gets 512Mi memory for dashboards and query processing.
 
-The Ollama LLM pod is the resource hog. 48Gi memory limit for the iGPU (shared system RAM). AMD gfx1103 requires `HSA_OVERRIDE_GFX_VERSION=11.0.0` and `/dev/kfd` device access. One wrong setting and it segfaults.
+The Ollama LLM pod is the resource hog. 48Gi memory limit for the integrated GPU (which uses shared system RAM). The GPU requires specific environment variables and `/dev/kfd` device access for ROCm support. One wrong setting and it segfaults.
 
 HPA prevents runaway scaling. Blog scales 2-5 pods. API scales 1-3 pods. I've hit the limits during traffic spikes (Reddit posts, Hacker News mentions). The cluster survived, but CPU throttling was visible.
 
+## AI-Powered Features
+
+The blog leverages local LLM inference for several user-facing features. No API costs, no rate limits, complete privacy.
+
+### AI-Generated Display Names
+
+When users first visit the blog, they're assigned a creative AI-generated username like "Mystic-Phoenix-45621" or "Swift-Falcon-78294". The system:
+
+1. Calls Ollama (gemma3:12b) with a 2-second timeout
+2. Generates creative adjective-animal-number combinations
+3. Falls back to cryptographically random generation if AI is unavailable
+4. Stores the name in browser localStorage for persistence
+
+**Identity Persistence**: Users can set custom names, and the system updates ALL their previous comments across all posts in the database. The `client_id` column tracks anonymous identity, enabling cross-post name consistency without user accounts.
+
+```typescript
+// Name generation with hybrid AI + fallback
+const name = await fetch('/api/generate-name', {
+  signal: AbortSignal.timeout(2000)
+});
+// Falls back to: Adjective-Animal-Number with crypto.getRandomValues()
+```
+
+### Comment Moderation
+
+Every comment passes through AI moderation before approval. Ollama analyzes content for harmful, offensive, or spam content with temperature 0.1 for consistent judgments.
+
+Moderation is asynchronous and non-blocking. Comments appear immediately, but flagged content gets auto-rejected in the background. False positives are rare due to the lenient prompt design.
+
+```typescript
+// Async moderation (doesn't block user response)
+moderateComment(content, authorName).then(result => {
+  if (result.isHarmful) {
+    db.query('UPDATE comments SET status = $1 WHERE id = $2',
+      ['rejected', commentId]);
+  }
+});
+```
+
+### Comment Summarization
+
+Long comment threads get AI-generated summaries. Ollama condenses multiple comments into 2-3 sentence insights displayed above the comment form. Summaries update via Dagster background jobs when comment count thresholds are reached.
+
+Users see "What readers are saying" boxes with synthesized takeaways, saving time on long discussions.
+
 ## Ollama LLM Integration
 
-The blog has an AI-powered comment summarization feature. Ollama runs Llama 3 on the AMD iGPU. Blog pods call the Ollama API over HTTP to summarize comment threads.
+All AI features run through a single Ollama deployment on the cluster's integrated GPU. Blog pods call Ollama over HTTP (`ollama-service.web:11434`). The Ollama pod runs the ROCm variant with proper GPU device access.
 
 This setup is hybrid cloud-homelab. Firebase portfolio functions call my K3s cluster for LLM inference. No OpenAI API costs. Just electricity.
 
-Getting AMD ROCm working on the Phoenix1 APU was painful. The GPU reports as gfx1103, but ROCm libraries expect gfx1100. The override environment variable bridges the gap. Without it, containers exit 139 (segfault).
+Getting ROCm working on an integrated GPU was non-trivial. The GPU architecture required specific environment variable overrides to bridge compatibility gaps. Without correct configuration, containers exit with segfaults.
 
 ```yaml
 env:
 - name: HSA_OVERRIDE_GFX_VERSION
-  value: "11.0.0"
+  value: "11.0.0"  # Architecture compatibility bridge
 ```
 
 ## Deployment Strategy
