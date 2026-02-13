@@ -287,18 +287,44 @@ export async function postRoute(slug: string): Promise<Response> {
       commentForm.addEventListener('submit', async (e) => {
         e.preventDefault();
         const formData = new FormData(commentForm);
+        const customName = formData.get('name')?.trim();
+        const finalName = customName || displayName;
 
         const res = await fetch('/api/posts/' + slug + '/comments', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            name: formData.get('name')?.trim() || displayName,
+            name: finalName,
             comment: formData.get('comment')
           })
         });
 
         if (res.ok) {
+          // If user provided a custom name, save it to localStorage
+          if (customName && customName !== displayName) {
+            localStorage.setItem('blog-display-name', customName);
+            displayName = customName;
+
+            // Update the name input field
+            const nameInput = document.getElementById('comment-name');
+            if (nameInput) {
+              nameInput.placeholder = customName;
+              nameInput.value = customName;
+            }
+
+            // Update the name badge
+            const badge = document.querySelector('.name-badge');
+            if (badge) {
+              badge.innerHTML = '<i class="fas fa-user"></i> Your username: <strong>' + customName + '</strong>';
+            }
+          }
+
           commentForm.reset();
+          // Restore the name field with the saved name
+          const nameInput = document.getElementById('comment-name');
+          if (nameInput) {
+            nameInput.value = displayName;
+          }
           loadComments();
         }
       });
