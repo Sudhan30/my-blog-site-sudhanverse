@@ -142,7 +142,27 @@ export function layout(options: LayoutOptions): string {
       <p>&copy; ${new Date().getFullYear()} Sudharsana Rajasekaran. All rights reserved.</p>
     </div>
   </footer>
-  
+
+  <!-- Cookie Consent Banner -->
+  <div id="cookie-consent" style="display: none; position: fixed; bottom: 0; left: 0; right: 0; background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: #e2e8f0; padding: 1.5rem; box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3); z-index: 10000; border-top: 2px solid #3b82f6;">
+    <div style="max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
+      <div style="flex: 1; min-width: 300px;">
+        <h3 style="margin: 0 0 0.5rem 0; font-size: 1.125rem; font-weight: 600; color: #60a5fa;">🍪 Cookie Consent</h3>
+        <p style="margin: 0; font-size: 0.9375rem; line-height: 1.5; color: #cbd5e1;">
+          I use Google Analytics to understand how readers engage with my blog. Your data helps me create better content. You can accept or decline analytics tracking.
+        </p>
+      </div>
+      <div style="display: flex; gap: 0.75rem; flex-shrink: 0;">
+        <button onclick="acceptCookies()" style="padding: 0.75rem 1.5rem; background: #3b82f6; color: white; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer; transition: background 0.2s;">
+          Accept
+        </button>
+        <button onclick="declineCookies()" style="padding: 0.75rem 1.5rem; background: #475569; color: white; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer; transition: background 0.2s;">
+          Decline
+        </button>
+      </div>
+    </div>
+  </div>
+
   <!-- Scripts -->
   <script>
     // Theme Toggle
@@ -225,6 +245,42 @@ export function layout(options: LayoutOptions): string {
         msg.className = 'feedback-message error';
       }
     });
+
+    // Cookie Consent & Analytics
+    const cookieConsent = localStorage.getItem('cookieConsent');
+
+    if (cookieConsent === null) {
+      document.getElementById('cookie-consent').style.display = 'block';
+    } else if (cookieConsent === 'accepted') {
+      loadGoogleAnalytics();
+    }
+
+    function acceptCookies() {
+      localStorage.setItem('cookieConsent', 'accepted');
+      document.getElementById('cookie-consent').style.display = 'none';
+      loadGoogleAnalytics();
+    }
+
+    function declineCookies() {
+      localStorage.setItem('cookieConsent', 'declined');
+      document.getElementById('cookie-consent').style.display = 'none';
+    }
+
+    function loadGoogleAnalytics() {
+      const script = document.createElement('script');
+      script.async = true;
+      script.src = 'https://www.googletagmanager.com/gtag/js?id=G-F2C1BRDZDW';
+      document.head.appendChild(script);
+
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'G-F2C1BRDZDW', {
+        'anonymize_ip': true
+      });
+
+      console.log('✅ Google Analytics loaded with user consent');
+    }
   </script>
 </body>
 </html>`;
