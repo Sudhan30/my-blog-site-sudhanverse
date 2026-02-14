@@ -63,8 +63,15 @@ export async function postRoute(slug: string): Promise<Response> {
         </section>
         
         <!-- Comments Section -->
-        <section class="comments-section">
-          <h3>Comments <span id="comment-count">(0)</span></h3>
+        <section class="comments-section" id="comments-section">
+          <div class="comments-header">
+            <h3>Comments <span id="comment-count">(0)</span></h3>
+            <select id="comment-sort" class="comment-sort">
+              <option value="recent">Most Recent</option>
+              <option value="oldest">Oldest First</option>
+              <option value="most_liked">Most Liked</option>
+            </select>
+          </div>
 
           <!-- AI-Generated Comment Summary (hidden if no summary) -->
           <div id="comment-summary" class="comment-summary" style="display: none;">
@@ -88,6 +95,9 @@ export async function postRoute(slug: string): Promise<Response> {
           
           <div id="comments-list" class="comments-list">
             <!-- Comments loaded dynamically -->
+          </div>
+          <div id="comments-pagination" class="comments-pagination">
+            <!-- Pagination controls loaded dynamically -->
           </div>
         </section>
       </div>
@@ -278,15 +288,24 @@ export async function postRoute(slug: string): Promise<Response> {
       const commentForm = document.getElementById('comment-form');
       const commentsList = document.getElementById('comments-list');
       const commentCount = document.getElementById('comment-count');
-      
-      async function loadComments() {
-        const res = await fetch('/api/posts/' + slug + '/comments');
+      const commentSort = document.getElementById('comment-sort');
+      let currentPage = 1;
+      let currentSort = 'recent';
+      const commentsPerPage = 10;
+
+      async function loadComments(page = 1, sort = currentSort) {
+        const res = await fetch(\`/api/posts/\${slug}/comments?page=\${page}&limit=\${commentsPerPage}&sort=\${sort}&clientId=\${clientId}\`);
         const data = await res.json();
-        const total = data.total || data.comments?.length || 0;
+        const { comments, pagination } = data;
+        const total = pagination?.total || 0;
+        currentPage = page;
+        currentSort = sort;
+
         commentCount.textContent = '(' + total + ')';
 
-        if (!data.comments || data.comments.length === 0) {
+        if (!comments || comments.length === 0) {
           commentsList.innerHTML = '<p class="no-comments">No comments yet. Be the first to share your thoughts!</p>';
+          renderPagination(pagination);
           return;
         }
 
@@ -294,12 +313,17 @@ export async function postRoute(slug: string): Promise<Response> {
         const previousNames = JSON.parse(localStorage.getItem('blog-previous-names') || '[]');
         const currentName = localStorage.getItem('blog-display-name');
 
-        commentsList.innerHTML = data.comments.map(c => {
+        commentsList.innerHTML = comments.map(c => {
           // Replace previous auto-generated names with current custom name
           let authorName = c.display_name;
           if (currentName && previousNames.includes(c.display_name)) {
             authorName = currentName;
           }
+
+          const likeCount = c.like_count || 0;
+          const userLiked = c.user_liked || false;
+          const likeIcon = userLiked ? 'fas fa-thumbs-up' : 'far fa-thumbs-up';
+          const likedClass = userLiked ? 'liked' : '';
 
           return \`
             <div class="comment">
@@ -308,9 +332,103 @@ export async function postRoute(slug: string): Promise<Response> {
                 <span class="comment-date">\${timeAgo(c.created_at)}</span>
               </div>
               <p class="comment-text">\${c.content}</p>
+              <div class="comment-actions">
+                <button class="comment-like-btn \${likedClass}" data-comment-id="\${c.id}" data-liked="\${userLiked}">
+                  <i class="\${likeIcon}"></i>
+                  <span class="like-count">\${likeCount}</span>
+                </button>
+              </div>
             </div>
           \`;
         }).join('');
+
+        // Add event listeners to like buttons
+        document.querySelectorAll('.comment-like-btn').forEach(btn => {
+          btn.addEventListener('click', handleCommentLike);
+        });
+
+        renderPagination(pagination);
+      }
+
+      // Handle comment like/unlike
+      async function handleCommentLike(e) {
+        const btn = e.currentTarget;
+        const commentId = btn.dataset.commentId;
+        const isLiked = btn.dataset.liked === 'true';
+        const method = isLiked ? 'DELETE' : 'POST';
+
+        try {
+          const res = await fetch('/api/comments/' + commentId + '/likes', {
+            method,
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ clientId })
+          });
+
+          if (res.ok) {
+            const data = await res.json();
+            const likeCountSpan = btn.querySelector('.like-count');
+            const icon = btn.querySelector('i');
+
+            likeCountSpan.textContent = data.count;
+            btn.dataset.liked = data.liked;
+
+            if (data.liked) {
+              btn.classList.add('liked');
+              icon.className = 'fas fa-thumbs-up';
+            } else {
+              btn.classList.remove('liked');
+              icon.className = 'far fa-thumbs-up';
+            }
+          }
+        } catch (error) {
+          console.error('Failed to toggle comment like:', error);
+        }
+      }
+
+      // Sort dropdown change listener
+      commentSort.addEventListener('change', (e) => {
+        currentSort = e.target.value;
+        currentPage = 1; // Reset to first page
+        loadComments(currentPage, currentSort);
+      });
+
+      function renderPagination(pagination) {
+        const paginationContainer = document.getElementById('comments-pagination');
+        if (!paginationContainer) return;
+
+        if (!pagination || pagination.totalPages <= 1) {
+          paginationContainer.innerHTML = '';
+          return;
+        }
+
+        const { page, totalPages } = pagination;
+        let html = '<div class="pagination">';
+
+        // Previous button
+        if (page > 1) {
+          html += \`<button class="page-btn" data-page="\${page - 1}">← Previous</button>\`;
+        }
+
+        // Page numbers
+        html += '<span class="page-info">Page ' + page + ' of ' + totalPages + '</span>';
+
+        // Next button
+        if (page < totalPages) {
+          html += \`<button class="page-btn" data-page="\${page + 1}">Next →</button>\`;
+        }
+
+        html += '</div>';
+        paginationContainer.innerHTML = html;
+
+        // Attach event listeners to pagination buttons
+        paginationContainer.querySelectorAll('.page-btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const newPage = parseInt(btn.dataset.page, 10);
+            loadComments(newPage, currentSort);
+            // Scroll to comments section
+            document.getElementById('comments-section')?.scrollIntoView({ behavior: 'smooth' });
+          });
+        });
       }
       
       commentForm.addEventListener('submit', async (e) => {

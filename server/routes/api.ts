@@ -213,21 +213,69 @@ export async function apiRouter(req: Request, path: string): Promise<Response> {
 
         if (method === "GET") {
             try {
-                // Only return approved comments
-                const result = await pool.query(
-                    `SELECT id, content, display_name, created_at
+                // Parse pagination and sorting params from URL
+                const url = new URL(req.url);
+                const page = parseInt(url.searchParams.get('page') || '1', 10);
+                const limit = parseInt(url.searchParams.get('limit') || '10', 10);
+                const offset = (page - 1) * limit;
+                const sort = url.searchParams.get('sort') || 'recent'; // recent, oldest, most_liked
+                const clientId = url.searchParams.get('clientId') || null;
+
+                // Determine ORDER BY clause based on sort
+                let orderBy = 'created_at DESC';
+                if (sort === 'oldest') {
+                    orderBy = 'created_at ASC';
+                } else if (sort === 'most_liked') {
+                    orderBy = 'like_count DESC, created_at DESC';
+                }
+
+                // Get total count
+                const countResult = await pool.query(
+                    `SELECT COUNT(*) as total
                      FROM comments
-                     WHERE post_id = $1 AND status = 'approved'
-                     ORDER BY created_at DESC`,
+                     WHERE post_id = $1 AND status = 'approved'`,
                     [postId]
                 );
+                const total = parseInt(countResult.rows[0]?.total || '0', 10);
+
+                // Get paginated comments with like counts
+                const result = await pool.query(
+                    `SELECT
+                        c.id,
+                        c.content,
+                        c.display_name,
+                        c.created_at,
+                        COUNT(cl.id) as like_count,
+                        ${clientId ? `EXISTS(SELECT 1 FROM comment_likes WHERE comment_id = c.id AND client_id = $4::uuid) as user_liked` : 'false as user_liked'}
+                     FROM comments c
+                     LEFT JOIN comment_likes cl ON c.id = cl.comment_id
+                     WHERE c.post_id = $1 AND c.status = 'approved'
+                     GROUP BY c.id
+                     ORDER BY ${orderBy}
+                     LIMIT $2 OFFSET $3`,
+                    clientId ? [postId, limit, offset, clientId] : [postId, limit, offset]
+                );
+
                 return json({
-                    comments: result.rows,
-                    total: result.rows.length
+                    comments: result.rows.map(row => ({
+                        id: row.id,
+                        content: row.content,
+                        display_name: row.display_name,
+                        created_at: row.created_at,
+                        like_count: parseInt(row.like_count, 10),
+                        user_liked: row.user_liked
+                    })),
+                    pagination: {
+                        page,
+                        limit,
+                        total,
+                        totalPages: Math.ceil(total / limit),
+                        hasMore: offset + result.rows.length < total
+                    }
                 });
             } catch (error) {
                 console.error('Comments GET error:', error);
-                return json({ comments: [], total: 0 });
+                return json({ comments: [], pagination: { page: 1, limit: 10, total: 0, totalPages: 0, hasMore: false } });
             }
         }
 
@@ -419,6 +467,72 @@ export async function apiRouter(req: Request, path: string): Promise<Response> {
             console.error('Telemetry error:', error);
             // Fail silently - don't break user experience
             return json({ success: false }, 200);
+        }
+    }
+
+    // Comment likes - /api/comments/:id/likes
+    const commentLikesMatch = path.match(/^\/api\/comments\/(\d+)\/likes$/);
+    if (commentLikesMatch) {
+        const commentId = commentLikesMatch[1];
+
+        if (method === "POST") {
+            try {
+                const body = await req.json().catch(() => ({})) as { clientId?: string };
+                const clientId = body.clientId;
+
+                if (!clientId) {
+                    return json({ error: 'clientId is required' }, 400);
+                }
+
+                // Check if already liked
+                const existing = await pool.query(
+                    'SELECT id FROM comment_likes WHERE comment_id = $1 AND client_id = $2::uuid',
+                    [commentId, clientId]
+                );
+
+                if (existing.rows.length === 0) {
+                    await pool.query(
+                        'INSERT INTO comment_likes (comment_id, client_id) VALUES ($1, $2::uuid)',
+                        [commentId, clientId]
+                    );
+                }
+
+                const result = await pool.query(
+                    'SELECT COUNT(*) as count FROM comment_likes WHERE comment_id = $1',
+                    [commentId]
+                );
+
+                return json({ count: parseInt(result.rows[0]?.count || '0', 10), liked: true });
+            } catch (error) {
+                console.error('Comment like error:', error);
+                return json({ error: 'Failed to like comment' }, 500);
+            }
+        }
+
+        if (method === "DELETE") {
+            try {
+                const body = await req.json().catch(() => ({})) as { clientId?: string };
+                const clientId = body.clientId;
+
+                if (!clientId) {
+                    return json({ error: 'clientId is required' }, 400);
+                }
+
+                await pool.query(
+                    'DELETE FROM comment_likes WHERE comment_id = $1 AND client_id = $2::uuid',
+                    [commentId, clientId]
+                );
+
+                const result = await pool.query(
+                    'SELECT COUNT(*) as count FROM comment_likes WHERE comment_id = $1',
+                    [commentId]
+                );
+
+                return json({ count: parseInt(result.rows[0]?.count || '0', 10), liked: false });
+            } catch (error) {
+                console.error('Comment unlike error:', error);
+                return json({ error: 'Failed to unlike comment' }, 500);
+            }
         }
     }
 
