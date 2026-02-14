@@ -242,8 +242,7 @@ export async function apiRouter(req: Request, path: string): Promise<Response> {
                 console.log('📊 Total comments for', postId, ':', total);
 
                 // Get paginated comments with like counts
-                const result = await pool.query(
-                    `SELECT
+                const query = `SELECT
                         c.id,
                         c.content,
                         c.display_name,
@@ -255,11 +254,15 @@ export async function apiRouter(req: Request, path: string): Promise<Response> {
                      WHERE c.post_id = $1 AND c.status = 'approved'
                      GROUP BY c.id
                      ORDER BY ${orderBy}
-                     LIMIT $2 OFFSET $3`,
-                    clientId ? [postId, limit, offset, clientId] : [postId, limit, offset]
-                );
+                     LIMIT $2 OFFSET $3`;
+                const params = clientId ? [postId, limit, offset, clientId] : [postId, limit, offset];
 
-                console.log('✅ Returning', result.rows.length, 'comments');
+                console.log('🔍 SQL:', query.replace(/\s+/g, ' '));
+                console.log('🔍 Params:', JSON.stringify(params));
+
+                const result = await pool.query(query, params);
+
+                console.log('✅ Returning', result.rows.length, 'comments, IDs:', result.rows.map(r => r.id).join(', '));
 
                 return json({
                     comments: result.rows.map(row => ({
