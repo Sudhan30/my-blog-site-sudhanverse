@@ -2597,6 +2597,13 @@ pre.code-block code,
   border-radius: 12px;
 }
 
+/* Add light background for SVG diagrams in dark mode for better contrast */
+[data-theme="dark"] .article-content img[src$=".svg"] {
+  background-color: #f8fafc;
+  padding: var(--space-lg);
+  border: 1px solid var(--color-border);
+}
+
 /* Make article images clickable with hover effect */
 .article-content img {
   cursor: pointer;
