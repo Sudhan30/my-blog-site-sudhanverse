@@ -221,8 +221,6 @@ export async function apiRouter(req: Request, path: string): Promise<Response> {
                 const sort = url.searchParams.get('sort') || 'recent'; // recent, oldest, most_liked
                 const clientId = url.searchParams.get('clientId') || null;
 
-                console.log('📝 Comments GET request:', { postId, page, limit, sort, clientId });
-
                 // Determine ORDER BY clause based on sort
                 let orderBy = 'created_at DESC';
                 if (sort === 'oldest') {
@@ -239,7 +237,6 @@ export async function apiRouter(req: Request, path: string): Promise<Response> {
                     [postId]
                 );
                 const total = parseInt(countResult.rows[0]?.total || '0', 10);
-                console.log('📊 Total comments for', postId, ':', total);
 
                 // Get paginated comments with like counts
                 const query = `SELECT
@@ -257,12 +254,7 @@ export async function apiRouter(req: Request, path: string): Promise<Response> {
                      LIMIT $2 OFFSET $3`;
                 const params = clientId ? [postId, limit, offset, clientId] : [postId, limit, offset];
 
-                console.log('🔍 SQL:', query.replace(/\s+/g, ' '));
-                console.log('🔍 Params:', JSON.stringify(params));
-
                 const result = await pool.query(query, params);
-
-                console.log('✅ Returning', result.rows.length, 'comments, IDs:', result.rows.map(r => r.id).join(', '));
 
                 return json({
                     comments: result.rows.map(row => ({
@@ -552,7 +544,9 @@ function json(data: unknown, status = 200): Response {
         status,
         headers: {
             "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": "*"
+            "Access-Control-Allow-Origin": "*",
+            "Cache-Control": "no-store, no-cache, must-revalidate",
+            "Pragma": "no-cache"
         }
     });
 }

@@ -294,10 +294,8 @@ export async function postRoute(slug: string): Promise<Response> {
       const commentsPerPage = 10;
 
       async function loadComments(page = 1, sort = currentSort) {
-        console.log('🔄 Loading comments for:', slug, { page, sort, clientId });
-        const res = await fetch(\`/api/posts/\${slug}/comments?page=\${page}&limit=\${commentsPerPage}&sort=\${sort}&clientId=\${clientId}\`);
+        const res = await fetch(\`/api/posts/\${slug}/comments?page=\${page}&limit=\${commentsPerPage}&sort=\${sort}&clientId=\${clientId}&_t=\${Date.now()}\`);
         const data = await res.json();
-        console.log('📦 Received comments data:', data);
         const { comments, pagination } = data;
         const total = pagination?.total || 0;
         currentPage = page;
@@ -306,13 +304,10 @@ export async function postRoute(slug: string): Promise<Response> {
         commentCount.textContent = '(' + total + ')';
 
         if (!comments || comments.length === 0) {
-          console.log('⚠️ No comments to display');
           commentsList.innerHTML = '<p class="no-comments">No comments yet. Be the first to share your thoughts!</p>';
           renderPagination(pagination);
           return;
         }
-
-        console.log('✨ Rendering', comments.length, 'comments');
 
         // Get list of previous auto-generated names used by this user
         const previousNames = JSON.parse(localStorage.getItem('blog-previous-names') || '[]');
@@ -334,8 +329,6 @@ export async function postRoute(slug: string): Promise<Response> {
             // Escape HTML in content to prevent injection
             const escapedContent = c.content.replace(/</g, '&lt;').replace(/>/g, '&gt;');
 
-            console.log(\`Rendering comment \${index + 1}/\${comments.length}: ID \${c.id}, Author: \${authorName}\`);
-
             return \`
               <div class="comment">
                 <div class="comment-header">
@@ -353,9 +346,7 @@ export async function postRoute(slug: string): Promise<Response> {
             \`;
           }).join('');
 
-          console.log('📝 Generated HTML length:', html.length, 'characters');
           commentsList.innerHTML = html;
-          console.log('✅ DOM updated, children count:', commentsList.children.length);
         } catch (error) {
           console.error('❌ Error rendering comments:', error);
         }
@@ -611,7 +602,7 @@ export async function postRoute(slug: string): Promise<Response> {
   return new Response(html, {
     headers: {
       "Content-Type": "text/html; charset=utf-8",
-      "Cache-Control": "public, max-age=3600"
+      "Cache-Control": "public, max-age=60"
     }
   });
 }
