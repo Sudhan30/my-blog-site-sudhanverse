@@ -60,6 +60,7 @@ export function layout(options: LayoutOptions): string {
   <link rel="stylesheet" href="/styles/main.css?v=2026020604">
   
   <!-- Favicon -->
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg">
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
   
   <!-- Structured Data -->
