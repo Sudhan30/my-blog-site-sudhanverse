@@ -2639,13 +2639,14 @@ pre.code-block code,
 
 .page-btn {
   padding: 0.5rem 1rem;
-  background: var(--color-bg-tertiary);
+  background: var(--color-bg-secondary);
   border: 1px solid var(--color-border);
-  color: var(--color-text-secondary);
+  color: var(--color-text);
   border-radius: 6px;
   cursor: pointer;
   transition: all 0.2s ease;
   font-size: 0.9rem;
+  box-shadow: var(--shadow-sm);
 }
 
 .page-btn:hover {
