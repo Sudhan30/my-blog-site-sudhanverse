@@ -294,8 +294,10 @@ export async function postRoute(slug: string): Promise<Response> {
       const commentsPerPage = 10;
 
       async function loadComments(page = 1, sort = currentSort) {
+        console.log('🔄 Loading comments for:', slug, { page, sort, clientId });
         const res = await fetch(\`/api/posts/\${slug}/comments?page=\${page}&limit=\${commentsPerPage}&sort=\${sort}&clientId=\${clientId}\`);
         const data = await res.json();
+        console.log('📦 Received comments data:', data);
         const { comments, pagination } = data;
         const total = pagination?.total || 0;
         currentPage = page;
@@ -304,10 +306,13 @@ export async function postRoute(slug: string): Promise<Response> {
         commentCount.textContent = '(' + total + ')';
 
         if (!comments || comments.length === 0) {
+          console.log('⚠️ No comments to display');
           commentsList.innerHTML = '<p class="no-comments">No comments yet. Be the first to share your thoughts!</p>';
           renderPagination(pagination);
           return;
         }
+
+        console.log('✨ Rendering', comments.length, 'comments');
 
         // Get list of previous auto-generated names used by this user
         const previousNames = JSON.parse(localStorage.getItem('blog-previous-names') || '[]');
