@@ -88,7 +88,13 @@ export async function postRoute(slug: string): Promise<Response> {
 
           <form class="comment-form" id="comment-form">
             <input type="hidden" name="postSlug" value="${post.slug}">
-            <input type="text" name="name" placeholder="Your name" class="comment-input" id="comment-name">
+            <div class="name-input-wrapper">
+              <input type="text" name="name" placeholder="Your name" class="comment-input" id="comment-name">
+              <div class="name-error" id="name-error" style="display: none;">
+                <i class="fas fa-exclamation-circle"></i>
+                <span id="name-error-text"></span>
+              </div>
+            </div>
             <textarea name="comment" placeholder="Share your thoughts..." required class="comment-textarea" maxlength="2000"></textarea>
             <button type="submit" class="comment-submit">Post Comment</button>
           </form>
@@ -512,19 +518,22 @@ export async function postRoute(slug: string): Promise<Response> {
           const errorData = await res.json();
           const errorMessage = errorData.error || 'Failed to post comment';
 
-          // Show error message to user
-          alert(errorMessage);
+          // Show inline error message
+          const nameError = document.getElementById('name-error');
+          const nameErrorText = document.getElementById('name-error-text');
+          const nameInput = document.getElementById('comment-name');
 
-          // If the name was taken, highlight the name input field
-          if (res.status === 409) {
-            const nameInput = document.getElementById('comment-name');
-            if (nameInput) {
-              nameInput.focus();
-              nameInput.style.borderColor = '#ef4444';
-              setTimeout(() => {
-                nameInput.style.borderColor = '';
-              }, 3000);
-            }
+          if (nameError && nameErrorText && nameInput) {
+            nameErrorText.textContent = errorMessage;
+            nameError.style.display = 'flex';
+            nameInput.classList.add('input-error');
+            nameInput.focus();
+
+            // Hide error after 5 seconds
+            setTimeout(() => {
+              nameError.style.display = 'none';
+              nameInput.classList.remove('input-error');
+            }, 5000);
           }
         }
       });

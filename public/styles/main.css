@@ -1248,6 +1248,45 @@ pre.code-block code,
   margin-bottom: var(--space-xl);
 }
 
+.name-input-wrapper {
+  position: relative;
+}
+
+.name-error {
+  display: none;
+  align-items: center;
+  gap: var(--space-sm);
+  margin-top: var(--space-sm);
+  padding: var(--space-sm) var(--space-md);
+  background: #fee;
+  border: 1px solid #fcc;
+  border-radius: var(--radius-md);
+  color: #c33;
+  font-size: 0.875rem;
+  animation: slideDown 0.3s ease;
+}
+
+.name-error i {
+  font-size: 1rem;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+[data-theme="dark"] .name-error {
+  background: rgba(239, 68, 68, 0.1);
+  border-color: rgba(239, 68, 68, 0.3);
+  color: #fca5a5;
+}
+
 .comment-input,
 .comment-textarea {
   width: 100%;
@@ -1259,6 +1298,18 @@ pre.code-block code,
   background: var(--color-bg);
   color: var(--color-text);
   resize: vertical;
+  transition: border-color 0.2s ease;
+}
+
+.comment-input.input-error {
+  border-color: #ef4444;
+  animation: shake 0.3s ease;
+}
+
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-5px); }
+  75% { transform: translateX(5px); }
 }
 
 .comment-textarea {
