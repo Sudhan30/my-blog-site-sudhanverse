@@ -373,7 +373,7 @@ export async function apiRouter(req: Request, path: string): Promise<Response> {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     model: 'gemma3:12b',
-                    prompt: 'Generate a creative, unique username using an adjective and an animal name. Format: Adjective-Animal-5DigitNumber. Examples: Swift-Falcon-78294, Clever-Otter-23415, Brave-Lynx-91827, Mystic-Phoenix-45621, Silent-Leopard-64918. Output ONLY the username in that exact format, nothing else.',
+                    prompt: 'Generate a creative, UNIQUE username using a random adjective and animal name. Format: Adjective-Animal-5DigitNumber. Choose from varied adjectives like: Swift, Clever, Brave, Mystic, Silent, Bold, Gentle, Noble, Cosmic, Azure, Golden, Silver, Crimson, Emerald, Violet, Ancient, Modern, Wild, Calm, Fierce, Witty, Wise, Lucky, Bright, Shadow, Storm, Dawn, Dusk, Frost, Ember, Ocean, Forest, Desert, Arctic. Choose from varied animals like: Falcon, Otter, Lynx, Phoenix, Leopard, Eagle, Wolf, Bear, Fox, Raven, Hawk, Owl, Tiger, Panda, Deer, Seal, Dolphin, Whale, Shark, Octopus, Dragon, Griffin, Unicorn, Sphinx. IMPORTANT: Be creative and vary your choices. Avoid repetition. Output ONLY the username, nothing else.',
                     stream: false,
                     options: { temperature: 0.9 }
                 })
