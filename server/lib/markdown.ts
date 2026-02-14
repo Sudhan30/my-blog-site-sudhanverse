@@ -23,13 +23,8 @@ marked.use({
             const language = token.lang || "text";
             const codeText = token.text || "";
             return `<pre class="code-block"><code class="language-${language}">${escapeHtml(codeText)}</code></pre>\n`;
-        },
-        image(token: any): string {
-            const href = token.href || "";
-            const title = token.title ? ` title="${escapeHtml(token.title)}"` : "";
-            const alt = token.text ? escapeHtml(token.text) : "";
-            return `<img src="${href}" alt="${alt}"${title} loading="eager" style="opacity: 0; transition: opacity 0.3s ease;" onload="this.style.opacity='1'">`;
         }
+        // Removing custom image renderer to use default marked behavior
     }
 });
 
