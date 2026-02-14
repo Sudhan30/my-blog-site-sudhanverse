@@ -397,9 +397,40 @@ export async function apiRouter(req: Request, path: string): Promise<Response> {
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({
                     model: 'gemma3:12b',
-                    prompt: 'Generate a creative, UNIQUE username using a random adjective and animal name. Format: Adjective-Animal-5DigitNumber. Choose from varied adjectives like: Swift, Clever, Brave, Mystic, Silent, Bold, Gentle, Noble, Cosmic, Azure, Golden, Silver, Crimson, Emerald, Violet, Ancient, Modern, Wild, Calm, Fierce, Witty, Wise, Lucky, Bright, Shadow, Storm, Dawn, Dusk, Frost, Ember, Ocean, Forest, Desert, Arctic. Choose from varied animals like: Falcon, Otter, Lynx, Phoenix, Leopard, Eagle, Wolf, Bear, Fox, Raven, Hawk, Owl, Tiger, Panda, Deer, Seal, Dolphin, Whale, Shark, Octopus, Dragon, Griffin, Unicorn, Sphinx. IMPORTANT: Be creative and vary your choices. Avoid repetition. Output ONLY the username, nothing else.',
+                    prompt: `Generate ONE highly creative and unique username in the format Word-Word-5DigitNumber
+
+Uniqueness is the highest priority.
+
+Core style:
+- Blend mythological, cosmic, or legendary vibes with modern username style
+- Draw inspiration from global mythologies (Greek, Norse, Hindu, Egyptian, Mesopotamian)
+- Do NOT simply output famous god names
+- You may INVENT new myth-sounding words inspired by mythology
+- Prefer rare, evocative, and pronounceable words
+
+Rules:
+- Do NOT rely on a fixed adjective or animal list unless necessary
+- Avoid common internet username clichés
+- Avoid overused animals like fox, wolf, tiger unless no other option works
+- The two words should feel stylistically coherent and slightly mythic or legendary
+- The 5-digit number must be random from 10000 to 99999 and not sequential or patterned
+
+Internal process you must follow:
+1. First try to create original or rare myth-inspired words
+2. Internally check that the name feels novel and not generic
+3. If it feels common, regenerate internally
+4. Only if you fail to produce a novel result, use the fallback lists
+5. If using fallback lists, choose rare and unexpected pairings
+
+Fallback lists (use ONLY if needed):
+
+Adjectives: Swift, Clever, Brave, Mystic, Silent, Bold, Gentle, Noble, Cosmic, Azure, Golden, Silver, Crimson, Emerald, Violet, Ancient, Modern, Wild, Calm, Fierce, Witty, Wise, Lucky, Bright, Shadow, Storm, Dawn, Dusk, Frost, Ember, Ocean, Forest, Desert, Arctic
+
+Animals: Falcon, Otter, Lynx, Phoenix, Leopard, Eagle, Wolf, Bear, Fox, Raven, Hawk, Owl, Tiger, Panda, Deer, Seal, Dolphin, Whale, Shark, Octopus, Dragon, Griffin, Unicorn, Sphinx
+
+Output ONLY the final username and nothing else.`,
                     stream: false,
-                    options: { temperature: 0.9 }
+                    options: { temperature: 0.95 }
                 })
             });
 
