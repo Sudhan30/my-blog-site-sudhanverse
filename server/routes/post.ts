@@ -151,7 +151,7 @@ export async function postRoute(slug: string): Promise<Response> {
         try {
           const response = await fetch('/api/generate-name', {
             method: 'GET',
-            signal: AbortSignal.timeout(2000) // 2s timeout
+            signal: AbortSignal.timeout(15000) // 15s timeout for Ollama generation
           });
 
           if (response.ok) {
