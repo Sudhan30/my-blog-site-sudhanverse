@@ -35,6 +35,9 @@ Respond with ONLY a JSON object in this exact format:
 Be strict about: hate speech, harassment, threats, spam, explicit content, personal attacks, or discriminatory language.
 Be lenient about: constructive criticism, mild disagreement, casual language.`;
 
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 20000); // 20s timeout
+
         const response = await fetch(`${OLLAMA_HOST}/api/generate`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -43,11 +46,14 @@ Be lenient about: constructive criticism, mild disagreement, casual language.`;
                 prompt,
                 stream: false,
                 options: { temperature: 0.1 }
-            })
+            }),
+            signal: controller.signal
         });
 
+        clearTimeout(timeoutId);
+
         if (!response.ok) {
-            console.error('Ollama moderation failed:', response.status);
+            console.error(`❌ Ollama moderation failed: ${response.status} ${response.statusText}`);
             return { isHarmful: false }; // Fail open - allow comment if moderation fails
         }
 
@@ -55,12 +61,19 @@ Be lenient about: constructive criticism, mild disagreement, casual language.`;
         const jsonMatch = data.response.match(/\{[\s\S]*\}/);
         if (jsonMatch) {
             const result = JSON.parse(jsonMatch[0]);
-            return { isHarmful: result.harmful === true, reason: result.reason || '' };
+            const isHarmful = result.harmful === true;
+            console.log(`✓ Moderation complete: isHarmful=${isHarmful}, reason="${result.reason || 'none'}"`);
+            return { isHarmful, reason: result.reason || '' };
         }
 
+        console.error('❌ Moderation response parsing failed - no JSON found in response');
         return { isHarmful: false };
     } catch (error) {
-        console.error('Comment moderation error:', error);
+        if (error instanceof Error && error.name === 'AbortError') {
+            console.error('❌ Moderation timeout after 20s');
+        } else {
+            console.error('❌ Moderation error:', error);
+        }
         return { isHarmful: false }; // Fail open
     }
 }
