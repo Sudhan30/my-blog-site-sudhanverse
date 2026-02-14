@@ -1337,7 +1337,14 @@ pre.code-block code,
 .comment-header {
   display: flex;
   justify-content: space-between;
+  align-items: flex-start;
   margin-bottom: var(--space-sm);
+}
+
+.comment-author-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
 }
 
 .comment-author {
@@ -1392,54 +1399,45 @@ pre.code-block code,
   box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
 }
 
-/* Comment Actions (Like Button) */
-.comment-actions {
-  display: flex;
-  gap: var(--space-md);
-  margin-top: var(--space-sm);
-  padding-top: var(--space-sm);
-  border-top: 1px solid rgba(255, 255, 255, 0.05);
-}
-
+/* Comment Like Button (Heart on Right) */
 .comment-like-btn {
   display: inline-flex;
   align-items: center;
   gap: 0.4rem;
-  padding: 0.4rem 0.8rem;
+  padding: 0.25rem 0.5rem;
   background: transparent;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  border-radius: var(--radius-sm);
-  color: rgba(255, 255, 255, 0.6);
-  font-size: 0.8rem;
+  border: none;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.85rem;
   cursor: pointer;
   transition: all 0.2s ease;
 }
 
 .comment-like-btn:hover {
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.2);
-  color: rgba(255, 255, 255, 0.8);
+  color: rgba(255, 255, 255, 0.7);
+  transform: scale(1.05);
 }
 
 .comment-like-btn.liked {
-  background: rgba(99, 102, 241, 0.1);
-  border-color: rgba(99, 102, 241, 0.3);
-  color: var(--color-primary);
+  color: #ff6b6b;
 }
 
 .comment-like-btn.liked:hover {
-  background: rgba(99, 102, 241, 0.15);
-  border-color: rgba(99, 102, 241, 0.4);
+  color: #ff5252;
 }
 
 .comment-like-btn i {
-  font-size: 0.9rem;
+  font-size: 1rem;
+  transition: transform 0.2s ease;
+}
+
+.comment-like-btn:active i {
+  transform: scale(1.2);
 }
 
 .comment-like-btn .like-count {
   font-weight: 500;
-  min-width: 1.2rem;
-  text-align: center;
+  font-size: 0.85rem;
 }
 
 /* ============================================

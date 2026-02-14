@@ -322,22 +322,22 @@ export async function postRoute(slug: string): Promise<Response> {
 
           const likeCount = c.like_count || 0;
           const userLiked = c.user_liked || false;
-          const likeIcon = userLiked ? 'fas fa-thumbs-up' : 'far fa-thumbs-up';
+          const likeIcon = userLiked ? 'fas fa-heart' : 'far fa-heart';
           const likedClass = userLiked ? 'liked' : '';
 
           return \`
             <div class="comment">
               <div class="comment-header">
-                <span class="comment-author">\${authorName}</span>
-                <span class="comment-date">\${timeAgo(c.created_at)}</span>
-              </div>
-              <p class="comment-text">\${c.content}</p>
-              <div class="comment-actions">
+                <div class="comment-author-info">
+                  <span class="comment-author">\${authorName}</span>
+                  <span class="comment-date">\${timeAgo(c.created_at)}</span>
+                </div>
                 <button class="comment-like-btn \${likedClass}" data-comment-id="\${c.id}" data-liked="\${userLiked}">
                   <i class="\${likeIcon}"></i>
-                  <span class="like-count">\${likeCount}</span>
+                  <span class="like-count">\${likeCount > 0 ? likeCount : ''}</span>
                 </button>
               </div>
+              <p class="comment-text">\${c.content}</p>
             </div>
           \`;
         }).join('');
@@ -369,15 +369,15 @@ export async function postRoute(slug: string): Promise<Response> {
             const likeCountSpan = btn.querySelector('.like-count');
             const icon = btn.querySelector('i');
 
-            likeCountSpan.textContent = data.count;
+            likeCountSpan.textContent = data.count > 0 ? data.count : '';
             btn.dataset.liked = data.liked;
 
             if (data.liked) {
               btn.classList.add('liked');
-              icon.className = 'fas fa-thumbs-up';
+              icon.className = 'fas fa-heart';
             } else {
               btn.classList.remove('liked');
-              icon.className = 'far fa-thumbs-up';
+              icon.className = 'far fa-heart';
             }
           }
         } catch (error) {
