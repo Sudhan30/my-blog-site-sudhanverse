@@ -236,21 +236,31 @@ The blog leverages local LLM inference for several user-facing features. No API 
 
 ### AI-Generated Display Names
 
-When users first visit the blog, they're assigned a creative AI-generated username like "Mystic-Phoenix-45621" or "Swift-Falcon-78294". The system:
+When users first visit the blog, they're assigned a creative AI-generated username like "Aethyr-Wanderer-42857", "Nyx-Seeker-91024", or "Vahana-Drifter-38420". Unlike simple random selection from word lists, the LLM truly **invents** mythologically-inspired usernames.
+
+**Creative Process**:
+
+1. **Mythological Invention**: The AI draws from global mythologies (Greek, Norse, Hindu, Egyptian, Mesopotamian) to invent new myth-sounding words rather than recycling famous god names
+2. **Internal Novelty Checks**: The model internally evaluates whether generated names feel unique and evocative before outputting
+3. **Fallback Lists**: Only if invention fails, the system uses curated rare word combinations (avoiding overused internet clichés)
+4. **High Temperature**: Uses temperature 0.95 for maximum creativity and diversity
+
+This approach truly leverages AI's generative capabilities—producing names like "Khepri-Echo" or "Zephyros-Flame" that wouldn't emerge from simple randomization. The system:
 
 1. Calls Ollama (gemma3:12b) with a 2-second timeout
-2. Generates creative adjective-animal-number combinations
+2. Generates mythologically-creative Word-Word-5DigitNumber format
 3. Falls back to cryptographically random generation if AI is unavailable
 4. Stores the name in browser localStorage for persistence
 
-**Identity Persistence**: Users can set custom names, and the system updates ALL their previous comments across all posts in the database. The `client_id` column tracks anonymous identity, enabling cross-post name consistency without user accounts.
+**Identity Persistence**: Users can set custom names, and the system updates ALL their previous comments across all posts in the database. The `client_id` column tracks anonymous identity, enabling cross-post name consistency without user accounts. Display names are enforced unique—preventing impersonation across different anonymous users.
 
 ```typescript
 // Name generation with hybrid AI + fallback
 const name = await fetch('/api/generate-name', {
   signal: AbortSignal.timeout(2000)
 });
-// Falls back to: Adjective-Animal-Number with crypto.getRandomValues()
+// AI invents mythological names with internal novelty checks
+// Falls back to: Rare word combinations + crypto.getRandomValues()
 ```
 
 ### Comment Moderation
