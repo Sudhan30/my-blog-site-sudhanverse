@@ -507,6 +507,25 @@ export async function postRoute(slug: string): Promise<Response> {
             nameInput.value = displayName;
           }
           loadComments(); // Reload comments to show updated names
+        } else {
+          // Handle errors
+          const errorData = await res.json();
+          const errorMessage = errorData.error || 'Failed to post comment';
+
+          // Show error message to user
+          alert(errorMessage);
+
+          // If the name was taken, highlight the name input field
+          if (res.status === 409) {
+            const nameInput = document.getElementById('comment-name');
+            if (nameInput) {
+              nameInput.focus();
+              nameInput.style.borderColor = '#ef4444';
+              setTimeout(() => {
+                nameInput.style.borderColor = '';
+              }, 3000);
+            }
+          }
         }
       });
 

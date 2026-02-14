@@ -290,6 +290,19 @@ export async function apiRouter(req: Request, path: string): Promise<Response> {
                     return json({ error: 'Comment content is required' }, 400);
                 }
 
+                // Check if display name is already taken by another user
+                if (authorName !== 'Anonymous' && clientId) {
+                    const nameCheck = await pool.query(
+                        `SELECT client_id FROM comments
+                         WHERE display_name = $1 AND client_id != $2::uuid
+                         LIMIT 1`,
+                        [authorName, clientId]
+                    );
+                    if (nameCheck.rows.length > 0) {
+                        return json({ error: 'This display name is already taken by another user' }, 409);
+                    }
+                }
+
                 // Insert comment as approved initially with client_id for future updates
                 const result = await pool.query(
                     `INSERT INTO comments (post_id, content, display_name, status, client_id)
@@ -328,6 +341,17 @@ export async function apiRouter(req: Request, path: string): Promise<Response> {
 
             if (!clientId || !newDisplayName) {
                 return json({ error: 'clientId and newDisplayName are required' }, 400);
+            }
+
+            // Check if display name is already taken by another user
+            const nameCheck = await pool.query(
+                `SELECT client_id FROM comments
+                 WHERE display_name = $1 AND client_id != $2::uuid
+                 LIMIT 1`,
+                [newDisplayName, clientId]
+            );
+            if (nameCheck.rows.length > 0) {
+                return json({ error: 'This display name is already taken by another user' }, 409);
             }
 
             // Update all comments by this client_id to use the new display name
