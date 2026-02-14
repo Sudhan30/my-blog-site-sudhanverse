@@ -2590,6 +2590,13 @@ pre.code-block code,
   transform: scale(1.1);
 }
 
+/* SVG diagrams: ensure proper sizing and visual treatment */
+.article-content img[src$=".svg"] {
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+}
+
 /* Make article images clickable with hover effect */
 .article-content img {
   cursor: pointer;
