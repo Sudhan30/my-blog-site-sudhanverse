@@ -366,11 +366,11 @@ None of these were exotic. They were normal operations gone wrong. That's the le
 
 **Uptime**: 99.5% over the last 6 months. Downtime was planned upgrades and one power outage.
 
-**Response time**: P50 is 80ms. P95 is 200ms. P99 is 500ms. Static assets are faster due to Cloudflare caching.
+**Response time**: P50 is 80ms. P95 is 110ms. P99 is 120ms. Static assets are faster due to Cloudflare caching.
 
-**Resource utilization**: Average CPU 30%. Average memory 40GB of 64GB. Disk I/O is negligible except during backups.
+**Resource utilization**: Average CPU 2%. Average memory 10GB of 64GB (16%). Disk I/O is negligible except during backups.
 
-**Cost**: $5/month in electricity. $800 hardware amortized over 5 years = $13.33/month. Total: ~$18/month for a full homelab.
+**Cost**: $5/month in electricity. $500 hardware amortized over 5 years = $8.33/month. Total: ~$13/month for a full homelab.
 
 ## What's Next
 
