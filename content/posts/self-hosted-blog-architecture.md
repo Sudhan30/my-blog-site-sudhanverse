@@ -375,5 +375,5 @@ But honestly? The system works. It's fast, reliable, observable, and maintainabl
 
 ---
 
-**Cluster Infrastructure**: [GitHub Repo](https://github.com/your-repo/cluster-infra)
+**Cluster Infrastructure**: [GitHub Repo](https://github.com/sudhan30/my-blog-site-cluster-infra)
 **Blog**: [blog.sudharsana.dev](https://blog.sudharsana.dev)

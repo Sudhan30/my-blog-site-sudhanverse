@@ -233,5 +233,5 @@ But honestly? The system works. It's fast, reliable, secure, and free. Sometimes
 
 ---
 
-**Architecture Docs**: [ARCHITECTURE.md](https://github.com/your-repo/portfolio)
+**Architecture Docs**: [ARCHITECTURE.md](https://github.com/sudhan30/my-portfolio-website)
 **Live Site**: [www.sudharsana.dev](https://www.sudharsana.dev)
