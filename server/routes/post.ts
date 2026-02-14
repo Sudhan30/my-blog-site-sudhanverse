@@ -318,34 +318,47 @@ export async function postRoute(slug: string): Promise<Response> {
         const previousNames = JSON.parse(localStorage.getItem('blog-previous-names') || '[]');
         const currentName = localStorage.getItem('blog-display-name');
 
-        commentsList.innerHTML = comments.map(c => {
-          // Replace previous auto-generated names with current custom name
-          let authorName = c.display_name;
-          if (currentName && previousNames.includes(c.display_name)) {
-            authorName = currentName;
-          }
+        try {
+          const html = comments.map((c, index) => {
+            // Replace previous auto-generated names with current custom name
+            let authorName = c.display_name;
+            if (currentName && previousNames.includes(c.display_name)) {
+              authorName = currentName;
+            }
 
-          const likeCount = c.like_count || 0;
-          const userLiked = c.user_liked || false;
-          const likeIcon = userLiked ? 'fas fa-heart' : 'far fa-heart';
-          const likedClass = userLiked ? 'liked' : '';
+            const likeCount = c.like_count || 0;
+            const userLiked = c.user_liked || false;
+            const likeIcon = userLiked ? 'fas fa-heart' : 'far fa-heart';
+            const likedClass = userLiked ? 'liked' : '';
 
-          return \`
-            <div class="comment">
-              <div class="comment-header">
-                <div class="comment-author-info">
-                  <span class="comment-author">\${authorName}</span>
-                  <span class="comment-date">\${timeAgo(c.created_at)}</span>
+            // Escape HTML in content to prevent injection
+            const escapedContent = c.content.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+
+            console.log(\`Rendering comment \${index + 1}/\${comments.length}: ID \${c.id}, Author: \${authorName}\`);
+
+            return \`
+              <div class="comment">
+                <div class="comment-header">
+                  <div class="comment-author-info">
+                    <span class="comment-author">\${authorName}</span>
+                    <span class="comment-date">\${timeAgo(c.created_at)}</span>
+                  </div>
+                  <button class="comment-like-btn \${likedClass}" data-comment-id="\${c.id}" data-liked="\${userLiked}">
+                    <i class="\${likeIcon}"></i>
+                    <span class="like-count">\${likeCount > 0 ? likeCount : ''}</span>
+                  </button>
                 </div>
-                <button class="comment-like-btn \${likedClass}" data-comment-id="\${c.id}" data-liked="\${userLiked}">
-                  <i class="\${likeIcon}"></i>
-                  <span class="like-count">\${likeCount > 0 ? likeCount : ''}</span>
-                </button>
+                <p class="comment-text">\${escapedContent}</p>
               </div>
-              <p class="comment-text">\${c.content}</p>
-            </div>
-          \`;
-        }).join('');
+            \`;
+          }).join('');
+
+          console.log('📝 Generated HTML length:', html.length, 'characters');
+          commentsList.innerHTML = html;
+          console.log('✅ DOM updated, children count:', commentsList.children.length);
+        } catch (error) {
+          console.error('❌ Error rendering comments:', error);
+        }
 
         // Add event listeners to like buttons
         document.querySelectorAll('.comment-like-btn').forEach(btn => {
