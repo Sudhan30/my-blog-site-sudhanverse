@@ -3,8 +3,12 @@
 
 import { Pool } from 'pg';
 
-const DATABASE_URL = process.env.DATABASE_URL || 'postgresql://blog_user:piVdLYWqbtZyfWo2VkcY2QFC9lVjXbde@localhost:5432/blog_db';
+const DATABASE_URL = process.env.DATABASE_URL;
 const OLLAMA_HOST = process.env.OLLAMA_HOST || 'http://ollama-service:11434';
+
+if (!DATABASE_URL) {
+    throw new Error('DATABASE_URL environment variable must be set');
+}
 
 const pool = new Pool({
     connectionString: DATABASE_URL,

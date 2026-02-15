@@ -130,6 +130,17 @@ export async function postRoute(slug: string): Promise<Response> {
         return id;
       }
 
+      // HTML escape function to prevent XSS attacks
+      function escapeHtml(unsafe) {
+        if (!unsafe) return '';
+        return unsafe
+          .replace(/&/g, "&amp;")
+          .replace(/</g, "&lt;")
+          .replace(/>/g, "&gt;")
+          .replace(/"/g, "&quot;")
+          .replace(/'/g, "&#039;");
+      }
+
       // Relative time formatting
       function timeAgo(dateStr) {
         const now = new Date();
@@ -239,7 +250,7 @@ export async function postRoute(slug: string): Promise<Response> {
           if (!existingBadge) {
             const badge = document.createElement('div');
             badge.className = 'name-badge';
-            badge.innerHTML = '<i class="fas fa-robot"></i> Your username: <strong>' + displayName + '</strong>';
+            badge.innerHTML = '<i class="fas fa-robot"></i> Your username: <strong>' + escapeHtml(displayName) + '</strong>';
             badge.style.cssText = 'margin-top: 0.5rem; padding: 0.5rem 1rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 8px; font-size: 0.875rem; display: inline-flex; align-items: center; gap: 0.5rem;';
             nameInput.parentElement.appendChild(badge);
           }
@@ -339,7 +350,7 @@ export async function postRoute(slug: string): Promise<Response> {
               <div class="comment">
                 <div class="comment-header">
                   <div class="comment-author-info">
-                    <span class="comment-author">\${authorName}</span>
+                    <span class="comment-author">\${escapeHtml(authorName)}</span>
                     <span class="comment-date">\${timeAgo(c.created_at)}</span>
                   </div>
                   <button class="comment-like-btn \${likedClass}" data-comment-id="\${c.id}" data-liked="\${userLiked}">
@@ -500,7 +511,7 @@ export async function postRoute(slug: string): Promise<Response> {
             // Update the name badge
             const badge = document.querySelector('.name-badge');
             if (badge) {
-              badge.innerHTML = '<i class="fas fa-user"></i> Your username: <strong>' + customName + '</strong>';
+              badge.innerHTML = '<i class="fas fa-user"></i> Your username: <strong>' + escapeHtml(customName) + '</strong>';
             }
 
             console.log('✅ Custom name saved:', customName);
