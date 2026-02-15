@@ -6,7 +6,7 @@ excerpt: "From GCS buckets and expensive load balancers to Firebase's serverless
 slug: my-cloud-site
 ---
 
-> "Cost optimization isn't about being cheap—it's about being smart with resources."
+> "Cost optimization isn't about being cheap. It's about being smart with resources."
 
 Learning cloud architecture is as much about economics as it is about engineering. My portfolio website started simple—HTML, CSS, JavaScript. But when it came time to deploy, I made the classic beginner mistake: over-engineering the infrastructure for what was basically a static site.
 
@@ -42,7 +42,7 @@ Deployments are automated through GitHub Actions. Push to main, and the site reb
 The portfolio runs **six Cloud Functions**, each handling specific tasks:
 
 #### 1. Page View Tracker
-Tracks website visits and celebrates mathematical milestones. When someone visits, it increments a Firestore counter and checks if the number is special—prime, perfect, or Fibonacci. Hit visit 1,597? You get a Fibonacci celebration. Visit 28? That's a perfect number.
+Tracks website visits and celebrates mathematical milestones. When someone visits, it increments a Firestore counter and checks if the number is special (prime, perfect, or Fibonacci). Hit visit 1,597? You get a Fibonacci celebration. Visit 28? That's a perfect number.
 
 Rate limited to 20 requests per minute to prevent abuse.
 
@@ -63,14 +63,14 @@ Rate limited to 5 requests per hour per IP.
 #### 4. Job Description Analyzer
 AI-powered job fit analysis. Paste a job description, and it analyzes the role against my resume data. Calculates match percentage, identifies relevant qualifications, and explains areas of interest or misalignment.
 
-This function integrates resume data stored as structured JSON and connects to an Ollama LLM running on my self-hosted K3s cluster (the same mini PC that hosts this blog). The Cloud Function makes an API call to the LLM endpoint for intelligent analysis. Hybrid architecture—serverless frontend with self-hosted AI inference.
+This function integrates resume data stored as structured JSON and connects to an Ollama LLM running on my self-hosted K3s cluster (the same mini PC that hosts this blog). The Cloud Function makes an API call to the LLM endpoint for intelligent analysis. It's a hybrid architecture: serverless frontend with self-hosted AI inference.
 
 Rate limited to 10 requests per hour per IP.
 
 #### 5. OpenTelemetry Data Processor
-Real-time processing of observability data. The frontend instruments user interactions using OpenTelemetry SDK—traces, metrics, and logs. This function receives that data via HTTP POST, validates it, and routes it to BigQuery for analytics and Pub/Sub for batch processing.
+Real-time processing of observability data. The frontend instruments user interactions using OpenTelemetry SDK (traces, metrics, and logs). This function receives that data via HTTP POST, validates it, and routes it to BigQuery for analytics and Pub/Sub for batch processing.
 
-Handles traces (user journey tracking), metrics (Core Web Vitals, performance data), and logs (errors, debug info). CCPA-compliant with explicit user consent.
+Handles traces (user journey tracking), metrics (Core Web Vitals, performance data), and logs (errors, debug info). It's CCPA-compliant with explicit user consent.
 
 Rate limited to 200 requests per minute.
 
@@ -83,15 +83,15 @@ This separation allows for efficient processing without blocking the frontend. R
 
 **Firestore** stores operational data. Collections for page views, contact submissions, feedback entries, job analyses, and telemetry sessions. Document-based NoSQL with real-time sync capabilities.
 
-**BigQuery** handles analytics. Separate tables for traces, metrics, and logs. The OpenTelemetry pipeline feeds all observability data here. SQL queries for insights like most visited pages, user engagement patterns, error rates, performance trends.
+**BigQuery** handles analytics. Separate tables for traces, metrics, and logs. The OpenTelemetry pipeline feeds all observability data here. SQL queries provide insights like most visited pages, user engagement patterns, error rates, and performance trends.
 
 **Cloud Storage** archives historical data. The batch processor stores compressed telemetry data for long-term retention. Cost-effective storage for compliance and historical analysis.
 
-**Pub/Sub** queues telemetry data between the real-time processor and batch processor. Decouples processing stages and handles traffic spikes gracefully.
+**Pub/Sub** queues telemetry data between the real-time processor and batch processor. It decouples processing stages and handles traffic spikes gracefully.
 
 ## Email System Architecture
 
-The email system is more sophisticated than it looks. SMTP configuration stored in Google Secret Manager. Primary recipient, optional CC recipients, host, port, SSL settings—all secured.
+The email system is more sophisticated than it looks. SMTP configuration stored in Google Secret Manager. Primary recipient, optional CC recipients, host, port, SSL settings are all secured.
 
 When a contact form is submitted:
 1. Cloud Function validates input
@@ -100,7 +100,7 @@ When a contact form is submitted:
 4. Sends via Nodemailer to configured recipients
 5. Stores submission in Firestore for record-keeping
 
-Email templates are HTML with inline styles. Professional formatting, portfolio branding, clear message structure. Works across email clients.
+Email templates are HTML with inline styles for professional formatting, portfolio branding, and clear message structure. They work across email clients.
 
 Feedback emails include star visualizations: ★★★★★ for 5 stars, ★★★☆☆ for 3 stars, and so on.
 
@@ -116,21 +116,21 @@ Defense in depth across multiple layers:
 
 **Application Security**: Every Cloud Function has rate limiting. Per-IP request throttling prevents abuse. Input validation and sanitization on all user inputs. CORS configured to accept requests only from the portfolio domain.
 
-**Data Security**: Secret Manager encrypts credentials at rest. Cloud Functions access secrets via IAM permissions—no hardcoded credentials. Firestore security rules enforce access control. Database writes only from authenticated Cloud Functions.
+**Data Security**: Secret Manager encrypts credentials at rest. Cloud Functions access secrets via IAM permissions with no hardcoded credentials. Firestore security rules enforce access control. Database writes only from authenticated Cloud Functions.
 
-**Privacy Compliance**: CCPA-compliant analytics with user consent. OpenTelemetry only activates if the user opts in. No PII collection. User IDs are hashed. Data retention policies configurable. Users can opt out anytime.
+**Privacy Compliance**: CCPA-compliant analytics with user consent. OpenTelemetry only activates if the user opts in. No PII collection, and user IDs are hashed. Data retention policies are configurable, and users can opt out anytime.
 
 ## Observability
 
 The OpenTelemetry implementation provides comprehensive visibility:
 
-**Traces** track user journeys. Page navigation events, form submissions, button clicks, API calls. Each trace includes timing data, parent-child relationships, and custom attributes. Distributed tracing shows the full path from frontend interaction to backend processing.
+**Traces** track user journeys through page navigation events, form submissions, button clicks, and API calls. Each trace includes timing data, parent-child relationships, and custom attributes. Distributed tracing shows the full path from frontend interaction to backend processing.
 
-**Metrics** measure performance. Core Web Vitals (LCP, FID, CLS), custom business metrics (engagement duration, feature usage), error rates, API latency. Aggregated over time for trend analysis.
+**Metrics** measure performance including Core Web Vitals (LCP, FID, CLS), custom business metrics (engagement duration, feature usage), error rates, and API latency. Data is aggregated over time for trend analysis.
 
-**Logs** capture events. JavaScript errors, user actions, debug information, security events. Structured logging with severity levels, trace correlation, and resource attributes.
+**Logs** capture events like JavaScript errors, user actions, debug information, and security events. Structured logging includes severity levels, trace correlation, and resource attributes.
 
-All data flows through the dual-processor pipeline: real-time for immediate visibility, batch for efficient archival. BigQuery provides a unified analytics platform. SQL queries across all telemetry data.
+All data flows through the dual-processor pipeline with real-time processing for immediate visibility and batch processing for efficient archival. BigQuery provides a unified analytics platform for SQL queries across all telemetry data.
 
 ## Cost Reality
 
@@ -148,7 +148,7 @@ Current usage at my traffic levels:
 - ~10k Firestore reads per month
 - ~50MB BigQuery inserts per month
 
-Well within free tier limits. The trick is understanding the quotas and architecting accordingly. Batching telemetry data reduces writes. Sampling traces (10%) keeps BigQuery usage low. Efficient queries minimize Firestore reads.
+Well within free tier limits. The trick is understanding the quotas and architecting accordingly. Batching telemetry data reduces writes, sampling traces at 10% keeps BigQuery usage low, and efficient queries minimize Firestore reads.
 
 If traffic grew 10x, I'd still be in the free tier. At 100x traffic, I'd start paying, but that would be a good problem to have.
 
@@ -177,9 +177,9 @@ jobs:
           projectId: my-project-id
 ```
 
-Push to main triggers the build. React app compiles to static files. Firebase Hosting deployment pushes to the CDN. Global distribution in minutes.
+Push to main triggers the build. The React app compiles to static files, and Firebase Hosting deployment pushes to the CDN for global distribution in minutes.
 
-Cloud Functions deploy separately via `gcloud functions deploy`. Each function can be updated independently. Zero downtime deployments.
+Cloud Functions deploy separately via `gcloud functions deploy`. Each function can be updated independently with zero downtime deployments.
 
 ### Deployment Flow
 
@@ -189,15 +189,15 @@ Cloud Functions deploy separately via `gcloud functions deploy`. Each function c
 
 **Serverless is not a compromise.** For the right workload, it's superior. Zero ops burden, automatic scaling, pay-per-use pricing. My portfolio would cost hundreds per month on traditional infrastructure. On Firebase, it's free.
 
-**Free tiers are real infrastructure.** Firebase's free tier isn't a trial. It's a production platform for low to moderate traffic. I've run mission-critical workloads on it for years. No artificial limits or sudden cutoffs. Just solid infrastructure.
+**Free tiers are real infrastructure.** Firebase's free tier isn't a trial. It's a production platform for low to moderate traffic. I've run mission-critical workloads on it for years with no artificial limits or sudden cutoffs, just solid infrastructure.
 
-**Security is layers, not a single wall.** Rate limiting, input validation, secret management, CORS, security headers, encryption—each layer provides defense. Compromise one, the others hold.
+**Security is layers, not a single wall.** Rate limiting, input validation, secret management, CORS, security headers, and encryption each provide a layer of defense. Compromise one, and the others hold.
 
 **Observability isn't optional.** You can't fix what you can't see. OpenTelemetry transformed how I understand user behavior. Where do people spend time? What features get used? What causes errors? The data answers questions I didn't know to ask.
 
-**Optimize for your constraints.** Early on, I optimized for "looking professional." Load balancers, VPCs, multi-region setups. Cost me $20/month and hours of maintenance. Now I optimize for actual constraints: low cost, minimal ops, fast iteration. Firebase delivers all three.
+**Optimize for your constraints.** Early on, I optimized for "looking professional" with load balancers, VPCs, and multi-region setups. This cost me $20/month and hours of maintenance. Now I optimize for actual constraints like low cost, minimal ops, and fast iteration. Firebase delivers all three.
 
-**AI integration doesn't require commercial APIs.** The job description analyzer uses a self-hosted Ollama LLM running on my mini PC. The Cloud Function calls the LLM API endpoint on my local K3s cluster. Resume data is structured JSON. No OpenAI or commercial API costs, just electricity for the homelab. Hybrid cloud-homelab architecture.
+**AI integration doesn't require commercial APIs.** The job description analyzer uses a self-hosted Ollama LLM running on my mini PC. The Cloud Function calls the LLM API endpoint on my local K3s cluster with resume data stored as structured JSON. No OpenAI or commercial API costs, just electricity for the homelab in a hybrid cloud-homelab architecture.
 
 ## The Hidden Value
 
