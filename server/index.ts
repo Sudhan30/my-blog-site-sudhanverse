@@ -6,6 +6,7 @@ import { tagRoute } from "./routes/tag";
 import { sitemapRoute } from "./routes/sitemap";
 import { rssRoute } from "./routes/rss";
 import { apiRouter } from "./routes/api";
+import { addSecurityHeaders, csrfProtection } from "./middleware/security";
 
 const PORT = process.env.PORT || 80;
 const PUBLIC_DIR = join(import.meta.dir, "..", "public");
@@ -18,9 +19,15 @@ serve({
 
         // Health check endpoint for Kubernetes
         if (path === "/health" || path === "/healthz") {
-            return new Response(JSON.stringify({ status: "ok", timestamp: new Date().toISOString() }), {
+            return addSecurityHeaders(new Response(JSON.stringify({ status: "ok", timestamp: new Date().toISOString() }), {
                 headers: { "Content-Type": "application/json" }
-            });
+            }));
+        }
+
+        // CSRF protection for state-changing requests
+        const csrfError = csrfProtection(req);
+        if (csrfError) {
+            return csrfError;
         }
 
         // Static file serving
@@ -28,11 +35,11 @@ serve({
             const filePath = join(PUBLIC_DIR, path);
             const file = Bun.file(filePath);
             if (await file.exists()) {
-                return new Response(file, {
+                return addSecurityHeaders(new Response(file, {
                     headers: { "Cache-Control": "public, max-age=31536000" }
-                });
+                }));
             }
-            return new Response("Not Found", { status: 404 });
+            return addSecurityHeaders(new Response("Not Found", { status: 404 }));
         }
 
         // API routes
@@ -64,10 +71,10 @@ serve({
                 return tagRoute(decodeURIComponent(tagMatch[1]));
             }
 
-            return new Response("Not Found", { status: 404 });
+            return addSecurityHeaders(new Response("Not Found", { status: 404 }));
         } catch (error) {
             console.error("Server error:", error);
-            return new Response("Internal Server Error", { status: 500 });
+            return addSecurityHeaders(new Response("Internal Server Error", { status: 500 }));
         }
     }
 });

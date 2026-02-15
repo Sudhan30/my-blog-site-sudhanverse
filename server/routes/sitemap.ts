@@ -1,4 +1,5 @@
 import { getAllPosts } from "../lib/posts";
+import { addSecurityHeaders } from "../middleware/security";
 
 const SITE_URL = "https://blog.sudharsana.dev";
 
@@ -37,7 +38,7 @@ export async function sitemapRoute(): Promise<Response> {
 ${urls.join("\n")}
 </urlset>`;
 
-    return new Response(xml, {
+    return addSecurityHeaders(new Response(xml, {
         headers: { "Content-Type": "application/xml; charset=utf-8" }
-    });
+    }));
 }

@@ -2,6 +2,7 @@
 // Uses PostgreSQL directly for persistence
 
 import { Pool } from 'pg';
+import { secureJson } from '../middleware/security';
 
 const DATABASE_URL = process.env.DATABASE_URL;
 const OLLAMA_HOST = process.env.OLLAMA_HOST || 'http://ollama-service:11434';
@@ -612,13 +613,17 @@ Output ONLY the final username and nothing else.`,
 }
 
 function json(data: unknown, status = 200): Response {
-    return new Response(JSON.stringify(data), {
-        status,
-        headers: {
-            "Content-Type": "application/json",
-            "Access-Control-Allow-Origin": "*",
-            "Cache-Control": "no-store, no-cache, must-revalidate",
-            "Pragma": "no-cache"
-        }
+    // Use secure JSON response with security headers
+    const response = secureJson(data, status);
+
+    // Add CORS and cache control headers
+    const headers = new Headers(response.headers);
+    headers.set("Access-Control-Allow-Origin", "*");
+    headers.set("Cache-Control", "no-store, no-cache, must-revalidate");
+    headers.set("Pragma", "no-cache");
+
+    return new Response(response.body, {
+        status: response.status,
+        headers
     });
 }

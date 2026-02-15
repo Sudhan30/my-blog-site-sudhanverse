@@ -1,5 +1,6 @@
 import { layout } from "../templates/layout";
 import { getPostIndex } from "../lib/posts";
+import { secureHtml } from "../middleware/security";
 
 export async function homeRoute(_req: Request): Promise<Response> {
   const index = await getPostIndex();
@@ -152,10 +153,12 @@ export async function homeRoute(_req: Request): Promise<Response> {
     content
   });
 
-  return new Response(html, {
-    headers: {
-      "Content-Type": "text/html; charset=utf-8",
-      "Cache-Control": "public, max-age=3600"
-    }
+  const response = secureHtml(html);
+  const headers = new Headers(response.headers);
+  headers.set("Cache-Control", "public, max-age=3600");
+
+  return new Response(response.body, {
+    status: response.status,
+    headers
   });
 }

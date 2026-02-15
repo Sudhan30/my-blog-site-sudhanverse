@@ -1,12 +1,13 @@
 import { layout } from "../templates/layout";
 import { getPostBySlug } from "../lib/posts";
 import { renderMarkdown } from "../lib/markdown";
+import { secureHtml } from "../middleware/security";
 
 export async function postRoute(slug: string): Promise<Response> {
   const post = await getPostBySlug(slug);
 
   if (!post) {
-    return new Response("Post not found", { status: 404 });
+    return secureHtml("Post not found", 404);
   }
 
   const date = new Date(post.date).toLocaleDateString("en-US", {
@@ -638,10 +639,12 @@ export async function postRoute(slug: string): Promise<Response> {
     content
   });
 
-  return new Response(html, {
-    headers: {
-      "Content-Type": "text/html; charset=utf-8",
-      "Cache-Control": "public, max-age=60"
-    }
+  const response = secureHtml(html);
+  const headers = new Headers(response.headers);
+  headers.set("Cache-Control", "public, max-age=60");
+
+  return new Response(response.body, {
+    status: response.status,
+    headers
   });
 }

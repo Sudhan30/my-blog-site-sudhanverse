@@ -1,5 +1,6 @@
 import { layout } from "../templates/layout";
 import { getPostsByTag } from "../lib/posts";
+import { secureHtml } from "../middleware/security";
 
 export async function tagRoute(tag: string): Promise<Response> {
     const posts = await getPostsByTag(tag);
@@ -68,7 +69,5 @@ export async function tagRoute(tag: string): Promise<Response> {
         content
     });
 
-    return new Response(html, {
-        headers: { "Content-Type": "text/html; charset=utf-8" }
-    });
+    return secureHtml(html);
 }

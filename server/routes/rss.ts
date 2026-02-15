@@ -1,4 +1,5 @@
 import { getAllPosts } from "../lib/posts";
+import { addSecurityHeaders } from "../middleware/security";
 
 const SITE_URL = "https://blog.sudharsana.dev";
 
@@ -33,7 +34,7 @@ ${items}
   </channel>
 </rss>`;
 
-    return new Response(xml, {
+    return addSecurityHeaders(new Response(xml, {
         headers: { "Content-Type": "application/rss+xml; charset=utf-8" }
-    });
+    }));
 }
