@@ -4,22 +4,26 @@ date: 2025-06-15
 tags: [kubernetes, k3s, self-hosting, infrastructure, monitoring, gitops, devops]
 excerpt: "From a mini PC to a full production blog platform. Deep dive into the K3s architecture, monitoring stack, GitOps deployment, and lessons learned running a self-hosted blog on a homelab cluster."
 slug: k3s-blog-architecture
-readTime: 8
+readTime: 12
 ---
 
 > "The best way to learn infrastructure is to own every layer of it."
 
 ## Two Production Websites, Two Philosophies
 
-I run two production sites built on completely different philosophies:
+I run production websites built on completely different philosophies. Two of them represent opposite ends of the deployment spectrum:
 
-**Portfolio ([sudharsana.dev](https://sudharsana.dev))**: Firebase Hosting, Cloud Functions, Firestore. Zero infrastructure management. Deploy with `firebase deploy`. Scales automatically. Economically rational.
+**Portfolio ([sudharsana.dev](https://sudharsana.dev))**: Firebase Hosting, Cloud Functions, Firestore. Zero infrastructure management. Deploy with `firebase deploy`. Scales automatically. Never think about servers, containers, or orchestration. It just works.
 
-**Blog ([blog.sudharsana.dev](https://blog.sudharsana.dev))**: Self-hosted on a mini PC. K3s cluster. Manual everything. SSH to fix issues. Monitor resource usage. Understand every component from bootloader to ingress controller. Educationally valuable.
+**Blog ([blog.sudharsana.dev](https://blog.sudharsana.dev))**: Self-hosted on a mini PC. K3s cluster. Manual everything. SSH to fix issues. Monitor resource usage. Understand every component from the bootloader to the ingress controller.
 
-The portfolio is the smart economic choice. Firebase is cheap, reliable, maintained by Google. The blog is the smart learning choice. I learn by breaking things, fixing state drift, debugging OOM kills. Most blogs run on WordPress, Ghost, Medium. But I wanted to understand production Kubernetes at a level you don't get from tutorials or managed services.
+The portfolio is economically rational. Firebase is cheap, reliable, and maintained by Google. It's the smart choice for a personal site.
 
-This is the full technical breakdown of running a production blog on K3s.
+The blog is educationally valuable. I learn by breaking things, fixing state drift, debugging OOM kills, and tuning resource limits. It's the smart choice for understanding infrastructure deeply.
+
+This post is about the second one. Not because it's better, but because there's more to explain. Most blogs run on managed platforms. WordPress, Ghost, Medium. Simple, reliable, managed. But I wanted to understand production Kubernetes at a level you don't get from tutorials or managed services.
+
+So I built a blog platform on a mini PC running K3s. This is the full technical breakdown.
 
 ## The Stack
 
@@ -31,7 +35,9 @@ Everything is declarative. Git is the source of truth. Changes get committed, Fl
 
 ## Architecture Overview
 
-Multiple namespaces: `web` for user services, `monitoring` for observability, `orchestrator` for Dagster jobs, `flux-system` for GitOps. Each namespace is isolated with resource quotas and network policies.
+The cluster runs multiple namespaces. `web` for user-facing services (the blog, chat application, portfolio backend). `monitoring` for observability. `orchestrator` for Dagster jobs. `flux-system` for GitOps.
+
+Each namespace is isolated. Resource quotas prevent runaway processes. Network policies restrict cross-namespace communication to what's explicitly needed.
 
 ### Complete Architecture
 
@@ -73,7 +79,14 @@ FluxCD watches the container registry. When CI pushes a new image, FluxCD detect
 
 Every Kubernetes manifest lives in a Git repository. Deployments, services, ingresses, secrets (encrypted), config maps. FluxCD runs in the cluster, polls the repo every minute, applies changes.
 
-The workflow: edit YAML locally, commit and push to main, FluxCD detects the change, applies the diff to the cluster, pods restart with new config. No manual kubectl apply. No imperative changes. If cluster state drifts from Git, FluxCD corrects it automatically. Disaster recovery is cloning the repo and pointing FluxCD at it.
+The workflow:
+1. Edit YAML locally
+2. Commit and push to main
+3. FluxCD detects the change
+4. Applies the diff to the cluster
+5. Pods restart with new config
+
+No manual kubectl apply. No imperative changes. If the cluster state drifts from Git, FluxCD corrects it. Disaster recovery is cloning the repo and pointing FluxCD at it.
 
 ### GitOps Flow
 
@@ -81,15 +94,56 @@ The workflow: edit YAML locally, commit and push to main, FluxCD detects the cha
 
 ## Data Layer
 
-PostgreSQL runs as a StatefulSet with a persistent volume. 50GB SSD-backed storage. Single replica. Not highly available, but the failure domain is acceptable for a blog.
+PostgreSQL runs as a StatefulSet with a persistent volume. 50GB SSD-backed storage. Single replica. Not highly available, but the failure domain is acceptable. This is a blog, not a payment system.
 
-Database schema supports content management and user engagement:
-- `posts` and `tags` for blog metadata
-- `comments` with `client_id` tracking for anonymous identity persistence
+Database schema supports both content management and user engagement:
+- `posts` table for blog metadata
+- `tags` table for categories
+- `comments` table with client tracking for identity persistence
 - `page_views`, `events`, `user_sessions` for in-house analytics
-- `newsletter_subscribers` and `comment_summaries` for AI insights
+- `newsletter_subscribers` for email collection
+- `comment_summaries` for AI-generated comment insights
 
-Automated backups run daily via CronJob. Dumps to local PVC, rsyncs offsite. 30-day local retention, 90-day offsite. Connection pooling via PgBouncer keeps connections manageable and stable.
+Automated backups run daily via a CronJob. Dumps to a local PVC, then rsyncs to an offsite location. Retention is 30 days local, 90 days offsite.
+
+```sql
+-- Core tables
+CREATE TABLE posts (
+  id TEXT PRIMARY KEY,
+  title TEXT NOT NULL,
+  slug TEXT UNIQUE NOT NULL,
+  content TEXT,
+  excerpt TEXT,
+  created_at TIMESTAMP DEFAULT NOW(),
+  status TEXT DEFAULT 'draft'
+);
+
+CREATE TABLE tags (
+  name TEXT PRIMARY KEY,
+  count INTEGER DEFAULT 0
+);
+
+CREATE TABLE post_tags (
+  post_id TEXT REFERENCES posts(id),
+  tag_name TEXT REFERENCES tags(name),
+  PRIMARY KEY (post_id, tag_name)
+);
+
+-- Comments with client tracking for name persistence
+CREATE TABLE comments (
+  id BIGSERIAL PRIMARY KEY,
+  post_id VARCHAR(50) NOT NULL,
+  display_name TEXT NOT NULL,
+  content TEXT NOT NULL,
+  client_id UUID,  -- Anonymous ID for cross-post identity
+  status comment_status NOT NULL DEFAULT 'approved',
+  created_at TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT NOW()
+);
+
+CREATE INDEX idx_comments_client_id ON comments(client_id);
+```
+
+Connection pooling via PgBouncer keeps connections manageable. Blog pods hit PgBouncer, which maintains a pool to Postgres. Efficient, stable, no connection churn.
 
 ## Monitoring Stack
 
@@ -111,15 +165,59 @@ Alerts go to Gotify (self-hosted notification server). Critical alerts hit my ph
 
 ## In-House Analytics
 
-Custom analytics stored in PostgreSQL. No third-party trackers. GDPR-compliant with explicit consent.
+The blog tracks user behavior with a custom analytics system. No Google Analytics API calls. No third-party trackers. Everything stored in PostgreSQL.
 
-Tracks page views, link clicks, scroll depth, and time on page. Anonymous UUIDs in localStorage (no IPs, no PII). Events batch in groups of 5 or on page unload via `sendBeacon`. Indexed tables for user sessions, page views, and custom events. Fast queries, indefinite retention, no sampling.
+**GDPR-Compliant Consent**: Cookie consent banner appears on first visit. Analytics only initialize after explicit acceptance. Users can decline, and the site works perfectly without tracking.
+
+**Tracked Events**:
+- Page views (URL, title, referrer, timestamp)
+- Link clicks (destination, link text)
+- Scroll depth (25%, 50%, 75%, 100%)
+- Time on page (measured on page exit)
+
+**Anonymous Identity**: Each visitor gets a random UUID stored in localStorage. Sessions are tracked with session IDs in sessionStorage. No IP addresses logged. No personal data collected.
+
+```typescript
+// Telemetry batching for efficiency
+trackEvent(name, data) {
+  this.events.push({ name, timestamp: new Date().toISOString(), data });
+  if (this.events.length >= 5) this.flush();
+}
+
+// Reliable delivery on page unload
+window.addEventListener('beforeunload', () => {
+  navigator.sendBeacon('/api/telemetry', JSON.stringify(data));
+});
+```
+
+The system batches events to reduce database writes. Events are flushed every 5 events or on page unload via `sendBeacon` for reliability.
+
+**Analytics Schema**:
+- `user_sessions`: Anonymous user tracking across visits
+- `page_views`: Every page load with referrer context
+- `events`: Custom events (clicks, scrolls, form submissions)
+
+Query performance is excellent. Indexed by session_id and timestamp. Retention is indefinite (disk is cheap). No sampling, no data loss.
 
 ## Ingress and Networking
 
-Traefik ingress routes by Host header. TLS via cert-manager with Let's Encrypt auto-renewal. Cloudflare CDN + DDoS protection in front, proxying through Cloudflare Tunnel (no exposed home IP).
+Traefik is the ingress controller. Routes HTTP traffic based on Host headers. `blog.sudharsana.dev` → blog service. `grafana.sudharsana.dev` → Grafana. `api.sudharsana.dev` → backend API.
 
-Traffic: User → Cloudflare → Tunnel → Traefik → Service → Pod. Latency 50-100ms domestic. Edge caching for assets, fresh HTML for SEO.
+TLS termination happens at Traefik via cert-manager. Let's Encrypt certificates, automated renewal. HTTPS everywhere. Redirect loops and certificate errors taught me more about TLS than any book.
+
+Cloudflare sits in front as a CDN and DDoS shield. DNS points to Cloudflare. Cloudflare proxies to my home IP via a Cloudflare Tunnel. No port forwarding. No exposed home IP. Secure, simple, free.
+
+Traffic flow:
+1. User hits `blog.sudharsana.dev`
+2. Cloudflare DNS resolves
+3. Request proxied through Cloudflare Tunnel
+4. Traefik receives, terminates TLS
+5. Routes to blog service
+6. Load balancer picks a pod
+7. Bun.js renders HTML
+8. Response flows back
+
+Latency is surprisingly low. 50-100ms for domestic requests. Cloudflare edge caching helps. Most assets are cached. HTML is not. SEO and freshness matter more than speed for static content.
 
 ## Resource Management
 
@@ -139,11 +237,54 @@ The blog leverages local LLM inference for several user-facing features. No API 
 
 ### AI-Generated Display Names
 
-First-time visitors get AI-generated usernames like "Aethyr-Wanderer-42857". Ollama (gemma3:12b, temperature 0.95) invents mythologically-inspired names from global traditions. 2-second timeout with cryptographic fallback. Names stored in localStorage with `client_id` tracking for cross-post identity. Users can update names retroactively across all posts. Unique enforcement prevents impersonation.
+When users first visit the blog, they're assigned a creative AI-generated username like "Aethyr-Wanderer-42857", "Nyx-Seeker-91024", or "Vahana-Drifter-38420". Unlike simple random selection from word lists, the LLM truly **invents** mythologically-inspired usernames.
 
-### Comment Moderation & Summarization
+**Creative Process**:
 
-Async AI moderation (temperature 0.1) analyzes comments for harmful content. Non-blocking—appears immediately, rejected in background if flagged. Long threads get 2-3 sentence AI summaries via Dagster jobs, displayed as "What readers are saying."
+1. **Mythological Invention**: The AI draws from global mythologies (Greek, Norse, Hindu, Egyptian, Mesopotamian) to invent new myth-sounding words rather than recycling famous god names
+2. **Internal Novelty Checks**: The model internally evaluates whether generated names feel unique and evocative before outputting
+3. **Fallback Lists**: Only if invention fails, the system uses curated rare word combinations (avoiding overused internet clichés)
+4. **High Temperature**: Uses temperature 0.95 for maximum creativity and diversity
+
+This approach truly leverages AI's generative capabilities—producing names like "Khepri-Echo" or "Zephyros-Flame" that wouldn't emerge from simple randomization. The system:
+
+1. Calls Ollama (gemma3:12b) with a 2-second timeout
+2. Generates mythologically-creative Word-Word-5DigitNumber format
+3. Falls back to cryptographically random generation if AI is unavailable
+4. Stores the name in browser localStorage for persistence
+
+**Identity Persistence**: Users can set custom names, and the system updates ALL their previous comments across all posts in the database. The `client_id` column tracks anonymous identity, enabling cross-post name consistency without user accounts. Display names are enforced unique—preventing impersonation across different anonymous users.
+
+```typescript
+// Name generation with hybrid AI + fallback
+const name = await fetch('/api/generate-name', {
+  signal: AbortSignal.timeout(2000)
+});
+// AI invents mythological names with internal novelty checks
+// Falls back to: Rare word combinations + crypto.getRandomValues()
+```
+
+### Comment Moderation
+
+Every comment passes through AI moderation before approval. Ollama analyzes content for harmful, offensive, or spam content with temperature 0.1 for consistent judgments.
+
+Moderation is asynchronous and non-blocking. Comments appear immediately, but flagged content gets auto-rejected in the background. False positives are rare due to the lenient prompt design.
+
+```typescript
+// Async moderation (doesn't block user response)
+moderateComment(content, authorName).then(result => {
+  if (result.isHarmful) {
+    db.query('UPDATE comments SET status = $1 WHERE id = $2',
+      ['rejected', commentId]);
+  }
+});
+```
+
+### Comment Summarization
+
+Long comment threads get AI-generated summaries. Ollama condenses multiple comments into 2-3 sentence insights displayed above the comment form. Summaries update via Dagster background jobs when comment count thresholds are reached.
+
+Users see "What readers are saying" boxes with synthesized takeaways, saving time on long discussions.
 
 ## Ollama LLM Integration
 
@@ -161,19 +302,54 @@ env:
 
 ## Deployment Strategy
 
-Rolling updates via FluxCD. Readiness probes (`/health`) ensure 3 consecutive successes before routing traffic. Zero downtime in theory, occasional blips in practice. Rollbacks via Git commit pinning or kubectl rollout undo.
+Rolling updates are the default. FluxCD updates the deployment, Kubernetes creates new pods, waits for readiness, then terminates old pods. Zero downtime in theory. Occasional connection blips in practice.
+
+Readiness probes prevent premature traffic routing. The blog exposes `/health` that returns 200 when the app is ready. Kubernetes waits for 3 consecutive successes before adding the pod to the load balancer.
+
+```yaml
+readinessProbe:
+  httpGet:
+    path: /health
+    port: 3000
+  initialDelaySeconds: 5
+  periodSeconds: 10
+```
+
+Rollbacks are manual but fast. FluxCD can pin to a previous Git commit, reapply manifests, and restore the old state. Alternatively, kubectl rollout undo works for quick reverts.
 
 ## Persistent Storage
 
-Local path provisioner on the mini PC's SSD. PostgreSQL (50GB), Grafana (10GB), Loki (20GB), Ollama (30GB). Total ~110GB of 1TB used. Daily database dumps, weekly cluster exports, offsite rsync. RTO under 1 hour.
+Local path provisioner handles persistent volumes. Data lives on the mini PC's SSD. Not replicated. Not distributed. Just local storage with automatic directory management.
+
+PostgreSQL mounts a 50GB volume. Grafana dashboards mount 10GB. Loki logs mount 20GB. Ollama models mount 30GB. Total ~110GB used of 1TB available.
+
+Backups mitigate the single point of failure. Daily database dumps. Weekly full cluster state exports. Offsite copies via rsync. Recovery time objective is under 1 hour with the backup scripts.
 
 ## Security Model
 
-Network policies restrict pod-to-pod communication (deny by default). Kubernetes Secrets with SOPS encryption for Git-tracked YAML. Trivy image scanning in CI (critical vulns block deployment). Dependabot for dependencies, quarterly K3s upgrades, unattended Ubuntu updates.
+**Network Policies**: Restrict pod-to-pod communication. Blog pods can talk to Postgres. Monitoring pods can scrape metrics. Everything else is denied by default.
+
+**Secrets Management**: Kubernetes Secrets (base64-encoded, not great). Exploring External Secrets Operator to pull from a proper vault. For now, Git-tracked secrets are encrypted with SOPS (encrypted YAML, safe to commit).
+
+**Image Scanning**: Trivy scans container images in CI. Critical vulnerabilities block deployment. High-severity issues get flagged for review.
+
+**Updates**: Dependabot keeps dependencies current. K3s upgrades happen quarterly after testing in a VM. Unattended upgrades for the underlying Ubuntu system.
 
 ## Things That Broke
 
-Pod OOMKills from low memory limits. AMD GPU MES corruption requiring reboots. FluxCD drift from manual kubectl apply (never bypass GitOps). Let's Encrypt rate limits. Ingress routing conflicts from overlapping paths. Normal operations gone wrong. Systems break when you violate assumptions.
+Kubernetes doesn't care about your confidence. It breaks in ways you don't expect.
+
+**Pod evictions**: Memory limits were too low. Pods got OOMKilled under load. Increased limits and added swap as a buffer. Now stable.
+
+**GPU state corruption**: AMD GPU MES errors required full system reboots. Can't recover from kernel GPU state without restarting. Rare, but painful.
+
+**FluxCD drift**: A manual kubectl apply once caused FluxCD to reconcile incorrectly. Lesson: never bypass GitOps. Fixing the drift took an hour of diff comparison.
+
+**Certificate renewal failures**: Let's Encrypt rate limits hit when I churned through domains testing. Waited a week, fixed configs, automated properly.
+
+**Ingress routing conflicts**: Two services with overlapping path prefixes caused 404s. Fixed with explicit ordering and better path matching.
+
+None of these were exotic. They were normal operations gone wrong. That's the lesson. Systems break predictably when you violate their assumptions.
 
 ## What This Taught Me
 
