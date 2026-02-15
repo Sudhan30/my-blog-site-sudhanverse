@@ -308,11 +308,11 @@ export async function apiRouter(req: Request, path: string): Promise<Response> {
                     return json({ error: 'Comment content is required' }, 400);
                 }
 
-                // Check if display name is already taken by another user
+                // Check if display name is already taken by another user (case-insensitive)
                 if (authorName !== 'Anonymous' && clientId) {
                     const nameCheck = await pool.query(
                         `SELECT client_id FROM comments
-                         WHERE display_name = $1 AND client_id != $2::uuid
+                         WHERE LOWER(display_name) = LOWER($1) AND client_id != $2::uuid
                          LIMIT 1`,
                         [authorName, clientId]
                     );
@@ -361,10 +361,10 @@ export async function apiRouter(req: Request, path: string): Promise<Response> {
                 return json({ error: 'clientId and newDisplayName are required' }, 400);
             }
 
-            // Check if display name is already taken by another user
+            // Check if display name is already taken by another user (case-insensitive)
             const nameCheck = await pool.query(
                 `SELECT client_id FROM comments
-                 WHERE display_name = $1 AND client_id != $2::uuid
+                 WHERE LOWER(display_name) = LOWER($1) AND client_id != $2::uuid
                  LIMIT 1`,
                 [newDisplayName, clientId]
             );
