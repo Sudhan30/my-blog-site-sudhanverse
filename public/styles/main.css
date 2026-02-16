@@ -148,9 +148,10 @@ img {
   max-width: var(--max-width);
   margin: 0 auto;
   padding: var(--space-md) var(--space-xl);
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
   align-items: center;
-  justify-content: space-between;
+  gap: var(--space-md);
 }
 
 .logo {
@@ -183,6 +184,7 @@ img {
 .main-nav {
   display: flex;
   gap: var(--space-sm);
+  justify-content: center;
 }
 
 .nav-link {
@@ -203,6 +205,7 @@ img {
   display: flex;
   align-items: center;
   gap: var(--space-sm);
+  justify-self: end;
 }
 
 .theme-toggle {
@@ -274,6 +277,11 @@ img {
 }
 
 @media (max-width: 768px) {
+  .header-container {
+    display: flex;
+    justify-content: space-between;
+  }
+
   .main-nav {
     position: fixed;
     top: 60px;
@@ -287,6 +295,7 @@ img {
     opacity: 0;
     pointer-events: none;
     transition: all var(--transition-normal);
+    justify-content: flex-start;
   }
 
   .main-nav.open {
@@ -1657,6 +1666,8 @@ pre.code-block code,
 
 @media (max-width: 768px) {
   .header-container {
+    display: flex;
+    justify-content: space-between;
     padding: var(--space-sm) var(--space-md);
   }
 
@@ -1670,6 +1681,10 @@ pre.code-block code,
 
   .article-container {
     padding: 0 var(--space-md);
+  }
+
+  .article-title {
+    font-size: 1.75rem;
   }
 
   .author-section {
