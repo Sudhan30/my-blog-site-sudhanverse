@@ -12,9 +12,8 @@ export async function homeRoute(_req: Request): Promise<Response> {
       year: "numeric"
     });
 
-    // Estimate reading time (assuming average 200 words per minute)
-    const wordCount = post.excerpt.split(/\s+/).length * 10; // Rough estimate based on excerpt
-    const readingTime = Math.max(1, Math.ceil(wordCount / 200));
+    // Use readTime from frontmatter, or estimate based on excerpt
+    const readingTime = post.readTime || Math.max(1, Math.ceil((post.excerpt.split(/\s+/).length * 10) / 200));
 
     const tags = post.tags.map(t =>
       `<a href="/tag/${encodeURIComponent(t)}" class="tag">${t}</a>`

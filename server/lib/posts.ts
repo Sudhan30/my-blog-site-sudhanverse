@@ -11,6 +11,7 @@ export interface Post {
     tags: string[];
     excerpt: string;
     content: string;
+    readTime?: number;
 }
 
 export interface PostIndex {
@@ -39,7 +40,8 @@ export async function getAllPosts(): Promise<Post[]> {
             date: data.date ? new Date(data.date).toISOString() : new Date().toISOString(),
             tags: data.tags || [],
             excerpt: data.excerpt || body.slice(0, 160) + "...",
-            content: body
+            content: body,
+            readTime: data.readTime
         });
     }
 
