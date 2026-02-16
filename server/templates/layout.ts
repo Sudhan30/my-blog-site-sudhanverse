@@ -25,10 +25,22 @@ export function layout(options: LayoutOptions): string {
   <!-- Theme Script (runs immediately to prevent flash) -->
   <script>
     (function() {
-      const savedTheme = localStorage.getItem('theme');
-      const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      const theme = savedTheme || (systemDark ? 'dark' : 'light');
-      document.documentElement.setAttribute('data-theme', theme);
+      function applyTheme() {
+        const savedTheme = localStorage.getItem('theme');
+        const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        const theme = savedTheme || (systemDark ? 'dark' : 'light');
+        document.documentElement.setAttribute('data-theme', theme);
+      }
+
+      // Apply theme immediately
+      applyTheme();
+
+      // Reapply theme when page is restored from bfcache (back/forward navigation)
+      window.addEventListener('pageshow', function(event) {
+        if (event.persisted) {
+          applyTheme();
+        }
+      });
     })();
   </script>
   
@@ -178,20 +190,10 @@ export function layout(options: LayoutOptions): string {
 
   <!-- Scripts -->
   <script>
-    // Theme Toggle
+    // Theme Toggle (theme is already applied by inline script in head)
     const themeToggle = document.getElementById('theme-toggle');
     const html = document.documentElement;
-    
-    // Check saved preference or system preference
-    const savedTheme = localStorage.getItem('theme');
-    const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    
-    if (savedTheme) {
-      html.setAttribute('data-theme', savedTheme);
-    } else if (systemDark) {
-      html.setAttribute('data-theme', 'dark');
-    }
-    
+
     themeToggle.addEventListener('click', () => {
       const current = html.getAttribute('data-theme');
       const next = current === 'dark' ? 'light' : 'dark';
