@@ -9,21 +9,15 @@ readTime: 12
 
 > "The best way to learn infrastructure is to own every layer of it."
 
-## Two Production Websites, Two Philosophies
+## Why Self-Host a Blog?
 
-I run production websites built on completely different philosophies. Two of them represent opposite ends of the deployment spectrum:
+Most blogs run on managed platforms. WordPress, Ghost, Medium. Simple, reliable, managed. You write, they handle everything else.
 
-**Portfolio ([sudharsana.dev](https://sudharsana.dev))**: Firebase Hosting, Cloud Functions, Firestore. Zero infrastructure management. Deploy with `firebase deploy`. Scales automatically. Never think about servers, containers, or orchestration. It just works.
+But I wanted to understand production Kubernetes at a level you don't get from tutorials or managed services. Theory is useful. Breaking things at 2am and fixing them is educational.
 
-**Blog ([blog.sudharsana.dev](https://blog.sudharsana.dev))**: Self-hosted on a mini PC. K3s cluster. Manual everything. SSH to fix issues. Monitor resource usage. Understand every component from the bootloader to the ingress controller.
+So I built a blog platform on a mini PC running K3s. Self-hosted. Self-managed. Every layer from the bootloader to the ingress controller under my control. I learn by breaking things, fixing state drift, debugging OOM kills, and tuning resource limits.
 
-The portfolio is economically rational. Firebase is cheap, reliable, and maintained by Google. It's the smart choice for a personal site.
-
-The blog is educationally valuable. I learn by breaking things, fixing state drift, debugging OOM kills, and tuning resource limits. It's the smart choice for understanding infrastructure deeply.
-
-This post is about the second one. Not because it's better, but because there's more to explain. Most blogs run on managed platforms. WordPress, Ghost, Medium. Simple, reliable, managed. But I wanted to understand production Kubernetes at a level you don't get from tutorials or managed services.
-
-So I built a blog platform on a mini PC running K3s. This is the full technical breakdown.
+This is the full technical breakdown of running a production K3s blog on a homelab cluster.
 
 ## The Stack
 
