@@ -16,11 +16,21 @@ export function layout(options: LayoutOptions): string {
   const canonicalUrl = url.startsWith("http") ? url : `${SITE_URL}${url}`;
 
   return `<!DOCTYPE html>
-<html lang="en" data-theme="light">
+<html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>${fullTitle}</title>
+
+  <!-- Theme Script (runs immediately to prevent flash) -->
+  <script>
+    (function() {
+      const savedTheme = localStorage.getItem('theme');
+      const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+      const theme = savedTheme || (systemDark ? 'dark' : 'light');
+      document.documentElement.setAttribute('data-theme', theme);
+    })();
+  </script>
   
   <!-- SEO Meta Tags -->
   <meta name="description" content="${description}">
