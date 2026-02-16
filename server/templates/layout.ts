@@ -95,7 +95,7 @@ export function layout(options: LayoutOptions): string {
       <nav class="main-nav" id="main-nav">
         <a href="/" class="nav-link">Home</a>
         <a href="https://sudharsana.dev" target="_blank" rel="noopener" class="nav-link">Portfolio</a>
-        <a href="https://github.com/sudharsanarajasekaran" target="_blank" rel="noopener" class="nav-link">GitHub</a>
+        <a href="https://github.com/sudhan30" target="_blank" rel="noopener" class="nav-link">GitHub</a>
         <a href="https://www.linkedin.com/in/sudharsanarajasekaran/" target="_blank" rel="noopener" class="nav-link">LinkedIn</a>
       </nav>
       

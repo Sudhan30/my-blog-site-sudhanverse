@@ -53,7 +53,7 @@ export async function postRoute(slug: string): Promise<Response> {
             <p>Passionate about solving real-world problems with data, I'm a data engineer with experience building enterprise-level solutions.</p>
             <div class="author-links">
               <a href="https://sudharsana.dev" target="_blank" rel="noopener" title="Portfolio"><i class="fas fa-globe"></i></a>
-              <a href="https://github.com/sudharsanarajasekaran" target="_blank" rel="noopener" title="GitHub"><i class="fab fa-github"></i></a>
+              <a href="https://github.com/sudhan30" target="_blank" rel="noopener" title="GitHub"><i class="fab fa-github"></i></a>
               <a href="https://www.linkedin.com/in/sudharsanarajasekaran/" target="_blank" rel="noopener" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
             </div>
           </div>
