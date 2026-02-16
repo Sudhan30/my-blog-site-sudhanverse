@@ -6,6 +6,8 @@ import { secureJson } from '../middleware/security';
 
 const DATABASE_URL = process.env.DATABASE_URL;
 const OLLAMA_HOST = process.env.OLLAMA_HOST || 'http://ollama-service:11434';
+const GOTIFY_URL = process.env.GOTIFY_URL || 'http://gotify-service.web:80';
+const GOTIFY_TOKEN = process.env.GOTIFY_TOKEN;
 
 if (!DATABASE_URL) {
     throw new Error('DATABASE_URL environment variable must be set');
@@ -400,6 +402,24 @@ export async function apiRouter(req: Request, path: string): Promise<Response> {
         try {
             const body = await req.json() as { name?: string; message: string; feedbackType?: string; rating?: number };
             console.log('Feedback received:', body);
+
+            // Send Gotify notification
+            if (GOTIFY_TOKEN) {
+                const name = body.name || 'Anonymous';
+                const rating = body.rating ? `⭐️ Rating: ${body.rating}/5\n` : '';
+                const feedbackType = body.feedbackType ? `Type: ${body.feedbackType}\n` : '';
+
+                fetch(`${GOTIFY_URL}/message?token=${GOTIFY_TOKEN}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        title: `📝 New Feedback from ${name}`,
+                        message: `${rating}${feedbackType}\n${body.message}`,
+                        priority: 5
+                    })
+                }).catch(err => console.error('Gotify notification failed:', err));
+            }
+
             return json({ message: 'Feedback received! Thank you.' });
         } catch (error) {
             console.error('Feedback error:', error);
