@@ -1,6 +1,6 @@
 ---
 title: "Two Sites, Two Paths"
-date: 2025-01-15
+date: 2025-08-04
 tags: [infrastructure, deployment, cloud, self-hosting, devops, kubernetes]
 excerpt: "Firebase for a serverless portfolio versus a self-hosted Kubernetes cluster for a full-featured blog. Why I chose different deployment strategies for different needs, and what I learned from each."
 slug: two-sites-two-paths

@@ -1,6 +1,6 @@
 ---
 title: "Deploying to the Cloud: My Infrastructure Journey"
-date: 2025-09-15
+date: 2025-10-20
 tags: [cloud, deployment, infrastructure, devops, gcp, firebase]
 excerpt: "From GCS buckets and expensive load balancers to Firebase's serverless architecture. A journey through cost optimization, architecture decisions, and lessons learned deploying a production portfolio site."
 slug: my-cloud-site

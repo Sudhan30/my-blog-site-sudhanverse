@@ -1,6 +1,6 @@
 ---
 title: "Building a Production K3s Blog: Architecture Deep Dive"
-date: 2025-08-04
+date: 2025-09-15
 tags: [kubernetes, k3s, self-hosting, infrastructure, monitoring, gitops, devops]
 excerpt: "From a mini PC to a full production blog platform. Deep dive into the K3s architecture, monitoring stack, GitOps deployment, and lessons learned running a self-hosted blog on a homelab cluster."
 slug: k3s-blog-architecture
