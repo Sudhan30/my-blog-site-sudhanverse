@@ -1,6 +1,6 @@
 ---
 title: "Building an AI Chat System with Practical Memory, Search, and Multimodal Intelligence"
-date: 2026-02-05
+date: 2025-10-20
 tags: [ai, llm, architecture, backend, typescript]
 excerpt: "A behind-the-scenes engineering deep dive into building a production AI chat system. Memory management, context compression, web search integration, and the infrastructure decisions that make it work."
 slug: building-ai-chat-system
