@@ -154,7 +154,7 @@ or nearby places, use THIS location - NOT any other location.
 
 Location is treated as **optional context, not a requirement**. If location is missing or imprecise, the system still functions normally. This avoids brittle behavior and privacy concerns.
 
-Location data is never blindly injected—it's only used when the user's query is location-sensitive.
+Location data is never blindly injected. It is only surfaced when the user's query is actually location-sensitive.
 
 ---
 
@@ -389,7 +389,7 @@ With these foundations, it becomes easier to add:
 - **Long-term memory** - Facts that persist across sessions
 - **Domain-specific tools** - Calculator, code execution, APIs
 
-The system is not a demo—it's a **platform for continuous improvement**.
+The system is not a demo. It is a **platform for continuous improvement**.
 
 ---
 
