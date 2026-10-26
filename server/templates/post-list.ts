@@ -1,10 +1,10 @@
 import type { PostIndex } from "../lib/posts";
 import { icon } from "./icons";
+import { esc } from "../lib/escape";
 
 export type PostSummary = PostIndex["posts"][number];
 
-export const esc = (s: string): string =>
-  s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;");
+export { esc };
 
 export const readingTime = (post: PostSummary): number =>
   post.readTime || Math.max(1, Math.ceil((post.excerpt.split(/\s+/).length * 10) / 200));
