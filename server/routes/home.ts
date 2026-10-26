@@ -33,7 +33,7 @@ export async function homeRoute(_req: Request): Promise<Response> {
     <section class="spotlight reveal" aria-label="Featured post">
       <a href="/post/${spotlight.slug}" class="spotlight-media" aria-hidden="true" tabindex="-1">
         ${spotlight.cover ? `<img src="${spotlight.cover}" alt="" loading="eager">` : `<div class="media-fallback" style="--tag-hue:${tagHue(spotlight.tags[0] || spotlight.slug)}"></div>`}
-        ${spotlight.video ? `<span class="play-chip"><i class="fas fa-play"></i> Watch the demo</span>` : ""}
+        ${spotlight.video ? `<span class="play-chip"><i class="fas fa-play"></i> Demo video</span>` : ""}
       </a>
       <div class="spotlight-body">
         <div class="eyebrow">
@@ -103,18 +103,12 @@ export async function homeRoute(_req: Request): Promise<Response> {
   const content = `
     <!-- Hero Section -->
     <section class="hero">
-      <div class="hero-bg" aria-hidden="true">
-        <div class="blob blob-a"></div>
-        <div class="blob blob-b"></div>
-        <div class="blob blob-c"></div>
-        <div class="hero-grid"></div>
-      </div>
       <div class="hero-content">
         <div class="hero-kicker">
           <img src="/assets/images/author-potrait-small.png" alt="Sudharsana" class="hero-avatar" fetchpriority="high">
           <span>Sudharsana Rajasekaran · data engineer, builder</span>
         </div>
-        <h1 class="hero-title">Resolving <span class="highlight">dependencies</span>,<br>one idea at a time.</h1>
+        <h1 class="hero-title">Resolving dependencies, one idea at a time.</h1>
         <p class="hero-subtitle">A logbook of building data systems and AI agents in the real world: production lessons, homelab infrastructure, and the things I ship in a day at hackathons.</p>
         <div class="hero-actions">
           <a href="#latest" class="btn btn-primary">Start reading <i class="fas fa-arrow-down"></i></a>
@@ -138,12 +132,12 @@ export async function homeRoute(_req: Request): Promise<Response> {
     </section>
 
     <div class="container">
-      ${spotlight ? `<h2 class="section-title reveal"><span class="section-index">01</span> Featured</h2>` : ""}
+      ${spotlight ? `<h2 class="section-title reveal">Featured</h2>` : ""}
       ${spotlightHtml}
       ${secondaryHtml}
 
       <section class="posts-section" id="latest">
-        <h2 class="section-title reveal"><span class="section-index">${spotlight ? "02" : "01"}</span> Latest writing</h2>
+        <h2 class="section-title reveal">Latest writing</h2>
         <div class="posts-grid">
           ${postCards}
         </div>
