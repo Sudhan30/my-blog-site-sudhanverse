@@ -1,23 +1,26 @@
 import { layout } from "../templates/layout";
 import { getPostsByTag } from "../lib/posts";
 import { secureHtml } from "../middleware/security";
+import { tagHue } from "../lib/tags";
 
 export async function tagRoute(tag: string): Promise<Response> {
     const posts = await getPostsByTag(tag);
 
     const postCards = posts.map(post => {
         const date = new Date(post.date).toLocaleDateString("en-US", {
+    timeZone: "UTC",
             month: "short",
             day: "numeric",
             year: "numeric"
         });
 
         const tags = post.tags.map(t =>
-            `<a href="/tag/${encodeURIComponent(t)}" class="tag ${t === tag ? 'active' : ''}">${t}</a>`
+            `<a href="/tag/${encodeURIComponent(t)}" class="tag ${t === tag ? 'active' : ''}" style="--tag-hue:${tagHue(t)}">${t}</a>`
         ).join("");
 
         return `
-      <article class="post-card">
+      <article class="post-card" style="--tag-hue:${tagHue(post.tags[0] || post.slug)}">
+        <div class="post-card-accent"></div>
         <div class="post-content">
           <div class="post-meta">
             <time datetime="${post.date}">${date}</time>
@@ -28,7 +31,7 @@ export async function tagRoute(tag: string): Promise<Response> {
           <p class="post-excerpt">${post.excerpt}</p>
           <div class="post-footer">
             <div class="post-tags">${tags}</div>
-            <a href="/post/${post.slug}" class="read-more">Read more →</a>
+            <a href="/post/${post.slug}" class="read-more" aria-label="Read ${post.title}"><i class="fas fa-arrow-right"></i></a>
           </div>
         </div>
       </article>
@@ -48,9 +51,9 @@ export async function tagRoute(tag: string): Promise<Response> {
     <div class="container">
       <div class="tag-page">
         <div class="tag-header">
-          <a href="/" class="back-link">← Back to blog</a>
-          <h1>Posts tagged with "${tag}"</h1>
-          <span class="tag-badge">${tag}</span>
+          <a href="/" class="back-link"><i class="fas fa-arrow-left"></i> All posts</a>
+          <span class="eyebrow">Topic · ${posts.length} post${posts.length === 1 ? "" : "s"}</span>
+          <h1 style="--tag-hue:${tagHue(tag)}"><span class="tag-hash">#</span>${tag}</h1>
         </div>
         
         ${posts.length > 0 ? `

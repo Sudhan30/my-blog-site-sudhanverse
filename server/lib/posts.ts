@@ -12,6 +12,12 @@ export interface Post {
     excerpt: string;
     content: string;
     readTime?: number;
+    cover?: string;
+    video?: string;
+    poster?: string;
+    featured?: boolean;
+    badge?: string;
+    event?: string;
 }
 
 export interface PostIndex {
@@ -41,7 +47,13 @@ export async function getAllPosts(): Promise<Post[]> {
             tags: data.tags || [],
             excerpt: data.excerpt || body.slice(0, 160) + "...",
             content: body,
-            readTime: data.readTime
+            readTime: data.readTime,
+            cover: data.cover,
+            video: data.video,
+            poster: data.poster,
+            featured: data.featured === true,
+            badge: data.badge,
+            event: data.event
         });
     }
 
