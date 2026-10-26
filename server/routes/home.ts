@@ -136,7 +136,7 @@ export async function homeRoute(_req: Request): Promise<Response> {
 
   const response = secureHtml(html);
   const headers = new Headers(response.headers);
-  headers.set("Cache-Control", "public, max-age=3600");
+  headers.set("Cache-Control", "public, max-age=300");
 
   return new Response(response.body, {
     status: response.status,

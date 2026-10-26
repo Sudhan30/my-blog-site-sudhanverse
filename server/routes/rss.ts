@@ -35,6 +35,6 @@ ${items}
 </rss>`;
 
     return addSecurityHeaders(new Response(xml, {
-        headers: { "Content-Type": "application/rss+xml; charset=utf-8" }
+        headers: { "Content-Type": "application/rss+xml; charset=utf-8", "Cache-Control": "public, max-age=3600" }
     }));
 }
