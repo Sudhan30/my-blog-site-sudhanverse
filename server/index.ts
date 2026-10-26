@@ -58,11 +58,11 @@ serve({
                     headers.set("Content-Type", file.type);
                     headers.set("Content-Range", `bytes ${start}-${end}/${size}`);
                     headers.set("Accept-Ranges", "bytes");
-                    headers.set("Cache-Control", "public, max-age=31536000");
+                    headers.set("Cache-Control", "public, max-age=86400");
                     return new Response(bytes, { status: 206, headers });
                 }
                 return addSecurityHeaders(new Response(file, {
-                    headers: { "Cache-Control": "public, max-age=31536000", "Accept-Ranges": "bytes" }
+                    headers: { "Cache-Control": "public, max-age=86400", "Accept-Ranges": "bytes" }
                 }));
             }
             return addSecurityHeaders(new Response("Not Found", { status: 404 }));
