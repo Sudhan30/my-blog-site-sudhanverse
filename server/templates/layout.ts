@@ -1,4 +1,5 @@
 import { icon } from "./icons";
+import { esc } from "../lib/escape";
 
 export interface LayoutOptions {
   title: string;
@@ -13,9 +14,23 @@ const SITE_NAME = "Sudharsana's Tech Blog";
 const SITE_URL = "https://blog.sudharsana.dev";
 
 export function layout(options: LayoutOptions): string {
-  const { title, description, url, content, ogType = "website", ogImage } = options;
-  const fullTitle = title === "Home" ? `Resolving Dependencies, One Idea at a Time. | ${SITE_NAME}` : `${title} | ${SITE_NAME}`;
-  const canonicalUrl = url.startsWith("http") ? url : `${SITE_URL}${url}`;
+  const { content } = options;
+  const title = esc(options.title);
+  const description = esc(options.description);
+  const ogType = esc(options.ogType ?? "website");
+  const ogImage = options.ogImage ? esc(options.ogImage) : undefined;
+  const fullTitle = options.title === "Home" ? `Resolving Dependencies, One Idea at a Time. | ${SITE_NAME}` : `${title} | ${SITE_NAME}`;
+  const canonicalUrl = esc(options.url.startsWith("http") ? options.url : `${SITE_URL}${options.url}`);
+
+  // JSON.stringify is not enough in a <script>: "<" would let "</script>" end the block
+  const jsonLd = JSON.stringify({
+    "@context": "https://schema.org",
+    "@type": "Blog",
+    name: "Resolving Dependencies, One Idea at a Time.",
+    description: options.description,
+    url: SITE_URL,
+    author: { "@type": "Person", name: "Sudharsana" }
+  }).replace(/</g, "\\u003c");
 
   return `<!DOCTYPE html>
 <html lang="en">
@@ -91,19 +106,7 @@ export function layout(options: LayoutOptions): string {
   <link rel="icon" type="image/x-icon" href="/favicon.ico">
   
   <!-- Structured Data -->
-  <script type="application/ld+json">
-  {
-    "@context": "https://schema.org",
-    "@type": "Blog",
-    "name": "Resolving Dependencies, One Idea at a Time.",
-    "description": "${description}",
-    "url": "${SITE_URL}",
-    "author": {
-      "@type": "Person",
-      "name": "Sudharsana"
-    }
-  }
-  </script>
+  <script type="application/ld+json">${jsonLd}</script>
 </head>
 <body>
   <a href="#main" class="skip-link">Skip to content</a>
