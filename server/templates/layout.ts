@@ -1,3 +1,5 @@
+import { icon } from "./icons";
+
 export interface LayoutOptions {
   title: string;
   description: string;
@@ -20,7 +22,8 @@ export function layout(options: LayoutOptions): string {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#111317">
+  <meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0B0B0C" media="(prefers-color-scheme: dark)">
   <title>${fullTitle}</title>
 
   <!-- Theme Script (runs immediately to prevent flash) -->
@@ -78,11 +81,10 @@ export function layout(options: LayoutOptions): string {
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
   
   <!-- Styles -->
-  <link rel="stylesheet" href="/styles/main.css?v=2026102601">
+  <link rel="stylesheet" href="/styles/main.css?v=2026102701">
   
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
@@ -104,18 +106,14 @@ export function layout(options: LayoutOptions): string {
   </script>
 </head>
 <body>
-  <!-- Reading Progress Bar -->
-  <div class="reading-progress" id="reading-progress"></div>
-  
+  <a href="#main" class="skip-link">Skip to content</a>
+
   <!-- Header -->
   <header class="site-header" id="site-header">
     <div class="header-container">
-      <a href="/" class="logo" aria-label="Home">
-        <span class="logo-initials">SR</span>
-        <span class="logo-text">Sudharsana Rajasekaran</span>
-      </a>
+      <a href="/" class="logo" aria-label="Home">Sudharsana Rajasekaran</a>
 
-      <nav class="main-nav" id="main-nav">
+      <nav class="main-nav" id="main-nav" aria-label="Primary">
         <a href="/" class="nav-link">Writing</a>
         <a href="/tag/hackathon" class="nav-link">Hackathons</a>
         <a href="https://sudharsana.dev" target="_blank" rel="noopener" class="nav-link">Portfolio</a>
@@ -124,85 +122,59 @@ export function layout(options: LayoutOptions): string {
       </nav>
 
       <div class="header-actions">
-        <a href="/rss.xml" class="icon-btn" aria-label="RSS feed" title="RSS feed"><i class="fas fa-rss"></i></a>
+        <a href="/rss.xml" class="icon-btn" aria-label="RSS feed" title="RSS feed">${icon("rss")}</a>
         <button class="theme-toggle icon-btn" id="theme-toggle" aria-label="Toggle theme">
-          <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-          <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+          ${icon("sun", { cls: "icon sun-icon" })}
+          ${icon("moon", { cls: "icon moon-icon" })}
         </button>
-
-        <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Toggle menu">
-          <span></span>
-          <span></span>
-          <span></span>
+        <button class="mobile-menu-btn icon-btn" id="mobile-menu-btn" aria-label="Toggle menu" aria-expanded="false" aria-controls="main-nav">
+          ${icon("menu", { cls: "icon menu-open" })}
+          ${icon("x", { cls: "icon menu-close" })}
         </button>
       </div>
     </div>
   </header>
 
   <!-- Main Content -->
-  <main class="main-content">
+  <main class="main-content" id="main">
     ${content}
   </main>
-  
-  <!-- Feedback Button -->
-  <button class="feedback-btn" id="feedback-btn" aria-label="Send Feedback">
-    <i class="fas fa-comment-dots"></i>
-  </button>
-  
+
   <!-- Feedback Modal -->
   <div class="feedback-modal" id="feedback-modal">
-    <div class="feedback-content">
-      <button class="feedback-close" id="feedback-close">&times;</button>
-      <h3>Send Feedback</h3>
-      <p>Have a suggestion or found an issue? Let me know!</p>
+    <div class="feedback-content" role="dialog" aria-modal="true" aria-labelledby="feedback-title">
+      <button class="feedback-close icon-btn" id="feedback-close" aria-label="Close">${icon("x")}</button>
+      <h3 id="feedback-title">Send feedback</h3>
+      <p>Have a suggestion or found an issue? Let me know.</p>
       <form class="feedback-form" id="feedback-form">
-        <input type="text" name="name" placeholder="Your name (optional)" class="feedback-input">
-        <textarea name="message" placeholder="Your feedback..." required class="feedback-textarea"></textarea>
-        <button type="submit" class="feedback-submit">Send Feedback</button>
+        <input type="text" name="name" placeholder="Your name (optional)" class="feedback-input" aria-label="Your name (optional)">
+        <textarea name="message" placeholder="Your feedback..." required class="feedback-textarea" aria-label="Your feedback"></textarea>
+        <button type="submit" class="feedback-submit">Send feedback</button>
       </form>
-      <div id="feedback-message" class="feedback-message"></div>
+      <div id="feedback-message" class="feedback-message" role="status"></div>
     </div>
   </div>
-  
+
   <!-- Footer -->
   <footer class="site-footer">
     <div class="footer-container">
-      <div class="footer-brand">
-        <a href="/" class="logo">
-          <span class="logo-initials">SR</span>
-          <span class="logo-text">Sudharsana Rajasekaran</span>
-        </a>
-        <p>Resolving dependencies, one idea at a time. Notes on data systems, AI agents and the things I build at hackathons.</p>
-      </div>
-      <div class="footer-col">
-        <h4>Read</h4>
-        <a href="/">All posts</a>
-        <a href="/tag/hackathon">Hackathons</a>
+      <p class="footer-copy">&copy; ${new Date().getFullYear()} Sudharsana Rajasekaran</p>
+      <nav class="footer-links" aria-label="Footer">
         <a href="/rss.xml">RSS</a>
-      </div>
-      <div class="footer-col">
-        <h4>Elsewhere</h4>
-        <a href="https://sudharsana.dev" target="_blank" rel="noopener">Portfolio</a>
         <a href="https://github.com/sudhan30" target="_blank" rel="noopener">GitHub</a>
         <a href="https://www.linkedin.com/in/sudharsanarajasekaran/" target="_blank" rel="noopener">LinkedIn</a>
-      </div>
-    </div>
-    <div class="footer-bottom">
-      <p>&copy; ${new Date().getFullYear()} Sudharsana Rajasekaran</p>
+        <a href="https://sudharsana.dev" target="_blank" rel="noopener">Portfolio</a>
+        <button type="button" class="link-btn" id="feedback-btn">Send feedback</button>
+      </nav>
     </div>
   </footer>
 
-  <!-- Cookie Consent Banner -->
-  <div id="cookie-consent" class="cookie-consent" style="display: none;">
-    <div class="cookie-inner">
-      <div class="cookie-text">
-        <h3>Cookies</h3>
-        <p>I use Google Analytics to understand how readers engage with the blog. You can accept or decline analytics tracking.</p>
-      </div>
-      <div class="cookie-actions">
-        <button onclick="acceptCookies()" class="btn btn-primary">Accept</button>
-        <button onclick="declineCookies()" class="btn btn-ghost">Decline</button>
-      </div>
+  <!-- Cookie Consent -->
+  <div id="cookie-consent" class="cookie-consent" role="region" aria-label="Cookie consent" style="display: none;">
+    <p>I use Google Analytics to understand how readers engage with the blog. You can accept or decline analytics tracking.</p>
+    <div class="cookie-actions">
+      <button onclick="acceptCookies()" class="btn btn-primary">Accept</button>
+      <button onclick="declineCookies()" class="btn btn-ghost">Decline</button>
     </div>
   </div>
 
@@ -224,25 +196,17 @@ export function layout(options: LayoutOptions): string {
     const mainNav = document.getElementById('main-nav');
     
     mobileBtn.addEventListener('click', () => {
-      mobileBtn.classList.toggle('active');
-      mainNav.classList.toggle('open');
+      const open = mainNav.classList.toggle('open');
+      mobileBtn.classList.toggle('active', open);
+      mobileBtn.setAttribute('aria-expanded', String(open));
     });
     
-    // Scroll reveal
-    const revealEls = document.querySelectorAll('.reveal');
-    if ('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      const io = new IntersectionObserver((entries) => {
-        entries.forEach(entry => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add('is-visible');
-            io.unobserve(entry.target);
-          }
-        });
-      }, { rootMargin: '0px 0px -8% 0px' });
-      revealEls.forEach(el => io.observe(el));
-    } else {
-      revealEls.forEach(el => el.classList.add('is-visible'));
-    }
+    // Mark the current nav link
+    document.querySelectorAll('.main-nav a[href^="/"]').forEach((a) => {
+      const href = a.getAttribute('href');
+      const path = window.location.pathname;
+      if (href === '/' ? (path === '/' || path.startsWith('/post/')) : path === href) a.setAttribute('aria-current', 'page');
+    });
 
     // Header state on scroll
     const siteHeader = document.getElementById('site-header');
@@ -253,12 +217,15 @@ export function layout(options: LayoutOptions): string {
     // Reading Progress
     const progressBar = document.getElementById('reading-progress');
     
-    window.addEventListener('scroll', () => {
-      const scrollTop = window.scrollY;
-      const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-      const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
-      progressBar.style.width = progress + '%';
-    });
+    if (progressBar) {
+      const updateProgress = () => {
+        const docHeight = document.documentElement.scrollHeight - window.innerHeight;
+        const progress = docHeight > 0 ? (window.scrollY / docHeight) * 100 : 0;
+        progressBar.style.width = progress + '%';
+      };
+      updateProgress();
+      window.addEventListener('scroll', updateProgress, { passive: true });
+    }
     
     // Feedback Modal
     const feedbackBtn = document.getElementById('feedback-btn');
@@ -268,14 +235,23 @@ export function layout(options: LayoutOptions): string {
     
     feedbackBtn.addEventListener('click', () => {
       feedbackModal.classList.add('open');
+      const field = feedbackForm.querySelector('textarea');
+      if (field) field.focus();
     });
-    
-    feedbackClose.addEventListener('click', () => {
+
+    const closeFeedback = () => {
       feedbackModal.classList.remove('open');
-    });
-    
+      feedbackBtn.focus();
+    };
+
+    feedbackClose.addEventListener('click', closeFeedback);
+
     feedbackModal.addEventListener('click', (e) => {
-      if (e.target === feedbackModal) feedbackModal.classList.remove('open');
+      if (e.target === feedbackModal) closeFeedback();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && feedbackModal.classList.contains('open')) closeFeedback();
     });
     
     feedbackForm.addEventListener('submit', async (e) => {

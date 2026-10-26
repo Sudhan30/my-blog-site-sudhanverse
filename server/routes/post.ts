@@ -2,7 +2,8 @@ import { layout } from "../templates/layout";
 import { getPostBySlug } from "../lib/posts";
 import { renderMarkdown } from "../lib/markdown";
 import { secureHtml } from "../middleware/security";
-import { tagHue } from "../lib/tags";
+import { icon } from "../templates/icons";
+import { esc } from "../templates/post-list";
 
 export async function postRoute(slug: string): Promise<Response> {
   const post = await getPostBySlug(slug);
@@ -14,7 +15,7 @@ export async function postRoute(slug: string): Promise<Response> {
   const date = new Date(post.date).toLocaleDateString("en-US", {
     timeZone: "UTC",
     year: "numeric",
-    month: "long",
+    month: "short",
     day: "numeric"
   });
 
@@ -23,8 +24,8 @@ export async function postRoute(slug: string): Promise<Response> {
   const htmlContent = renderMarkdown(post.content);
 
   const tags = post.tags.map(t =>
-    `<a href="/tag/${encodeURIComponent(t)}" class="tag" style="--tag-hue:${tagHue(t)}">${t}</a>`
-  ).join("");
+    `<a href="/tag/${encodeURIComponent(t)}">${esc(t)}</a>`
+  ).join(", ");
 
   const readTime = post.readTime || Math.max(1, Math.ceil(post.content.split(/\s+/).length / 220));
 
@@ -38,63 +39,75 @@ export async function postRoute(slug: string): Promise<Response> {
         </figure>
   ` : post.cover ? `
         <figure class="article-hero-media">
-          <img src="${post.cover}" alt="${post.title}">
+          <img src="${post.cover}" alt="${esc(post.title)}">
         </figure>
   ` : "";
 
+  const eventLine = post.event
+    ? `<p class="article-event">${post.badge ? `${esc(post.badge)}, ` : ""}${esc(post.event)}</p>`
+    : "";
+
   // Only show article header for non-custom template posts
   const articleHeader = isCustomTemplate ? '' : `
-        <header class="article-header" style="--tag-hue:${tagHue(post.tags[0] || post.slug)}">
-          <a href="/" class="back-link"><i class="fas fa-arrow-left"></i> All posts</a>
-          ${post.event ? `<div class="eyebrow">${post.badge ? `<span class="badge">${post.badge}</span>` : ""}<span>${post.event}</span></div>` : ""}
-          <h1 class="article-title">${post.title}</h1>
-          <p class="article-dek">${post.excerpt}</p>
+        <header class="article-header">
+          <a href="/" class="back-link">${icon("arrow-left")} All writing</a>
+          <h1 class="article-title">${esc(post.title)}</h1>
+          <p class="article-dek">${esc(post.excerpt)}</p>
           <div class="article-meta">
-            <img src="/assets/images/author-potrait-small.png" alt="" class="article-meta-avatar">
-            <span>Sudharsana Rajasekaran</span>
-            <span class="dot">·</span>
-            <time datetime="${post.date}">${date}</time>
-            <span class="dot">·</span>
-            <span>${readTime} min read</span>
+            <img src="/assets/images/author-potrait-small.png" alt="" class="article-meta-avatar" width="32" height="32">
+            <div class="article-meta-text">
+              <span class="article-meta-name">Sudharsana Rajasekaran</span>
+              <span class="article-meta-sub"><time datetime="${post.date}">${date}</time> · ${readTime} min read</span>
+            </div>
           </div>
-          <div class="article-tags">${tags}</div>
+          ${eventLine}
         </header>
         ${heroMedia}
   `;
 
   const content = `
+    <div class="reading-progress" id="reading-progress"></div>
     <article class="article-page${isCustomTemplate ? ' custom-template' : ''}">
       <div class="container article-container">
         ${articleHeader}
-        
-        <!-- Article Content -->
-        <div class="article-content">
-          ${htmlContent}
+
+        <div class="article-body">
+          <div class="article-content" id="article-content">
+            ${htmlContent}
+          </div>
+          <aside class="toc" id="toc" aria-label="On this page" hidden>
+            <div class="toc-inner">
+              <p class="toc-title">On this page</p>
+              <ul class="toc-list" id="toc-list"></ul>
+            </div>
+          </aside>
         </div>
-        
+
+        ${tags ? `<p class="article-tags">Filed under ${tags}</p>` : ""}
+
         <!-- Author Section with Like Button -->
         <section class="author-section">
-          <img src="/assets/images/author-potrait-small.png" alt="Sudharsana" class="author-avatar">
+          <img src="/assets/images/author-potrait-small.png" alt="Sudharsana" class="author-avatar" width="48" height="48" loading="lazy">
           <div class="author-info">
-            <h3>About the Author</h3>
-            <p>Passionate about solving real-world problems with data, I'm a data engineer with experience building enterprise-level solutions.</p>
+            <h3>Sudharsana Rajasekaran</h3>
+            <p>Data engineer building data systems and AI agents.</p>
             <div class="author-links">
-              <a href="https://sudharsana.dev" target="_blank" rel="noopener" title="Portfolio"><i class="fas fa-globe"></i></a>
-              <a href="https://github.com/sudhan30" target="_blank" rel="noopener" title="GitHub"><i class="fab fa-github"></i></a>
-              <a href="https://www.linkedin.com/in/sudharsanarajasekaran/" target="_blank" rel="noopener" title="LinkedIn"><i class="fab fa-linkedin"></i></a>
+              <a href="https://sudharsana.dev" target="_blank" rel="noopener" title="Portfolio" aria-label="Portfolio">${icon("globe")}</a>
+              <a href="https://github.com/sudhan30" target="_blank" rel="noopener" title="GitHub" aria-label="GitHub">${icon("github")}</a>
+              <a href="https://www.linkedin.com/in/sudharsanarajasekaran/" target="_blank" rel="noopener" title="LinkedIn" aria-label="LinkedIn">${icon("linkedin")}</a>
             </div>
           </div>
           <button class="like-btn" id="like-btn" data-slug="${post.slug}" aria-label="Like this post">
-            <i class="far fa-thumbs-up"></i>
+            <span class="like-icon">${icon("thumbs-up")}</span>
             <span id="like-count">0</span>
           </button>
         </section>
-        
+
         <!-- Comments Section -->
         <section class="comments-section" id="comments-section">
           <div class="comments-header">
-            <h3>Comments <span id="comment-count">(0)</span></h3>
-            <select id="comment-sort" class="comment-sort">
+            <h2>Comments <span id="comment-count">(0)</span></h2>
+            <select id="comment-sort" class="comment-sort" aria-label="Sort comments">
               <option value="recent">Most Recent</option>
               <option value="oldest">Oldest First</option>
               <option value="most_liked">Most Liked</option>
@@ -104,7 +117,7 @@ export async function postRoute(slug: string): Promise<Response> {
           <!-- AI-Generated Comment Summary (hidden if no summary) -->
           <div id="comment-summary" class="comment-summary" style="display: none;">
             <div class="summary-header">
-              <i class="fas fa-robot"></i>
+              ${icon("sparkles")}
               <span>What readers are saying</span>
             </div>
             <p id="summary-text"></p>
@@ -117,16 +130,16 @@ export async function postRoute(slug: string): Promise<Response> {
           <form class="comment-form" id="comment-form">
             <input type="hidden" name="postSlug" value="${post.slug}">
             <div class="name-input-wrapper">
-              <input type="text" name="name" placeholder="Your name" class="comment-input" id="comment-name">
-              <div class="name-error" id="name-error" style="display: none;">
-                <i class="fas fa-exclamation-circle"></i>
+              <input type="text" name="name" placeholder="Your name" class="comment-input" id="comment-name" aria-label="Your name">
+              <div class="name-error" id="name-error" style="display: none;" role="alert">
+                ${icon("alert-circle")}
                 <span id="name-error-text"></span>
               </div>
             </div>
-            <textarea name="comment" placeholder="Share your thoughts..." required class="comment-textarea" maxlength="2000"></textarea>
-            <button type="submit" class="comment-submit">Post Comment</button>
+            <textarea name="comment" placeholder="Share your thoughts..." required class="comment-textarea" maxlength="2000" aria-label="Comment"></textarea>
+            <button type="submit" class="comment-submit">Post comment</button>
           </form>
-          
+
           <div id="comments-list" class="comments-list">
             <!-- Comments loaded dynamically -->
           </div>
@@ -136,9 +149,19 @@ export async function postRoute(slug: string): Promise<Response> {
         </section>
       </div>
     </article>
-    
+
     <script>
       const slug = "${post.slug}";
+      const ICONS = ${JSON.stringify({
+        thumbs: icon("thumbs-up"),
+        thumbsFilled: icon("thumbs-up", { filled: true }),
+        heart: icon("heart"),
+        heartFilled: icon("heart", { filled: true }),
+        user: icon("user"),
+        arrowLeft: icon("arrow-left"),
+        arrowRight: icon("arrow-right"),
+        x: icon("x", { size: 20 })
+      })};
       
       // Client ID management
       function getClientId() {
@@ -278,7 +301,7 @@ export async function postRoute(slug: string): Promise<Response> {
           if (!existingBadge) {
             const badge = document.createElement('div');
             badge.className = 'name-badge';
-            badge.innerHTML = '<i class="fas fa-robot"></i> Your username: <strong>' + escapeHtml(displayName) + '</strong>';
+            badge.innerHTML = ICONS.user + ' Your username: <strong>' + escapeHtml(displayName) + '</strong>';
             nameInput.parentElement.appendChild(badge);
           }
         }
@@ -299,10 +322,10 @@ export async function postRoute(slug: string): Promise<Response> {
       function updateLikeBtn() {
         if (hasLiked) {
           likeBtn.classList.add('liked');
-          likeBtn.querySelector('i').className = 'fas fa-thumbs-up';
+          likeBtn.querySelector('.like-icon').innerHTML = ICONS.thumbsFilled;
         } else {
           likeBtn.classList.remove('liked');
-          likeBtn.querySelector('i').className = 'far fa-thumbs-up';
+          likeBtn.querySelector('.like-icon').innerHTML = ICONS.thumbs;
         }
       }
       
@@ -367,7 +390,7 @@ export async function postRoute(slug: string): Promise<Response> {
 
             const likeCount = c.like_count || 0;
             const userLiked = c.user_liked || false;
-            const likeIcon = userLiked ? 'fas fa-heart' : 'far fa-heart';
+            const likeIcon = userLiked ? ICONS.heartFilled : ICONS.heart;
             const likedClass = userLiked ? 'liked' : '';
 
             // Escape HTML in content to prevent injection
@@ -381,7 +404,7 @@ export async function postRoute(slug: string): Promise<Response> {
                     <span class="comment-date">\${timeAgo(c.created_at)}</span>
                   </div>
                   <button class="comment-like-btn \${likedClass}" data-comment-id="\${c.id}" data-liked="\${userLiked}">
-                    <i class="\${likeIcon}"></i>
+                    <span class="like-icon">\${likeIcon}</span>
                     <span class="like-count">\${likeCount > 0 ? likeCount : ''}</span>
                   </button>
                 </div>
@@ -420,17 +443,17 @@ export async function postRoute(slug: string): Promise<Response> {
           if (res.ok) {
             const data = await res.json();
             const likeCountSpan = btn.querySelector('.like-count');
-            const icon = btn.querySelector('i');
+            const icon = btn.querySelector('.like-icon');
 
             likeCountSpan.textContent = data.count > 0 ? data.count : '';
             btn.dataset.liked = data.liked;
 
             if (data.liked) {
               btn.classList.add('liked');
-              icon.className = 'fas fa-heart';
+              icon.innerHTML = ICONS.heartFilled;
             } else {
               btn.classList.remove('liked');
-              icon.className = 'far fa-heart';
+              icon.innerHTML = ICONS.heart;
             }
           }
         } catch (error) {
@@ -459,7 +482,7 @@ export async function postRoute(slug: string): Promise<Response> {
 
         // Previous button
         if (page > 1) {
-          html += \`<button class="page-btn" data-page="\${page - 1}">← Previous</button>\`;
+          html += \`<button class="page-btn" data-page="\${page - 1}">\${ICONS.arrowLeft} Previous</button>\`;
         }
 
         // Page numbers
@@ -467,7 +490,7 @@ export async function postRoute(slug: string): Promise<Response> {
 
         // Next button
         if (page < totalPages) {
-          html += \`<button class="page-btn" data-page="\${page + 1}">Next →</button>\`;
+          html += \`<button class="page-btn" data-page="\${page + 1}">Next \${ICONS.arrowRight}</button>\`;
         }
 
         html += '</div>';
@@ -538,7 +561,7 @@ export async function postRoute(slug: string): Promise<Response> {
             // Update the name badge
             const badge = document.querySelector('.name-badge');
             if (badge) {
-              badge.innerHTML = '<i class="fas fa-user"></i> Your username: <strong>' + escapeHtml(customName) + '</strong>';
+              badge.innerHTML = ICONS.user + ' Your username: <strong>' + escapeHtml(customName) + '</strong>';
             }
 
             console.log('✅ Custom name saved:', customName);
@@ -604,6 +627,67 @@ export async function postRoute(slug: string): Promise<Response> {
       loadComments();
       loadSummary();
 
+      // Fade the right edge of tables that scroll horizontally
+      (function() {
+        document.querySelectorAll('.table-wrap').forEach(function(w) {
+          const update = function() {
+            const more = w.scrollWidth - w.clientWidth - w.scrollLeft > 4;
+            w.classList.toggle('is-scrollable', more);
+          };
+          update();
+          w.addEventListener('scroll', update, { passive: true });
+          window.addEventListener('resize', update);
+        });
+      })();
+
+      // Table of contents ("On this page") built from the rendered H2s
+      (function() {
+        const container = document.getElementById('article-content');
+        const toc = document.getElementById('toc');
+        const list = document.getElementById('toc-list');
+        if (!container || !toc || !list) return;
+        const heads = Array.from(container.querySelectorAll('h2'));
+        if (heads.length < 3) return;
+        const used = new Set(Array.from(container.querySelectorAll('[id]')).map(function(el) { return el.id; }));
+        heads.forEach(function(h, i) {
+          if (!h.id) {
+            let base = h.textContent.toLowerCase().replace(/[^a-z0-9\\s-]/g, '').trim().replace(/\\s+/g, '-') || 'section-' + (i + 1);
+            let id = base, n = 2;
+            while (used.has(id)) { id = base + '-' + n++; }
+            used.add(id);
+            h.id = id;
+          }
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+          a.href = '#' + h.id;
+          a.textContent = h.textContent;
+          li.appendChild(a);
+          list.appendChild(li);
+        });
+        toc.hidden = false;
+
+        const links = Array.from(list.querySelectorAll('a'));
+        function setCurrent(id) {
+          links.forEach(function(l) { l.classList.toggle('current', l.getAttribute('href') === '#' + id); });
+        }
+        if ('IntersectionObserver' in window) {
+          const visible = new Set();
+          const io = new IntersectionObserver(function(entries) {
+            entries.forEach(function(e) {
+              if (e.isIntersecting) visible.add(e.target.id); else visible.delete(e.target.id);
+            });
+            const first = heads.find(function(h) { return visible.has(h.id); });
+            if (first) setCurrent(first.id);
+            else {
+              // Between headings: keep the last heading that is above the viewport
+              const above = heads.filter(function(h) { return h.getBoundingClientRect().top < 120; });
+              if (above.length) setCurrent(above[above.length - 1].id);
+            }
+          }, { rootMargin: '-80px 0px -65% 0px' });
+          heads.forEach(function(h) { io.observe(h); });
+        }
+      })();
+
       // Image lightbox functionality
       (function() {
         // Create lightbox modal HTML
@@ -611,8 +695,8 @@ export async function postRoute(slug: string): Promise<Response> {
           <div id="lightbox" class="lightbox" style="display: none;">
             <div class="lightbox-backdrop"></div>
             <div class="lightbox-content">
-              <button class="lightbox-close" aria-label="Close">&times;</button>
-              <img class="lightbox-image" src="" alt="">
+              <button class="lightbox-close" aria-label="Close">\${ICONS.x}</button>
+              <img class="lightbox-image" alt="">
             </div>
           </div>
         \`;

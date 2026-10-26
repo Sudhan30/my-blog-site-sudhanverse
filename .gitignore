@@ -3,3 +3,6 @@ server/data/
 .DS_Store
 *.log
 bun.lock
+.impeccable/review/
+.impeccable/hook.cache.json
+.impeccable/config.local.json

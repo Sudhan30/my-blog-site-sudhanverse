@@ -1,3 +1,5 @@
+import { icon } from "../icons";
+
 // Rich HTML template for "my-first-site" blog post
 // This provides a fancy, interactive experience instead of plain markdown
 
@@ -11,16 +13,16 @@ export function getMyFirstSiteContent(): string {
         <h1 class="post-hero-title">Two Sites, <span class="gradient-text">Two Paths</span></h1>
         <p class="post-hero-subtitle">Cloud Portfolio + Self-Hosted Blog</p>
         <div class="post-hero-stats">
-          <div class="stat-pill"><i class="fas fa-clock"></i> 2 min read</div>
-          <div class="stat-pill"><i class="fas fa-calendar"></i> Jan 15, 2024</div>
-          <div class="stat-pill"><i class="fas fa-fire"></i> Popular</div>
+          <div class="stat-pill">${icon("clock")} 2 min read</div>
+          <div class="stat-pill">${icon("calendar")} Jan 15, 2024</div>
+          <div class="stat-pill">${icon("flame")} Popular</div>
         </div>
       </div>
     </div>
 
     <!-- Quote Block -->
     <blockquote class="fancy-quote">
-      <i class="fas fa-quote-left quote-icon"></i>
+      ${icon("quote")}
       <p>"The best way to learn infrastructure is to break it yourself."</p>
       <cite>— Me, at 2 AM debugging DNS</cite>
     </blockquote>
@@ -43,10 +45,10 @@ export function getMyFirstSiteContent(): string {
           <h3>Cloud Path</h3>
           <h4>sudharsana.dev</h4>
           <ul class="feature-list">
-            <li><i class="fas fa-check"></i> Firebase + GCP</li>
-            <li><i class="fas fa-check"></i> React SPA</li>
-            <li><i class="fas fa-check"></i> ~$0/month</li>
-            <li><i class="fas fa-check"></i> Managed CI/CD</li>
+            <li>${icon("check")} Firebase + GCP</li>
+            <li>${icon("check")} React SPA</li>
+            <li>${icon("check")} ~$0/month</li>
+            <li>${icon("check")} Managed CI/CD</li>
           </ul>
           <div class="card-badge">Beginner Friendly</div>
         </div>
@@ -56,10 +58,10 @@ export function getMyFirstSiteContent(): string {
           <h3>Homelab Path</h3>
           <h4>blog.sudharsana.dev</h4>
           <ul class="feature-list">
-            <li><i class="fas fa-check"></i> Kubernetes (k8s)</li>
-            <li><i class="fas fa-check"></i> Bun.js + TypeScript</li>
-            <li><i class="fas fa-check"></i> Minimal (shared hardware)</li>
-            <li><i class="fas fa-check"></i> Full control</li>
+            <li>${icon("check")} Kubernetes (k8s)</li>
+            <li>${icon("check")} Bun.js + TypeScript</li>
+            <li>${icon("check")} Minimal (shared hardware)</li>
+            <li>${icon("check")} Full control</li>
           </ul>
           <div class="card-badge">Deep Learning</div>
         </div>
@@ -101,7 +103,7 @@ export function getMyFirstSiteContent(): string {
             <p class="timeline-meta">The spark & choice paralysis</p>
             <p>Spent 3 days researching frameworks. Made a spreadsheet comparing Firebase vs. Vercel vs. AWS. Finally just picked Firebase because it had the nicest docs.</p>
             <div class="timeline-lesson">
-              <i class="fas fa-lightbulb"></i>
+              ${icon("lightbulb")}
               <span>Lesson: Perfect is the enemy of done. Just pick something.</span>
             </div>
           </div>
@@ -145,9 +147,9 @@ blog-5d4f9c8b7-x2k9p   CrashLoopBackOff   5
             <h4>Week 4: "This is actually working!"</h4>
             <p class="timeline-meta">The payoff</p>
             <div class="milestone-grid">
-              <div class="milestone"><i class="fas fa-check-circle"></i> First visitor from Google</div>
-              <div class="milestone"><i class="fas fa-check-circle"></i> Portfolio celebrations working</div>
-              <div class="milestone"><i class="fas fa-check-circle"></i> Blog loading in < 1 second</div>
+              <div class="milestone">${icon("circle-check")} First visitor from Google</div>
+              <div class="milestone">${icon("circle-check")} Portfolio celebrations working</div>
+              <div class="milestone">${icon("circle-check")} Blog loading in < 1 second</div>
             </div>
           </div>
         </div>
@@ -162,28 +164,28 @@ blog-5d4f9c8b7-x2k9p   CrashLoopBackOff   5
         <div class="arch-path cloud-path">
           <div class="arch-label">CLOUD PATH</div>
           <div class="arch-flow">
-            <div class="arch-node"><i class="fas fa-user"></i><span>User</span></div>
-            <div class="arch-arrow"><i class="fas fa-arrow-right"></i></div>
-            <div class="arch-node highlight"><i class="fas fa-cloud"></i><span>Cloudflare CDN</span></div>
-            <div class="arch-arrow"><i class="fas fa-arrow-right"></i></div>
-            <div class="arch-node"><i class="fas fa-fire"></i><span>Firebase</span></div>
-            <div class="arch-arrow"><i class="fas fa-arrow-right"></i></div>
-            <div class="arch-node"><i class="fab fa-react"></i><span>React SPA</span></div>
+            <div class="arch-node">${icon("user")}<span>User</span></div>
+            <div class="arch-arrow">${icon("arrow-right")}</div>
+            <div class="arch-node highlight">${icon("cloud")}<span>Cloudflare CDN</span></div>
+            <div class="arch-arrow">${icon("arrow-right")}</div>
+            <div class="arch-node">${icon("flame")}<span>Firebase</span></div>
+            <div class="arch-arrow">${icon("arrow-right")}</div>
+            <div class="arch-node">${icon("box")}<span>React SPA</span></div>
           </div>
         </div>
         
         <div class="arch-path homelab-path">
           <div class="arch-label">HOMELAB PATH</div>
           <div class="arch-flow">
-            <div class="arch-node"><i class="fas fa-user"></i><span>User</span></div>
-            <div class="arch-arrow"><i class="fas fa-arrow-right"></i></div>
-            <div class="arch-node highlight"><i class="fas fa-cloud"></i><span>Cloudflare CDN</span></div>
-            <div class="arch-arrow"><i class="fas fa-arrow-right"></i></div>
-            <div class="arch-node"><i class="fas fa-network-wired"></i><span>Tunnel</span></div>
-            <div class="arch-arrow"><i class="fas fa-arrow-right"></i></div>
-            <div class="arch-node"><i class="fas fa-dharmachakra"></i><span>K8s Ingress</span></div>
-            <div class="arch-arrow"><i class="fas fa-arrow-right"></i></div>
-            <div class="arch-node"><i class="fas fa-cube"></i><span>Blog Pod</span></div>
+            <div class="arch-node">${icon("user")}<span>User</span></div>
+            <div class="arch-arrow">${icon("arrow-right")}</div>
+            <div class="arch-node highlight">${icon("cloud")}<span>Cloudflare CDN</span></div>
+            <div class="arch-arrow">${icon("arrow-right")}</div>
+            <div class="arch-node">${icon("network")}<span>Tunnel</span></div>
+            <div class="arch-arrow">${icon("arrow-right")}</div>
+            <div class="arch-node">${icon("globe")}<span>K8s Ingress</span></div>
+            <div class="arch-arrow">${icon("arrow-right")}</div>
+            <div class="arch-node">${icon("box")}<span>Blog Pod</span></div>
           </div>
         </div>
       </div>
@@ -286,7 +288,7 @@ blog-5d4f9c8b7-x2k9p   CrashLoopBackOff   5
       <div class="roadmap-grid">
         <div class="roadmap-card">
           <div class="roadmap-icon">
-            <i class="fas fa-sitemap"></i>
+            ${icon("network")}
           </div>
           <div class="roadmap-content">
             <h4>Architecture Deep-Dive</h4>
@@ -297,7 +299,7 @@ blog-5d4f9c8b7-x2k9p   CrashLoopBackOff   5
         
         <div class="roadmap-card">
           <div class="roadmap-icon">
-            <i class="fas fa-robot"></i>
+            ${icon("bot")}
           </div>
           <div class="roadmap-content">
             <h4>AI Integrations</h4>
@@ -308,7 +310,7 @@ blog-5d4f9c8b7-x2k9p   CrashLoopBackOff   5
         
         <div class="roadmap-card">
           <div class="roadmap-icon">
-            <i class="fas fa-globe"></i>
+            ${icon("globe")}
           </div>
           <div class="roadmap-content">
             <h4>Edge Deployments</h4>
@@ -319,7 +321,7 @@ blog-5d4f9c8b7-x2k9p   CrashLoopBackOff   5
         
         <div class="roadmap-card">
           <div class="roadmap-icon">
-            <i class="fas fa-envelope-open-text"></i>
+            ${icon("mail")}
           </div>
           <div class="roadmap-content">
             <h4>Weekly Newsletter</h4>
@@ -333,7 +335,7 @@ blog-5d4f9c8b7-x2k9p   CrashLoopBackOff   5
     <!-- Final CTA -->
     <div class="final-cta">
       <div class="cta-quote">
-        <i class="fas fa-bolt"></i>
+        ${icon("zap")}
         <p>"Not using AI now is like skipping the internet during the dot-com boom.<br><strong>Learn it. Use it. Ship faster.</strong>"</p>
       </div>
     </div>
