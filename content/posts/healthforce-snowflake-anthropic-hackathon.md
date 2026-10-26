@@ -6,6 +6,8 @@ excerpt: "We won the Anthropic × Snowflake Intelligence at Work Hackathon with 
 slug: healthforce-snowflake-anthropic-hackathon
 readTime: 9
 cover: /assets/images/hackathons/healthforce-cover.jpg
+video: /assets/video/healthforce.mp4
+poster: /assets/video/healthforce-poster.jpg
 featured: true
 badge: "Winner"
 event: "Anthropic × Snowflake Intelligence at Work Hackathon"
@@ -34,8 +36,6 @@ The facts are rarely in one place:
 The result is friction: phone calls to other hospitals, partner portal logins, repeated questions, repeated tests, and details lost at handover.
 
 ## What we built
-
-![HealthForce team view: paramedic, doctor and nurse phones driven by one Cortex Agent](/assets/images/hackathons/healthforce-cover.jpg)
 
 ### One agent, three people, three phones
 
@@ -139,4 +139,4 @@ Real FHIR and HIE feeds (starting de-identified), real lab results for blood typ
 
 Built with Amadeus Colenbrander, who laid the Snowflake foundation (Data Vault, gold layer, agent tools, semantic view and the Cortex Agent), and Aswin Subramanian.
 
-**Code:** [github.com/Amadeus415/healthline](https://github.com/Amadeus415/healthline)
+**Code:** [github.com/Sudhan30/healthline](https://github.com/Sudhan30/healthline)

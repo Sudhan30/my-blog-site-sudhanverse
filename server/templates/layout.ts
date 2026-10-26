@@ -20,7 +20,7 @@ export function layout(options: LayoutOptions): string {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#0b0b10">
+  <meta name="theme-color" content="#111317">
   <title>${fullTitle}</title>
 
   <!-- Theme Script (runs immediately to prevent flash) -->
@@ -78,11 +78,11 @@ export function layout(options: LayoutOptions): string {
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   
   <!-- Styles -->
-  <link rel="stylesheet" href="/styles/main.css?v=2026102503">
+  <link rel="stylesheet" href="/styles/main.css?v=2026102601">
   
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
@@ -112,7 +112,7 @@ export function layout(options: LayoutOptions): string {
     <div class="header-container">
       <a href="/" class="logo" aria-label="Home">
         <span class="logo-initials">SR</span>
-        <span class="logo-text">Sudharsana<span class="logo-dot">.</span>dev</span>
+        <span class="logo-text">Sudharsana Rajasekaran</span>
       </a>
 
       <nav class="main-nav" id="main-nav">
@@ -170,7 +170,7 @@ export function layout(options: LayoutOptions): string {
       <div class="footer-brand">
         <a href="/" class="logo">
           <span class="logo-initials">SR</span>
-          <span class="logo-text">Sudharsana<span class="logo-dot">.</span>dev</span>
+          <span class="logo-text">Sudharsana Rajasekaran</span>
         </a>
         <p>Resolving dependencies, one idea at a time. Notes on data systems, AI agents and the things I build at hackathons.</p>
       </div>
@@ -189,7 +189,6 @@ export function layout(options: LayoutOptions): string {
     </div>
     <div class="footer-bottom">
       <p>&copy; ${new Date().getFullYear()} Sudharsana Rajasekaran</p>
-      <p class="footer-mono">built with bun · served from a homelab k3s cluster</p>
     </div>
   </footer>
 
