@@ -20,6 +20,7 @@ export function layout(options: LayoutOptions): string {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#0b0b10">
   <title>${fullTitle}</title>
 
   <!-- Theme Script (runs immediately to prevent flash) -->
@@ -77,11 +78,11 @@ export function layout(options: LayoutOptions): string {
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&family=Inter:wght@400;500;600;700&family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
   
   <!-- Styles -->
-  <link rel="stylesheet" href="/styles/main.css?v=2026020604">
+  <link rel="stylesheet" href="/styles/main.css?v=2026102503">
   
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
@@ -107,26 +108,28 @@ export function layout(options: LayoutOptions): string {
   <div class="reading-progress" id="reading-progress"></div>
   
   <!-- Header -->
-  <header class="site-header">
+  <header class="site-header" id="site-header">
     <div class="header-container">
-      <a href="/" class="logo">
+      <a href="/" class="logo" aria-label="Home">
         <span class="logo-initials">SR</span>
-        <span class="logo-text">Sudharsana</span>
+        <span class="logo-text">Sudharsana<span class="logo-dot">.</span>dev</span>
       </a>
-      
+
       <nav class="main-nav" id="main-nav">
-        <a href="/" class="nav-link">Home</a>
+        <a href="/" class="nav-link">Writing</a>
+        <a href="/tag/hackathon" class="nav-link">Hackathons</a>
         <a href="https://sudharsana.dev" target="_blank" rel="noopener" class="nav-link">Portfolio</a>
         <a href="https://github.com/sudhan30" target="_blank" rel="noopener" class="nav-link">GitHub</a>
         <a href="https://www.linkedin.com/in/sudharsanarajasekaran/" target="_blank" rel="noopener" class="nav-link">LinkedIn</a>
       </nav>
-      
+
       <div class="header-actions">
-        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
-          <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
-          <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
+        <a href="/rss.xml" class="icon-btn" aria-label="RSS feed" title="RSS feed"><i class="fas fa-rss"></i></a>
+        <button class="theme-toggle icon-btn" id="theme-toggle" aria-label="Toggle theme">
+          <svg class="sun-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg>
+          <svg class="moon-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>
         </button>
-        
+
         <button class="mobile-menu-btn" id="mobile-menu-btn" aria-label="Toggle menu">
           <span></span>
           <span></span>
@@ -135,7 +138,7 @@ export function layout(options: LayoutOptions): string {
       </div>
     </div>
   </header>
-  
+
   <!-- Main Content -->
   <main class="main-content">
     ${content}
@@ -164,26 +167,42 @@ export function layout(options: LayoutOptions): string {
   <!-- Footer -->
   <footer class="site-footer">
     <div class="footer-container">
-      <p>&copy; ${new Date().getFullYear()} Sudharsana Rajasekaran. All rights reserved.</p>
+      <div class="footer-brand">
+        <a href="/" class="logo">
+          <span class="logo-initials">SR</span>
+          <span class="logo-text">Sudharsana<span class="logo-dot">.</span>dev</span>
+        </a>
+        <p>Resolving dependencies, one idea at a time. Notes on data systems, AI agents and the things I build at hackathons.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Read</h4>
+        <a href="/">All posts</a>
+        <a href="/tag/hackathon">Hackathons</a>
+        <a href="/rss.xml">RSS</a>
+      </div>
+      <div class="footer-col">
+        <h4>Elsewhere</h4>
+        <a href="https://sudharsana.dev" target="_blank" rel="noopener">Portfolio</a>
+        <a href="https://github.com/sudhan30" target="_blank" rel="noopener">GitHub</a>
+        <a href="https://www.linkedin.com/in/sudharsanarajasekaran/" target="_blank" rel="noopener">LinkedIn</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; ${new Date().getFullYear()} Sudharsana Rajasekaran</p>
+      <p class="footer-mono">built with bun · served from a homelab k3s cluster</p>
     </div>
   </footer>
 
   <!-- Cookie Consent Banner -->
-  <div id="cookie-consent" style="display: none; position: fixed; bottom: 0; left: 0; right: 0; background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%); color: #e2e8f0; padding: 1.5rem; box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3); z-index: 10000; border-top: 2px solid #3b82f6;">
-    <div style="max-width: 1200px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem;">
-      <div style="flex: 1; min-width: 300px;">
-        <h3 style="margin: 0 0 0.5rem 0; font-size: 1.125rem; font-weight: 600; color: #60a5fa;">🍪 Cookie Consent</h3>
-        <p style="margin: 0; font-size: 0.9375rem; line-height: 1.5; color: #cbd5e1;">
-          I use Google Analytics to understand how readers engage with my blog. Your data helps me create better content. You can accept or decline analytics tracking.
-        </p>
+  <div id="cookie-consent" class="cookie-consent" style="display: none;">
+    <div class="cookie-inner">
+      <div class="cookie-text">
+        <h3>Cookies</h3>
+        <p>I use Google Analytics to understand how readers engage with the blog. You can accept or decline analytics tracking.</p>
       </div>
-      <div style="display: flex; gap: 0.75rem; flex-shrink: 0;">
-        <button onclick="acceptCookies()" style="padding: 0.75rem 1.5rem; background: #3b82f6; color: white; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer; transition: background 0.2s;">
-          Accept
-        </button>
-        <button onclick="declineCookies()" style="padding: 0.75rem 1.5rem; background: #475569; color: white; border: none; border-radius: 0.5rem; font-weight: 600; cursor: pointer; transition: background 0.2s;">
-          Decline
-        </button>
+      <div class="cookie-actions">
+        <button onclick="acceptCookies()" class="btn btn-primary">Accept</button>
+        <button onclick="declineCookies()" class="btn btn-ghost">Decline</button>
       </div>
     </div>
   </div>
@@ -210,13 +229,35 @@ export function layout(options: LayoutOptions): string {
       mainNav.classList.toggle('open');
     });
     
+    // Scroll reveal
+    const revealEls = document.querySelectorAll('.reveal');
+    if ('IntersectionObserver' in window && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            io.unobserve(entry.target);
+          }
+        });
+      }, { rootMargin: '0px 0px -8% 0px' });
+      revealEls.forEach(el => io.observe(el));
+    } else {
+      revealEls.forEach(el => el.classList.add('is-visible'));
+    }
+
+    // Header state on scroll
+    const siteHeader = document.getElementById('site-header');
+    const onHeaderScroll = () => siteHeader.classList.toggle('scrolled', window.scrollY > 8);
+    onHeaderScroll();
+    window.addEventListener('scroll', onHeaderScroll, { passive: true });
+
     // Reading Progress
     const progressBar = document.getElementById('reading-progress');
     
     window.addEventListener('scroll', () => {
       const scrollTop = window.scrollY;
       const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-      const progress = (scrollTop / docHeight) * 100;
+      const progress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
       progressBar.style.width = progress + '%';
     });
     

@@ -10,6 +10,7 @@ import { addSecurityHeaders, csrfProtection } from "./middleware/security";
 
 const PORT = process.env.PORT || 80;
 const PUBLIC_DIR = join(import.meta.dir, "..", "public");
+const RANGE_CHUNK = 2 * 1024 * 1024;
 
 serve({
     port: PORT,
@@ -35,8 +36,33 @@ serve({
             const filePath = join(PUBLIC_DIR, path);
             const file = Bun.file(filePath);
             if (await file.exists()) {
+                // Byte ranges let browsers (Safari/iOS especially) stream and seek video
+                const range = req.headers.get("range")?.match(/^bytes=(\d*)-(\d*)$/);
+                if (range && (range[1] || range[2])) {
+                    const size = file.size;
+                    let start = range[1] ? parseInt(range[1], 10) : size - parseInt(range[2], 10);
+                    let end = range[1] && range[2] ? parseInt(range[2], 10) : size - 1;
+                    start = Math.max(0, start);
+                    // Serve at most 2 MB per request; clients ask for the rest
+                    end = Math.min(end, size - 1, start + RANGE_CHUNK - 1);
+                    if (start > end || start >= size) {
+                        return addSecurityHeaders(new Response(null, {
+                            status: 416,
+                            headers: { "Content-Range": `bytes */${size}` }
+                        }));
+                    }
+                    // Buffer the slice: Bun streams the whole file for a sliced BunFile body,
+                    // and re-wrapping a stream (addSecurityHeaders) drops Content-Length
+                    const bytes = await file.slice(start, end + 1).arrayBuffer();
+                    const headers = new Headers(addSecurityHeaders(new Response(null)).headers);
+                    headers.set("Content-Type", file.type);
+                    headers.set("Content-Range", `bytes ${start}-${end}/${size}`);
+                    headers.set("Accept-Ranges", "bytes");
+                    headers.set("Cache-Control", "public, max-age=31536000");
+                    return new Response(bytes, { status: 206, headers });
+                }
                 return addSecurityHeaders(new Response(file, {
-                    headers: { "Cache-Control": "public, max-age=31536000" }
+                    headers: { "Cache-Control": "public, max-age=31536000", "Accept-Ranges": "bytes" }
                 }));
             }
             return addSecurityHeaders(new Response("Not Found", { status: 404 }));

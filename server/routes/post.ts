@@ -2,6 +2,7 @@ import { layout } from "../templates/layout";
 import { getPostBySlug } from "../lib/posts";
 import { renderMarkdown } from "../lib/markdown";
 import { secureHtml } from "../middleware/security";
+import { tagHue } from "../lib/tags";
 
 export async function postRoute(slug: string): Promise<Response> {
   const post = await getPostBySlug(slug);
@@ -11,6 +12,7 @@ export async function postRoute(slug: string): Promise<Response> {
   }
 
   const date = new Date(post.date).toLocaleDateString("en-US", {
+    timeZone: "UTC",
     year: "numeric",
     month: "long",
     day: "numeric"
@@ -21,18 +23,43 @@ export async function postRoute(slug: string): Promise<Response> {
   const htmlContent = renderMarkdown(post.content);
 
   const tags = post.tags.map(t =>
-    `<a href="/tag/${encodeURIComponent(t)}" class="tag">${t}</a>`
+    `<a href="/tag/${encodeURIComponent(t)}" class="tag" style="--tag-hue:${tagHue(t)}">${t}</a>`
   ).join("");
+
+  const readTime = post.readTime || Math.max(1, Math.ceil(post.content.split(/\s+/).length / 220));
+
+  // Video takes the hero slot; otherwise the cover image if there is one
+  const heroMedia = post.video ? `
+        <figure class="article-hero-media video-embed">
+          <video controls playsinline preload="metadata"${post.poster || post.cover ? ` poster="${post.poster || post.cover}"` : ""}>
+            <source src="${post.video}" type="video/mp4">
+            Your browser can't play this video. <a href="${post.video}">Download it</a> instead.
+          </video>
+        </figure>
+  ` : post.cover ? `
+        <figure class="article-hero-media">
+          <img src="${post.cover}" alt="${post.title}">
+        </figure>
+  ` : "";
 
   // Only show article header for non-custom template posts
   const articleHeader = isCustomTemplate ? '' : `
-        <header class="article-header">
-          <div class="article-meta">
-            <time datetime="${post.date}">${date}</time>
-          </div>
+        <header class="article-header" style="--tag-hue:${tagHue(post.tags[0] || post.slug)}">
+          <a href="/" class="back-link"><i class="fas fa-arrow-left"></i> All posts</a>
+          ${post.event ? `<div class="eyebrow">${post.badge ? `<span class="badge">${post.badge}</span>` : ""}<span>${post.event}</span></div>` : ""}
           <h1 class="article-title">${post.title}</h1>
+          <p class="article-dek">${post.excerpt}</p>
+          <div class="article-meta">
+            <img src="/assets/images/author-potrait-small.png" alt="" class="article-meta-avatar">
+            <span>Sudharsana Rajasekaran</span>
+            <span class="dot">·</span>
+            <time datetime="${post.date}">${date}</time>
+            <span class="dot">·</span>
+            <span>${readTime} min read</span>
+          </div>
           <div class="article-tags">${tags}</div>
         </header>
+        ${heroMedia}
   `;
 
   const content = `
@@ -252,7 +279,6 @@ export async function postRoute(slug: string): Promise<Response> {
             const badge = document.createElement('div');
             badge.className = 'name-badge';
             badge.innerHTML = '<i class="fas fa-robot"></i> Your username: <strong>' + escapeHtml(displayName) + '</strong>';
-            badge.style.cssText = 'margin-top: 0.5rem; padding: 0.5rem 1rem; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; border-radius: 8px; font-size: 0.875rem; display: inline-flex; align-items: center; gap: 0.5rem;';
             nameInput.parentElement.appendChild(badge);
           }
         }
@@ -636,6 +662,7 @@ export async function postRoute(slug: string): Promise<Response> {
     description: post.excerpt,
     url: `/post/${post.slug}`,
     ogType: "article",
+    ogImage: post.cover ? `https://blog.sudharsana.dev${post.cover}` : undefined,
     content
   });
 
