@@ -36,17 +36,15 @@ export function layout(options: LayoutOptions): string {
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="theme-color" content="#FFFFFF" media="(prefers-color-scheme: light)">
-  <meta name="theme-color" content="#0B0B0C" media="(prefers-color-scheme: dark)">
+  <meta name="theme-color" content="#FFFFFF">
   <title>${fullTitle}</title>
 
-  <!-- Theme Script (runs immediately to prevent flash) -->
+  <!-- Theme Script (white-based default, honors explicit toggle) -->
   <script>
     (function() {
       function applyTheme() {
-        const savedTheme = localStorage.getItem('theme');
-        const systemDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-        const theme = savedTheme || (systemDark ? 'dark' : 'light');
+        const savedTheme = localStorage.getItem('blog-theme-manual');
+        const theme = savedTheme === 'dark' ? 'dark' : 'light';
         document.documentElement.setAttribute('data-theme', theme);
       }
       applyTheme();
@@ -92,7 +90,7 @@ export function layout(options: LayoutOptions): string {
   <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
   
   <!-- Styles -->
-  <link rel="stylesheet" href="/styles/main.css?v=2026103001">
+  <link rel="stylesheet" href="/styles/main.css?v=2026103002">
   
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
@@ -158,7 +156,7 @@ export function layout(options: LayoutOptions): string {
   <!-- Footer -->
   <footer class="site-footer">
     <div class="footer-container">
-      <p class="footer-copy">&copy; ${new Date().getFullYear()} Sudharsana Rajasekaran · Built with Bun &amp; self-hosted on K3s</p>
+      <p class="footer-copy">&copy; ${new Date().getFullYear()} Sudharsana Rajasekaran</p>
       <nav class="footer-links" aria-label="Footer">
         <a href="/category/open-source">Open Source</a>
         <a href="/category/hackathons">Hackathons</a>
@@ -191,7 +189,7 @@ export function layout(options: LayoutOptions): string {
       const current = html.getAttribute('data-theme');
       const next = current === 'dark' ? 'light' : 'dark';
       html.setAttribute('data-theme', next);
-      localStorage.setItem('theme', next);
+      localStorage.setItem('blog-theme-manual', next);
     });
     
     // Mobile Menu
@@ -202,6 +200,22 @@ export function layout(options: LayoutOptions): string {
       const open = mainNav.classList.toggle('open');
       mobileBtn.classList.toggle('active', open);
       mobileBtn.setAttribute('aria-expanded', String(open));
+    });
+
+    mainNav.querySelectorAll('a').forEach((link) => {
+      link.addEventListener('click', () => {
+        mainNav.classList.remove('open');
+        mobileBtn.classList.remove('active');
+        mobileBtn.setAttribute('aria-expanded', 'false');
+      });
+    });
+
+    document.addEventListener('click', (e) => {
+      if (mainNav.classList.contains('open') && !mainNav.contains(e.target) && !mobileBtn.contains(e.target)) {
+        mainNav.classList.remove('open');
+        mobileBtn.classList.remove('active');
+        mobileBtn.setAttribute('aria-expanded', 'false');
+      }
     });
     
     // Mark the current nav link
