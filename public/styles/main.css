@@ -1009,22 +1009,30 @@ time {
   left: 16px;
   bottom: 16px;
   z-index: 90;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
   width: calc(100% - 32px);
-  max-width: 360px;
-  padding: 16px;
-  border: 1px solid var(--hairline);
-  border-radius: 12px;
-  background: var(--bg-subtle);
+  max-width: 420px;
+  padding: 10px 14px;
+  border: 1px solid var(--hairline-strong);
+  border-radius: 10px;
+  background: var(--surface-glass, var(--bg-subtle));
+  -webkit-backdrop-filter: blur(10px);
+  backdrop-filter: blur(10px);
   box-shadow: var(--shadow-soft);
-  font-size: 14px;
-  line-height: 1.5;
+  font-size: 13px;
+  line-height: 1.35;
   color: var(--text-secondary);
 }
 
 .cookie-actions {
   display: flex;
-  gap: 8px;
-  margin-top: 12px;
+  align-items: center;
+  gap: 6px;
+  margin-top: 0;
+  flex: none;
 }
 
 /* ---------- Reading progress ---------- */
@@ -3959,47 +3967,69 @@ time {
   }
 
   .hero {
-    padding-top: 28px;
+    padding-top: 18px;
   }
 
   .hero-eyebrow-row {
-    margin-bottom: 14px;
+    margin-bottom: 10px;
   }
 
   .hero-status-pill {
-    font-size: 11.5px;
-    padding: 5px 10px;
-    line-height: 1.35;
+    font-size: 11px;
+    padding: 4px 10px;
+    line-height: 1.3;
   }
 
   .hero-title {
-    font-size: clamp(28px, 7.8vw, 38px);
+    font-size: clamp(24px, 6.8vw, 32px);
     line-height: 1.12;
   }
 
   .hero-subtitle {
-    margin-top: 14px;
-    font-size: 16px;
-    line-height: 1.55;
+    margin-top: 10px;
+    font-size: 14.5px;
+    line-height: 1.5;
   }
 
   .byline {
-    gap: 10px;
-    margin-top: 24px;
+    gap: 8px;
+    margin-top: 16px;
+    flex-wrap: wrap;
+  }
+
+  .byline-avatar {
+    width: 34px;
+    height: 34px;
+  }
+
+  .byline-name {
+    font-size: 13.5px;
+  }
+
+  .byline-role {
+    font-size: 12px;
   }
 
   .byline-links {
-    width: 100%;
-    margin-left: 0;
-    margin-top: 4px;
-    gap: 6px;
+    width: auto;
+    margin-left: auto;
+    margin-top: 0;
+    gap: 2px;
   }
 
   .byline-cta {
     margin-left: 0;
+    height: 28px !important;
+    padding: 0 10px !important;
+    font-size: 12px;
   }
 
   .pillar-filter-wrapper {
+    margin-top: 18px;
+    padding-bottom: 12px;
+  }
+
+  .pillar-section {
     margin-top: 28px;
   }
 
@@ -4014,8 +4044,8 @@ time {
 
   .pillar-tab {
     width: 100%;
-    min-height: 38px;
-    padding: 7px 9px;
+    min-height: 36px;
+    padding: 6px 9px;
     font-size: 12.5px;
     gap: 5px;
     justify-content: space-between;
@@ -4029,8 +4059,8 @@ time {
   .section-header-bar {
     flex-direction: column;
     align-items: flex-start;
-    gap: 10px;
-    margin-bottom: 18px;
+    gap: 8px;
+    margin-bottom: 14px;
   }
 
   .oss-spotlight-card {
@@ -4216,30 +4246,38 @@ time {
   }
 
   .article-content {
-    font-size: 16.5px;
-    line-height: 1.68;
+    font-size: 16px;
+    line-height: 1.65;
   }
 
   .article-content pre {
-    padding: 38px 14px 14px;
-    font-size: 12.5px;
+    padding: 34px 12px 12px;
+    font-size: 11.5px;
+    line-height: 1.5;
   }
 
-  .article-content .table-wrap {
-    margin: 22px -4px;
-    padding: 0 4px 6px;
+  .article-content .table-wrap,
+  .article-content .table-wrap.is-scrollable {
+    margin: 20px 0;
+    padding: 0;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+    -webkit-mask-image: none;
+    mask-image: none;
   }
 
   .article-content table {
-    min-width: 480px;
-    font-size: 13.5px;
+    width: 100%;
+    min-width: 0;
+    font-size: 12.5px;
+    line-height: 1.45;
   }
 
   .article-content th,
   .article-content td {
-    padding: 10px 14px 10px 0;
+    padding: 8px 8px 8px 0;
+    overflow-wrap: break-word;
+    word-break: break-word;
   }
 
   .author-section {
@@ -4275,17 +4313,25 @@ time {
   }
 
   .cookie-consent {
-    left: 10px;
-    right: 10px;
-    bottom: 10px;
+    left: 8px;
+    right: 8px;
+    bottom: 8px;
     width: auto;
     max-width: none;
-    padding: 12px 14px;
-    font-size: 12.5px;
+    padding: 8px 10px;
+    font-size: 12px;
+    gap: 8px;
+  }
+
+  .cookie-consent .btn {
+    height: 28px;
+    padding: 0 10px;
+    font-size: 12px;
   }
 
   .cookie-actions {
-    margin-top: 8px;
+    margin-top: 0;
+    gap: 4px;
   }
 
   .footer-container {

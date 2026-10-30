@@ -203,7 +203,7 @@ export function renderEngineeringCards(posts: PostSummary[], stats?: Record<stri
 
           ${post.cover ? `
             <div class="eng-card-Diagram" aria-hidden="true">
-              <img src="${esc(post.cover)}" alt="" loading="lazy">
+              <img src="${esc(post.cover)}?v=2026103004" alt="" loading="lazy">
             </div>
           ` : ""}
         </a>

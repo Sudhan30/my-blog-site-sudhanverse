@@ -31,16 +31,17 @@ export async function postRoute(slug: string): Promise<Response> {
 
   // Video takes the hero slot; otherwise the cover image if there is one (skip if cover is already embedded in markdown body)
   const coverAlreadyInBody = post.cover && post.content.includes(post.cover);
+  const coverSrc = post.cover ? (post.cover.endsWith(".svg") ? `${post.cover}?v=2026103004` : post.cover) : "";
   const heroMedia = post.video ? `
         <figure class="article-hero-media video-embed">
-          <video controls playsinline preload="metadata"${post.poster || post.cover ? ` poster="${post.poster || post.cover}"` : ""}>
+          <video controls playsinline preload="metadata"${post.poster || post.cover ? ` poster="${post.poster || coverSrc}"` : ""}>
             <source src="${post.video}" type="video/mp4">
             Your browser can't play this video. <a href="${post.video}">Download it</a> instead.
           </video>
         </figure>
   ` : (post.cover && !coverAlreadyInBody) ? `
         <figure class="article-hero-media">
-          <img src="${post.cover}" alt="${esc(post.title)}">
+          <img src="${coverSrc}" alt="${esc(post.title)}">
         </figure>
   ` : "";
 

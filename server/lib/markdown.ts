@@ -33,6 +33,9 @@ export function renderMarkdown(content: string): string {
     // Tables scroll horizontally on narrow screens
     html = html.replace(/<table>/g, '<div class="table-wrap"><table>').replace(/<\/table>/g, "</table></div>");
 
+    // Cache-bust local SVG diagrams so CDN and mobile browsers fetch the self-contained colorful SVGs
+    html = html.replace(/(src="\/assets\/images\/[^"?]+\.svg)(?:\?[^"]*)?(")/g, "$1?v=2026103004$2");
+
     // A paragraph holding only an image becomes a figure; the alt text is the caption
     html = html.replace(/<p>\s*(<img [^>]*?alt="([^"]*)"[^>]*>)\s*<\/p>/g, (_m, img: string, alt: string) =>
         alt ? `<figure class="prose-figure">${img}<figcaption>${alt}</figcaption></figure>` : `<figure class="prose-figure">${img}</figure>`

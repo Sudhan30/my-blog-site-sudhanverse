@@ -1,59 +1,106 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 450">
+<svg viewBox="0 0 800 450" width="800" height="450" xmlns="http://www.w3.org/2000/svg" style="font-family: system-ui, -apple-system, sans-serif;">
   <defs>
-    <marker id="arrow" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto" markerUnits="userSpaceOnUse">
-      <polygon points="0 0, 9 3.5, 0 7" class="dg-arrowhead" />
-    </marker>
-    <marker id="arrow-accent" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto" markerUnits="userSpaceOnUse">
-      <polygon points="0 0, 9 3.5, 0 7" class="dg-arrowhead dg-arrowhead--accent" />
-    </marker>
+    <linearGradient id="recentGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#3b82f6"/>
+      <stop offset="100%" style="stop-color:#1d4ed8"/>
+    </linearGradient>
+    <linearGradient id="summaryGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#8b5cf6"/>
+      <stop offset="100%" style="stop-color:#6d28d9"/>
+    </linearGradient>
+    <linearGradient id="systemGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#10b981"/>
+      <stop offset="100%" style="stop-color:#059669"/>
+    </linearGradient>
+    <linearGradient id="finalGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#f59e0b"/>
+      <stop offset="100%" style="stop-color:#d97706"/>
+    </linearGradient>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f172a"/>
+      <stop offset="100%" style="stop-color:#1e293b"/>
+    </linearGradient>
+    
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000" flood-opacity="0.3"/>
+    </filter>
   </defs>
-  <text x="400" y="35" text-anchor="middle" font-size="18" class="dg-heading">Context Composition</text>
-  <text x="400" y="55" text-anchor="middle" font-size="11" class="dg-label">Data Integration Flow</text>
-  <g>
-    <rect x="50" y="100" width="180" height="130" rx="8" class="dg-node" />
-    <text x="140" y="130" text-anchor="middle" font-size="14" class="dg-title">Recent Window</text>
-    <text x="140" y="150" text-anchor="middle" font-size="10" class="dg-sub">(Immediate Context)</text>
-    <text x="75" y="180" font-size="10" class="dg-sub">• Full message text</text>
-    <text x="75" y="197" font-size="10" class="dg-sub">• User intent</text>
-    <text x="75" y="214" font-size="10" class="dg-sub">• Current Task</text>
+
+  <rect width="800" height="450" rx="16" fill="url(#bgGrad)"/>
+
+  <pattern id="grid" width="30" height="30" patternUnits="userSpaceOnUse">
+    <path d="M 30 0 L 0 0 0 30" fill="none" stroke="#ffffff" stroke-width="0.3" opacity="0.05"/>
+  </pattern>
+  <rect width="800" height="450" fill="url(#grid)"/>
+
+  <text x="400" y="35" text-anchor="middle" fill="#ffffff" font-size="18" font-weight="700">Context Composition</text>
+  <text x="400" y="55" text-anchor="middle" fill="#94a3b8" font-size="11">Data Integration Flow</text>
+
+  <g filter="url(#shadow)">
+    <rect x="50" y="100" width="180" height="130" rx="12" fill="url(#recentGrad)"/>
+    <text x="140" y="130" text-anchor="middle" fill="#ffffff" font-size="14" font-weight="600">Recent Window</text>
+    <text x="140" y="150" text-anchor="middle" fill="#bfdbfe" font-size="10">(Immediate Context)</text>
+    <text x="75" y="180" fill="#dbeafe" font-size="10">• Full message text</text>
+    <text x="75" y="197" fill="#dbeafe" font-size="10">• User intent</text>
+    <text x="75" y="214" fill="#dbeafe" font-size="10">• Current Task</text>
   </g>
-  <g>
-    <rect x="310" y="100" width="180" height="130" rx="8" class="dg-node" />
-    <text x="400" y="130" text-anchor="middle" font-size="14" class="dg-title">Summary Snapshot</text>
-    <text x="400" y="150" text-anchor="middle" font-size="10" class="dg-sub">(Long-term Memory)</text>
-    <text x="335" y="180" font-size="10" class="dg-sub">• Key facts</text>
-    <text x="335" y="197" font-size="10" class="dg-sub">• Decisions made</text>
-    <text x="335" y="214" font-size="10" class="dg-sub">• User preferences</text>
+
+  <g filter="url(#shadow)">
+    <rect x="310" y="100" width="180" height="130" rx="12" fill="url(#summaryGrad)"/>
+    <text x="400" y="130" text-anchor="middle" fill="#ffffff" font-size="14" font-weight="600">Summary Snapshot</text>
+    <text x="400" y="150" text-anchor="middle" fill="#ddd6fe" font-size="10">(Long-term Memory)</text>
+    <text x="335" y="180" fill="#ede9fe" font-size="10">• Key facts</text>
+    <text x="335" y="197" fill="#ede9fe" font-size="10">• Decisions made</text>
+    <text x="335" y="214" fill="#ede9fe" font-size="10">• User preferences</text>
   </g>
-  <g>
-    <rect x="570" y="100" width="180" height="130" rx="8" class="dg-node" />
-    <text x="660" y="130" text-anchor="middle" font-size="14" class="dg-title">System Instructions</text>
-    <text x="660" y="150" text-anchor="middle" font-size="10" class="dg-sub">(Behavioral Rules)</text>
-    <text x="595" y="180" font-size="10" class="dg-sub">• Persona / Tone</text>
-    <text x="595" y="197" font-size="10" class="dg-sub">• Safety guardrails</text>
-    <text x="595" y="214" font-size="10" class="dg-sub">• Output format</text>
+
+  <g filter="url(#shadow)">
+    <rect x="570" y="100" width="180" height="130" rx="12" fill="url(#systemGrad)"/>
+    <text x="660" y="130" text-anchor="middle" fill="#ffffff" font-size="14" font-weight="600">System Instructions</text>
+    <text x="660" y="150" text-anchor="middle" fill="#d1fae5" font-size="10">(Behavioral Rules)</text>
+    <text x="595" y="180" fill="#d1fae5" font-size="10">• Persona / Tone</text>
+    <text x="595" y="197" fill="#d1fae5" font-size="10">• Safety guardrails</text>
+    <text x="595" y="214" fill="#d1fae5" font-size="10">• Output format</text>
   </g>
-  <g>
-    <rect x="230" y="295" width="340" height="110" rx="8" class="dg-node dg-node--accent" />
-    <text x="400" y="335" text-anchor="middle" font-size="16" class="dg-title dg-title--accent">Final Context Payload</text>
-    <text x="400" y="355" text-anchor="middle" font-size="11" class="dg-sub">(Sent to LLM for processing)</text>
-    <text x="285" y="380" font-size="10" class="dg-sub">✓ Continuity preserved • Tokens minimized</text>
+
+  <g filter="url(#shadow)">
+    <rect x="230" y="295" width="340" height="110" rx="12" fill="url(#finalGrad)"/>
+    <g transform="translate(250, 310)">
+      <rect width="22" height="28" rx="3" fill="#ffffff" opacity="0.9"/>
+      <rect x="4" y="6" width="14" height="2" rx="1" fill="#d97706"/>
+      <rect x="4" y="10" width="14" height="2" rx="1" fill="#d97706"/>
+    </g>
+    <text x="400" y="335" text-anchor="middle" fill="#ffffff" font-size="16" font-weight="700">Final Context Payload</text>
+    <text x="400" y="355" text-anchor="middle" fill="#fef3c7" font-size="11">(Sent to LLM for processing)</text>
+    
+    <text x="285" y="380" fill="#fde68a" font-size="10">✓ Continuity preserved • Tokens minimized</text>
   </g>
-  <path d="M 140 230 C 140 280, 260 250, 260 295" class="dg-edge" />
-  <circle r="4" class="dg-dot">
-    <animateMotion dur="2s" repeatCount="indefinite" path="M 140 230 C 140 280, 260 250, 260 295" />
+
+  <path d="M 140 230 C 140 280, 260 250, 260 295" 
+        stroke="#60a5fa" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.6"/>
+  <circle r="4" fill="#fbbf24">
+    <animateMotion dur="2s" repeatCount="indefinite"
+      path="M 140 230 C 140 280, 260 250, 260 295" />
   </circle>
-  <path d="M 400 230 L 400 295" class="dg-edge" />
-  <circle r="4" class="dg-dot">
-    <animateMotion dur="2s" repeatCount="indefinite" path="M 400 230 L 400 295" />
+
+  <path d="M 400 230 L 400 295" 
+        stroke="#a78bfa" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.6"/>
+   <circle r="4" fill="#fbbf24">
+    <animateMotion dur="2s" repeatCount="indefinite"
+      path="M 400 230 L 400 295" />
   </circle>
-  <path d="M 660 230 C 660 280, 540 250, 540 295" class="dg-edge" />
-  <circle r="4" class="dg-dot">
-    <animateMotion dur="2s" repeatCount="indefinite" path="M 660 230 C 660 280, 540 250, 540 295" />
+
+  <path d="M 660 230 C 660 280, 540 250, 540 295" 
+        stroke="#34d399" stroke-width="4" fill="none" stroke-linecap="round" opacity="0.6"/>
+   <circle r="4" fill="#fbbf24">
+    <animateMotion dur="2s" repeatCount="indefinite"
+      path="M 660 230 C 660 280, 540 250, 540 295" />
   </circle>
+
   <g transform="translate(40, 310)">
-    <rect width="130" height="60" rx="8" class="dg-node" />
-    <text x="65" y="25" text-anchor="middle" font-size="11" class="dg-title">Efficiency</text>
-    <text x="65" y="45" text-anchor="middle" font-size="10" class="dg-sub">Combined Input</text>
+    <rect width="130" height="60" rx="8" fill="#1e293b" stroke="#475569" stroke-width="1"/>
+    <text x="65" y="25" text-anchor="middle" fill="#f59e0b" font-size="11" font-weight="600">Efficiency</text>
+    <text x="65" y="45" text-anchor="middle" fill="#94a3b8" font-size="10">Combined Input</text>
   </g>
+
 </svg>

@@ -90,7 +90,7 @@ export function layout(options: LayoutOptions): string {
   <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
   
   <!-- Styles -->
-  <link rel="stylesheet" href="/styles/main.css?v=2026103003">
+  <link rel="stylesheet" href="/styles/main.css?v=2026103004">
   
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
@@ -172,7 +172,7 @@ export function layout(options: LayoutOptions): string {
 
   <!-- Cookie Consent -->
   <div id="cookie-consent" class="cookie-consent" role="region" aria-label="Cookie consent" style="display: none;">
-    <p>I use Google Analytics and self-hosted telemetry to understand how readers engage with the blog. You can accept or decline analytics tracking.</p>
+    <p>Analytics help improve this blog.</p>
     <div class="cookie-actions">
       <button onclick="acceptCookies()" class="btn btn-primary">Accept</button>
       <button onclick="declineCookies()" class="btn btn-ghost">Decline</button>
@@ -314,7 +314,7 @@ export function layout(options: LayoutOptions): string {
     const cookieConsent = localStorage.getItem('cookieConsent');
 
     if (cookieConsent === null) {
-      document.getElementById('cookie-consent').style.display = 'block';
+      document.getElementById('cookie-consent').style.display = 'flex';
     } else if (cookieConsent === 'accepted') {
       loadGoogleAnalytics();
       initTelemetry();
