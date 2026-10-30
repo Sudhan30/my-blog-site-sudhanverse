@@ -28,7 +28,7 @@ export function postRows(posts: PostSummary[], opts: { groupByYear: boolean }): 
     lastYear = year;
     const date = opts.groupByYear ? fmtShort(post.date) : fmtFull(post.date);
     return `
-      <li class="post-row">
+      <li class="post-row" data-tags="${esc(post.tags.join(","))}">
         <span class="post-row-year">${label}</span>
         <div class="post-row-main">
           <h3 class="post-row-title"><a href="/post/${post.slug}" class="post-row-link">${esc(post.title)}</a>${icon("arrow-right", { cls: "icon post-row-arrow" })}</h3>
