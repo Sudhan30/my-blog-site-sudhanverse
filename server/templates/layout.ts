@@ -100,6 +100,7 @@ export function layout(options: LayoutOptions): string {
   
   <!-- Styles -->
   <link rel="stylesheet" href="/styles/main.css?v=2026102701">
+  ${options.url === "/" ? '<link rel="stylesheet" href="/styles/home-experience.css?v=2026102901"><script src="/assets/js/home-experience.js?v=2026102901" defer></script>' : ""}
   
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
