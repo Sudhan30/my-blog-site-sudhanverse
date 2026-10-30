@@ -1,10 +1,17 @@
 ---
 title: "Building an AI Chat System with Practical Memory, Search, and Multimodal Intelligence"
 date: 2026-02-05
+category: engineering
 tags: [ai, llm, architecture, backend, typescript]
 excerpt: "A behind-the-scenes engineering deep dive into building a production AI chat system. Memory management, context compression, web search integration, and the infrastructure decisions that make it work."
 slug: building-ai-chat-system
 readTime: 8
+cover: /assets/images/chat-architecture.svg
+badge: "LLM Systems"
+highlights:
+  - "Rolling Context Compression"
+  - "Linear Token Scaling"
+  - "Hybrid Search + Vision"
 ---
 
 > "Building AI products is less about a single model and more about the system around it."

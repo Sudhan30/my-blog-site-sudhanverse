@@ -1,136 +1,42 @@
-name: Build Blog from External Repository
+name: CI & Container Build
 
 on:
   push:
     branches: [main]
+  pull_request:
+    branches: [main]
   workflow_dispatch:
-    inputs:
-      blog_repo_branch:
-        description: 'Blog repository branch to build'
-        required: true
-        default: 'main'
-  schedule:
-    # Run daily at 2 AM UTC to check for updates
-    - cron: '0 2 * * *'
-
-env:
-  REGISTRY: docker.io
-  IMAGE_NAME_BLOG: sudhan03/blog-site
-  BLOG_REPO: Sudhan30/my-blog-site-sudhanverse
-  INFRA_REPO: Sudhan30/my-blog-site-cluster-infra
 
 jobs:
-  build-blog-from-external:
+  verify:
+    name: Build & Verify Standalone App
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      packages: write
-    
     steps:
-    - name: Checkout current repository (for manifests)
-      uses: actions/checkout@v4
-      with:
-        token: ${{ secrets.GITHUB_TOKEN }}
-    
-    - name: Checkout blog repository
-      uses: actions/checkout@v4
-      with:
-        repository: ${{ env.BLOG_REPO }}
-        path: ./blog-source
-        token: ${{ secrets.GITHUB_TOKEN }}
-        ref: ${{ github.event.inputs.blog_repo_branch || 'main' }}
-    
-    - name: Checkout infrastructure repository
-      uses: actions/checkout@v4
-      with:
-        repository: ${{ env.INFRA_REPO }}
-        path: ./infra-source
-        token: ${{ secrets.PAT_TOKEN }}
-        ref: main
-    
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v3
-    
-    - name: Log in to Docker Hub
-      uses: docker/login-action@v3
-      with:
-        username: ${{ secrets.DOCKERHUB_USERNAME }}
-        password: ${{ secrets.DOCKERHUB_TOKEN }}
-    
-    - name: Get blog repository info
-      id: blog-info
-      run: |
-        cd blog-source
-        echo "commit_sha=$(git rev-parse HEAD)" >> $GITHUB_OUTPUT
-        echo "branch=$(git rev-parse --abbrev-ref HEAD)" >> $GITHUB_OUTPUT
-    
-    - name: Build and push blog image
-      uses: docker/build-push-action@v5
-      with:
-        context: ./blog-source
-        push: true
-        tags: |
-          ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_BLOG }}:blog-${{ steps.blog-info.outputs.commit_sha }}
-          ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_BLOG }}:latest
-        labels: |
-          org.opencontainers.image.title=Blog Site (from sudhanverse)
-          org.opencontainers.image.description=Blog site built from external repository
-          org.opencontainers.image.url=https://github.com/${{ env.BLOG_REPO }}
-          org.opencontainers.image.source=https://github.com/${{ env.BLOG_REPO }}
-          org.opencontainers.image.version=${{ steps.blog-info.outputs.commit_sha }}
-          org.opencontainers.image.created=${{ github.event.head_commit.timestamp }}
-          org.opencontainers.image.revision=${{ steps.blog-info.outputs.commit_sha }}
-        cache-from: type=gha
-        cache-to: type=gha,mode=max
-    
-    - name: Update blog deployment manifest
-      run: |
-        echo "📝 Updating blog deployment manifest with new image..."
-        
-        # Check if deployment file exists
-        if [ -f "infra-source/clusters/prod/apps/blog/deployment.yaml" ]; then
-          sed -i "s|image: docker.io/sudhan03/blog-site:.*|image: docker.io/sudhan03/blog-site:blog-${{ steps.blog-info.outputs.commit_sha }}|g" infra-source/clusters/prod/apps/blog/deployment.yaml
-          
-          # Commit and push the updated manifest
-          cd infra-source
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git add clusters/prod/apps/blog/deployment.yaml
-          git commit -m "🚀 Update blog image to blog-${{ steps.blog-info.outputs.commit_sha }}"
-          git remote set-url origin https://${{ secrets.PAT_TOKEN }}@github.com/${{ env.INFRA_REPO }}.git
-          git push origin main
-          
-          echo "✅ Deployment manifest updated and pushed to infrastructure repository"
-        else
-          echo "⚠️  Deployment manifest not found at infra-source/clusters/prod/apps/blog/deployment.yaml"
-          echo "📋 Please check the path in your infrastructure repository"
-        fi
-    
-    - name: Deployment summary
-      run: |
-        echo "✅ Blog image built and deployment updated successfully!"
-        echo "📦 Image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME_BLOG }}:blog-${{ steps.blog-info.outputs.commit_sha }}"
-        echo "📝 Source: ${{ env.BLOG_REPO }}@${{ steps.blog-info.outputs.branch }}"
-        echo "🔗 Commit: ${{ steps.blog-info.outputs.commit_sha }}"
-        echo ""
-        echo "🔄 Flux CD will now deploy the updated image to your cluster"
-        echo "⏱️  Expected deployment time: 2-3 minutes"
-        echo "🔍 Monitor with: kubectl get pods -n web"
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    - name: Purge Cloudflare Cache
-      run: |
-        echo "🧹 Purging Cloudflare cache for blog.sudharsana.dev..."
-        response=$(curl -X POST "https://api.cloudflare.com/client/v4/zones/${{ secrets.CLOUDFLARE_ZONE_ID }}/purge_cache" \
-          -H "Authorization: Bearer ${{ secrets.CLOUDFLARE_API_TOKEN }}" \
-          -H "Content-Type: application/json" \
-          --data '{"purge_everything":true}' -s)
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: latest
 
-        echo "Response: $response"
+      - name: Install dependencies
+        run: bun install --frozen-lockfile || bun install
 
-        # Check if purge was successful
-        if echo "$response" | grep -E -q '"success":\s*true'; then
-          echo "✅ Cloudflare cache purged successfully!"
-        else
-          echo "⚠️  Cache purge failed, but deployment continues"
-          echo "$response"
-        fi
+      - name: Build server bundle
+        run: bun run build
+
+      - name: Smoke test standalone mode (JSON storage fallback)
+        run: |
+          PORT=3099 bun run server/index.ts &
+          SERVER_PID=$!
+          sleep 2
+          curl -fsS http://localhost:3099/health
+          curl -fsS http://localhost:3099/ > /dev/null
+          curl -fsS http://localhost:3099/category/open-source > /dev/null
+          curl -fsS http://localhost:3099/category/hackathons > /dev/null
+          curl -fsS http://localhost:3099/category/engineering > /dev/null
+          curl -fsS http://localhost:3099/api/posts/stats > /dev/null
+          kill $SERVER_PID || true

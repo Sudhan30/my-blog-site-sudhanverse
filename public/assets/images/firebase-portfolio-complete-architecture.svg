@@ -1,240 +1,135 @@
-<svg viewBox="0 0 1200 720" width="1200" height="720" xmlns="http://www.w3.org/2000/svg" style="font-family: system-ui, -apple-system, sans-serif;">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 720">
   <defs>
-    <linearGradient id="userGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#3b82f6"/>
-      <stop offset="100%" style="stop-color:#1d4ed8"/>
-    </linearGradient>
-    <linearGradient id="cloudflareGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#f48120"/>
-      <stop offset="100%" style="stop-color:#faad3f"/>
-    </linearGradient>
-    <linearGradient id="firebaseGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#FFA500"/>
-      <stop offset="100%" style="stop-color:#FF8C00"/>
-    </linearGradient>
-    <linearGradient id="reactGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#61dafb"/>
-      <stop offset="100%" style="stop-color:#21a1c4"/>
-    </linearGradient>
-    <linearGradient id="functionGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#10b981"/>
-      <stop offset="100%" style="stop-color:#059669"/>
-    </linearGradient>
-    <linearGradient id="firestoreGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#ef4444"/>
-      <stop offset="100%" style="stop-color:#dc2626"/>
-    </linearGradient>
-    <linearGradient id="bigqueryGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#3b82f6"/>
-      <stop offset="100%" style="stop-color:#1d4ed8"/>
-    </linearGradient>
-    <linearGradient id="storageGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#8b5cf6"/>
-      <stop offset="100%" style="stop-color:#6d28d9"/>
-    </linearGradient>
-    <linearGradient id="pubsubGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#f59e0b"/>
-      <stop offset="100%" style="stop-color:#d97706"/>
-    </linearGradient>
-    <linearGradient id="secretGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#ec4899"/>
-      <stop offset="100%" style="stop-color:#be185d"/>
-    </linearGradient>
-    <linearGradient id="smtpGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#6366f1"/>
-      <stop offset="100%" style="stop-color:#4f46e5"/>
-    </linearGradient>
-    <linearGradient id="otelGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#14b8a6"/>
-      <stop offset="100%" style="stop-color:#0d9488"/>
-    </linearGradient>
-    <linearGradient id="ollamaGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#a855f7"/>
-      <stop offset="100%" style="stop-color:#7e22ce"/>
-    </linearGradient>
-    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#0f172a"/>
-      <stop offset="100%" style="stop-color:#1e293b"/>
-    </linearGradient>
-
-    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
-      <feDropShadow dx="0" dy="4" stdDeviation="6" flood-color="#000" flood-opacity="0.3"/>
-    </filter>
-
-    <marker id="arrow" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
-      <polygon points="0 0, 10 3.5, 0 7" fill="#94a3b8"/>
+    <marker id="arrow" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto" markerUnits="userSpaceOnUse">
+      <polygon points="0 0, 9 3.5, 0 7" class="dg-arrowhead" />
     </marker>
-    <marker id="arrow-orange" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
-      <polygon points="0 0, 10 3.5, 0 7" fill="#fb923c"/>
-    </marker>
-    <marker id="arrow-green" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
-      <polygon points="0 0, 10 3.5, 0 7" fill="#4ade80"/>
-    </marker>
-    <marker id="arrow-purple" markerWidth="10" markerHeight="7" refX="9" refY="3.5" orient="auto">
-      <polygon points="0 0, 10 3.5, 0 7" fill="#8b5cf6"/>
+    <marker id="arrow-accent" markerWidth="9" markerHeight="7" refX="8" refY="3.5" orient="auto" markerUnits="userSpaceOnUse">
+      <polygon points="0 0, 9 3.5, 0 7" class="dg-arrowhead dg-arrowhead--accent" />
     </marker>
   </defs>
-
-  <rect width="1200" height="720" rx="16" fill="url(#bgGrad)"/>
-
-  <pattern id="grid" width="30" height="30" patternUnits="userSpaceOnUse">
-    <path d="M 30 0 L 0 0 0 30" fill="none" stroke="#ffffff" stroke-width="0.3" opacity="0.05"/>
-  </pattern>
-  <rect width="1200" height="720" fill="url(#grid)"/>
-
-  <text x="600" y="35" text-anchor="middle" fill="#ffffff" font-size="22" font-weight="700">Firebase Portfolio - Complete Architecture</text>
-
-  <g filter="url(#shadow)">
-    <rect x="20" y="120" width="90" height="60" rx="8" fill="url(#userGrad)"/>
-    <text x="65" y="155" text-anchor="middle" fill="white" font-size="12" font-weight="600">User</text>
+  <text x="600" y="35" text-anchor="middle" font-size="22" class="dg-heading">Firebase Portfolio - Complete Architecture</text>
+  <g>
+    <rect x="20" y="120" width="90" height="60" rx="8" class="dg-node" />
+    <text x="65" y="155" text-anchor="middle" font-size="12" class="dg-title">User</text>
   </g>
-
-  <g filter="url(#shadow)">
-    <rect x="150" y="120" width="100" height="60" rx="8" fill="url(#cloudflareGrad)"/>
-    <text x="200" y="145" text-anchor="middle" fill="white" font-size="11" font-weight="600">Cloudflare</text>
-    <text x="200" y="163" text-anchor="middle" fill="white" font-size="9">DNS + CDN</text>
+  <g>
+    <rect x="150" y="120" width="100" height="60" rx="8" class="dg-node" />
+    <text x="200" y="145" text-anchor="middle" font-size="11" class="dg-title">Cloudflare</text>
+    <text x="200" y="163" text-anchor="middle" font-size="9" class="dg-sub">DNS + CDN</text>
   </g>
-
-  <g filter="url(#shadow)">
-    <rect x="290" y="120" width="110" height="60" rx="8" fill="url(#firebaseGrad)"/>
-    <text x="345" y="145" text-anchor="middle" fill="white" font-size="11" font-weight="600">Firebase</text>
-    <text x="345" y="163" text-anchor="middle" fill="white" font-size="9">Hosting + CDN</text>
+  <g>
+    <rect x="290" y="120" width="110" height="60" rx="8" class="dg-node dg-node--accent" />
+    <text x="345" y="145" text-anchor="middle" font-size="11" class="dg-title dg-title--accent">Firebase</text>
+    <text x="345" y="163" text-anchor="middle" font-size="9" class="dg-sub">Hosting + CDN</text>
   </g>
-
-  <g filter="url(#shadow)">
-    <rect x="440" y="120" width="100" height="60" rx="8" fill="url(#reactGrad)"/>
-    <text x="490" y="145" text-anchor="middle" fill="white" font-size="11" font-weight="600">React SPA</text>
-    <text x="490" y="163" text-anchor="middle" fill="white" font-size="9">Frontend</text>
+  <g>
+    <rect x="440" y="120" width="100" height="60" rx="8" class="dg-node" />
+    <text x="490" y="145" text-anchor="middle" font-size="11" class="dg-title">React SPA</text>
+    <text x="490" y="163" text-anchor="middle" font-size="9" class="dg-sub">Frontend</text>
   </g>
-
-  <g filter="url(#shadow)">
-    <rect x="440" y="210" width="100" height="45" rx="6" fill="url(#otelGrad)"/>
-    <text x="490" y="237" text-anchor="middle" fill="white" font-size="10" font-weight="600">OpenTelemetry</text>
+  <g>
+    <rect x="440" y="210" width="100" height="45" rx="8" class="dg-node" />
+    <text x="490" y="237" text-anchor="middle" font-size="10" class="dg-title">OpenTelemetry</text>
   </g>
-
-  <rect x="600" y="95" width="380" height="480" fill="#1e293b" stroke="#4ade80" stroke-width="2" rx="8" stroke-dasharray="5,5"/>
-  <text x="790" y="120" text-anchor="middle" fill="#4ade80" font-size="14" font-weight="700">Cloud Functions (Node.js 20)</text>
-
-  <g filter="url(#shadow)">
-    <rect x="620" y="140" width="100" height="50" rx="6" fill="url(#functionGrad)"/>
-    <text x="670" y="162" text-anchor="middle" fill="white" font-size="9" font-weight="600">Page View</text>
-    <text x="670" y="177" text-anchor="middle" fill="#d1fae5" font-size="8">Tracker</text>
+  <rect x="600" y="95" width="380" height="480" rx="8" class="dg-group" />
+  <text x="790" y="120" text-anchor="middle" font-size="14" class="dg-glabel">Cloud Functions (Node.js 20)</text>
+  <g>
+    <rect x="620" y="140" width="100" height="50" rx="8" class="dg-node" />
+    <text x="670" y="162" text-anchor="middle" font-size="9" class="dg-title">Page View</text>
+    <text x="670" y="177" text-anchor="middle" font-size="8" class="dg-sub">Tracker</text>
   </g>
-
-  <g filter="url(#shadow)">
-    <rect x="740" y="140" width="100" height="50" rx="6" fill="url(#functionGrad)"/>
-    <text x="790" y="162" text-anchor="middle" fill="white" font-size="9" font-weight="600">Contact Form</text>
-    <text x="790" y="177" text-anchor="middle" fill="#d1fae5" font-size="8">Handler</text>
+  <g>
+    <rect x="740" y="140" width="100" height="50" rx="8" class="dg-node" />
+    <text x="790" y="162" text-anchor="middle" font-size="9" class="dg-title">Contact Form</text>
+    <text x="790" y="177" text-anchor="middle" font-size="8" class="dg-sub">Handler</text>
   </g>
-
-  <g filter="url(#shadow)">
-    <rect x="860" y="140" width="100" height="50" rx="6" fill="url(#functionGrad)"/>
-    <text x="910" y="162" text-anchor="middle" fill="white" font-size="9" font-weight="600">Feedback</text>
-    <text x="910" y="177" text-anchor="middle" fill="#d1fae5" font-size="8">Handler</text>
+  <g>
+    <rect x="860" y="140" width="100" height="50" rx="8" class="dg-node" />
+    <text x="910" y="162" text-anchor="middle" font-size="9" class="dg-title">Feedback</text>
+    <text x="910" y="177" text-anchor="middle" font-size="8" class="dg-sub">Handler</text>
   </g>
-
-  <g filter="url(#shadow)">
-    <rect x="620" y="210" width="100" height="50" rx="6" fill="url(#functionGrad)"/>
-    <text x="670" y="232" text-anchor="middle" fill="white" font-size="9" font-weight="600">Job Analyzer</text>
-    <text x="670" y="247" text-anchor="middle" fill="#d1fae5" font-size="8">AI-Powered</text>
+  <g>
+    <rect x="620" y="210" width="100" height="50" rx="8" class="dg-node" />
+    <text x="670" y="232" text-anchor="middle" font-size="9" class="dg-title">Job Analyzer</text>
+    <text x="670" y="247" text-anchor="middle" font-size="8" class="dg-sub">AI-Powered</text>
   </g>
-
-  <g filter="url(#shadow)">
-    <rect x="740" y="210" width="100" height="50" rx="6" fill="url(#functionGrad)"/>
-    <text x="790" y="227" text-anchor="middle" fill="white" font-size="9" font-weight="600">OTel</text>
-    <text x="790" y="240" text-anchor="middle" fill="white" font-size="9" font-weight="600">Processor</text>
+  <g>
+    <rect x="740" y="210" width="100" height="50" rx="8" class="dg-node" />
+    <text x="790" y="227" text-anchor="middle" font-size="9" class="dg-title">OTel</text>
+    <text x="790" y="240" text-anchor="middle" font-size="9" class="dg-title">Processor</text>
   </g>
-
-  <g filter="url(#shadow)">
-    <rect x="860" y="210" width="100" height="50" rx="6" fill="url(#functionGrad)"/>
-    <text x="910" y="227" text-anchor="middle" fill="white" font-size="9" font-weight="600">OTel Batch</text>
-    <text x="910" y="240" text-anchor="middle" fill="white" font-size="9" font-weight="600">Processor</text>
+  <g>
+    <rect x="860" y="210" width="100" height="50" rx="8" class="dg-node" />
+    <text x="910" y="227" text-anchor="middle" font-size="9" class="dg-title">OTel Batch</text>
+    <text x="910" y="240" text-anchor="middle" font-size="9" class="dg-title">Processor</text>
   </g>
-
-  <rect x="600" y="350" width="380" height="210" fill="#1e293b" stroke="#60a5fa" stroke-width="2" rx="8" stroke-dasharray="5,5"/>
-  <text x="790" y="375" text-anchor="middle" fill="#60a5fa" font-size="14" font-weight="700">Data Layer</text>
-
-  <g filter="url(#shadow)">
-    <rect x="620" y="390" width="110" height="55" rx="6" fill="url(#firestoreGrad)"/>
-    <text x="675" y="415" text-anchor="middle" fill="white" font-size="11" font-weight="600">Firestore</text>
+  <rect x="600" y="350" width="380" height="210" rx="8" class="dg-group" />
+  <text x="790" y="375" text-anchor="middle" font-size="14" class="dg-glabel">Data Layer</text>
+  <g>
+    <rect x="620" y="390" width="110" height="55" rx="8" class="dg-node" />
+    <text x="675" y="415" text-anchor="middle" font-size="11" class="dg-title">Firestore</text>
   </g>
-  <g filter="url(#shadow)">
-    <rect x="750" y="390" width="110" height="55" rx="6" fill="url(#bigqueryGrad)"/>
-    <text x="805" y="415" text-anchor="middle" fill="white" font-size="11" font-weight="600">BigQuery</text>
+  <g>
+    <rect x="750" y="390" width="110" height="55" rx="8" class="dg-node" />
+    <text x="805" y="415" text-anchor="middle" font-size="11" class="dg-title">BigQuery</text>
   </g>
-  <g filter="url(#shadow)">
-    <rect x="620" y="465" width="110" height="55" rx="6" fill="url(#storageGrad)"/>
-    <text x="675" y="495" text-anchor="middle" fill="white" font-size="11" font-weight="600">Cloud Storage</text>
+  <g>
+    <rect x="620" y="465" width="110" height="55" rx="8" class="dg-node" />
+    <text x="675" y="495" text-anchor="middle" font-size="11" class="dg-title">Cloud Storage</text>
   </g>
-  <g filter="url(#shadow)">
-    <rect x="750" y="465" width="110" height="55" rx="6" fill="url(#pubsubGrad)"/>
-    <text x="805" y="495" text-anchor="middle" fill="white" font-size="11" font-weight="600">Pub/Sub</text>
+  <g>
+    <rect x="750" y="465" width="110" height="55" rx="8" class="dg-node" />
+    <text x="805" y="495" text-anchor="middle" font-size="11" class="dg-title">Pub/Sub</text>
   </g>
-
-  <rect x="1000" y="95" width="180" height="265" fill="#1e293b" stroke="#ec4899" stroke-width="2" rx="8" stroke-dasharray="5,5"/>
-  <text x="1090" y="120" text-anchor="middle" fill="#ec4899" font-size="12" font-weight="700">Email Services</text>
-
-  <g filter="url(#shadow)">
-    <rect x="1020" y="140" width="140" height="50" rx="6" fill="url(#secretGrad)"/>
-    <text x="1090" y="170" text-anchor="middle" fill="white" font-size="10" font-weight="600">Secret Manager</text>
+  <rect x="1000" y="95" width="180" height="265" rx="8" class="dg-group" />
+  <text x="1090" y="120" text-anchor="middle" font-size="12" class="dg-glabel">Email Services</text>
+  <g>
+    <rect x="1020" y="140" width="140" height="50" rx="8" class="dg-node" />
+    <text x="1090" y="170" text-anchor="middle" font-size="10" class="dg-title">Secret Manager</text>
   </g>
-  <g filter="url(#shadow)">
-    <rect x="1020" y="210" width="140" height="50" rx="6" fill="url(#smtpGrad)"/>
-    <text x="1090" y="240" text-anchor="middle" fill="white" font-size="10" font-weight="600">SMTP Provider</text>
+  <g>
+    <rect x="1020" y="210" width="140" height="50" rx="8" class="dg-node" />
+    <text x="1090" y="240" text-anchor="middle" font-size="10" class="dg-title">SMTP Provider</text>
   </g>
-  <g filter="url(#shadow)">
-    <rect x="1020" y="280" width="140" height="50" rx="6" fill="url(#userGrad)"/>
-    <text x="1090" y="310" text-anchor="middle" fill="white" font-size="10" font-weight="600">Email Recipients</text>
+  <g>
+    <rect x="1020" y="280" width="140" height="50" rx="8" class="dg-node" />
+    <text x="1090" y="310" text-anchor="middle" font-size="10" class="dg-title">Email Recipients</text>
   </g>
-
-  <rect x="20" y="280" width="180" height="150" fill="#1e293b" stroke="#8b5cf6" stroke-width="2" rx="8" stroke-dasharray="5,5"/>
-  <text x="110" y="305" text-anchor="middle" fill="#8b5cf6" font-size="12" font-weight="700">MINI PC</text>
-  <g filter="url(#shadow)">
-    <rect x="35" y="320" width="150" height="45" rx="6" fill="url(#ollamaGrad)"/>
-    <text x="110" y="338" text-anchor="middle" fill="white" font-size="10" font-weight="600">K3s Pod</text>
-    <text x="110" y="353" text-anchor="middle" fill="#e9d5ff" font-size="9">Ollama LLM</text>
+  <rect x="20" y="280" width="180" height="150" rx="8" class="dg-group" />
+  <text x="110" y="305" text-anchor="middle" font-size="12" class="dg-glabel">MINI PC</text>
+  <g>
+    <rect x="35" y="320" width="150" height="45" rx="8" class="dg-node" />
+    <text x="110" y="338" text-anchor="middle" font-size="10" class="dg-title">K3s Pod</text>
+    <text x="110" y="353" text-anchor="middle" font-size="9" class="dg-sub">Ollama LLM</text>
   </g>
-  <g filter="url(#shadow)">
-    <rect x="35" y="375" width="150" height="40" rx="6" fill="#374151"/>
-    <text x="110" y="400" text-anchor="middle" fill="#a78bfa" font-size="9" font-weight="600">API Endpoint</text>
+  <g>
+    <rect x="35" y="375" width="150" height="40" rx="8" class="dg-node" />
+    <text x="110" y="400" text-anchor="middle" font-size="9" class="dg-title">API Endpoint</text>
   </g>
-
-  <g filter="url(#shadow)">
-    <rect x="290" y="210" width="110" height="55" rx="8" fill="#24292f"/>
-    <text x="345" y="233" text-anchor="middle" fill="white" font-size="10" font-weight="600">GitHub</text>
-    <text x="345" y="249" text-anchor="middle" fill="#94a3b8" font-size="8">Actions CI/CD</text>
+  <g>
+    <rect x="290" y="210" width="110" height="55" rx="8" class="dg-node" />
+    <text x="345" y="233" text-anchor="middle" font-size="10" class="dg-title">GitHub</text>
+    <text x="345" y="249" text-anchor="middle" font-size="8" class="dg-sub">Actions CI/CD</text>
   </g>
-
-  <path d="M 110 150 L 150 150" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
-  <path d="M 250 150 L 290 150" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
-  <path d="M 400 150 L 440 150" stroke="#94a3b8" stroke-width="2" marker-end="url(#arrow)"/>
-  <path d="M 540 150 L 610 165" stroke="#fb923c" stroke-width="1.5" stroke-dasharray="3,3" marker-end="url(#arrow-orange)"/>
-
-  <path d="M 345 210 L 345 180" stroke="#94a3b8" stroke-width="1.5" stroke-dasharray="5,5" marker-end="url(#arrow)"/>
-  <text x="355" y="198" fill="#94a3b8" font-size="8">deploy</text>
-
-  <path d="M 200 395 L 620 235" stroke="#8b5cf6" stroke-width="1.5" stroke-dasharray="3,3" fill="none" marker-end="url(#arrow)"/>
-  <text x="380" y="310" text-anchor="middle" fill="#8b5cf6" font-size="8">HTTP API</text>
-
-  <path d="M 960 165 L 1020 165" stroke="#ec4899" stroke-width="1.5" stroke-dasharray="3,3"/>
-  <text x="990" y="158" text-anchor="middle" fill="#ec4899" font-size="7">get credentials</text>
-
-  <path d="M 1090 190 L 1090 210" stroke="#ec4899" stroke-width="1.5" marker-end="url(#arrow)"/>
-  <text x="1110" y="203" fill="#ec4899" font-size="7">auth</text>
-
-  <path d="M 1090 260 L 1090 280" stroke="#6366f1" stroke-width="1.5" marker-end="url(#arrow)"/>
-  <text x="1105" y="273" fill="#6366f1" font-size="7">send</text>
-
-  <path d="M 490 180 L 490 210" stroke="#14b8a6" stroke-width="1.5" marker-end="url(#arrow)"/>
-  <text x="505" y="198" fill="#14b8a6" font-size="7">track</text>
-
-  <path d="M 670 260 L 675 390" stroke="#4ade80" stroke-width="1.5" stroke-dasharray="3,3" marker-end="url(#arrow-green)"/>
-  
-  <path d="M 790 260 L 805 390" stroke="#4ade80" stroke-width="1.5" stroke-dasharray="3,3" marker-end="url(#arrow-green)"/>
-  <path d="M 910 260 L 830 390" stroke="#4ade80" stroke-width="1.5" stroke-dasharray="3,3" marker-end="url(#arrow-green)"/>
-
-  <path d="M 790 260 L 780 465" stroke="#f59e0b" stroke-width="1.5" stroke-dasharray="3,3" marker-end="url(#arrow-orange)"/>
-
-  <path d="M 910 260 L 680 465" stroke="#8b5cf6" stroke-width="1.5" stroke-dasharray="3,3" marker-end="url(#arrow-purple)"/>
-
+  <path d="M 110 150 L 150 150" marker-end="url(#arrow)" class="dg-edge" />
+  <path d="M 250 150 L 290 150" marker-end="url(#arrow-accent)" class="dg-edge dg-edge--accent" />
+  <path d="M 400 150 L 440 150" marker-end="url(#arrow-accent)" class="dg-edge dg-edge--accent" />
+  <path d="M 540 150 L 610 165" stroke-dasharray="3,3" marker-end="url(#arrow)" class="dg-edge" />
+  <path d="M 345 210 L 345 180" stroke-dasharray="5,5" marker-end="url(#arrow)" class="dg-edge" />
+  <text x="355" y="198" font-size="8" class="dg-label">deploy</text>
+  <path d="M 200 395 L 620 235" stroke-dasharray="3,3" marker-end="url(#arrow)" class="dg-edge" />
+  <text x="380" y="310" text-anchor="middle" font-size="8" class="dg-label">HTTP API</text>
+  <path d="M 960 165 L 1020 165" stroke-dasharray="3,3" class="dg-edge" />
+  <text x="990" y="158" text-anchor="middle" font-size="7" class="dg-label">get credentials</text>
+  <path d="M 1090 190 L 1090 210" marker-end="url(#arrow)" class="dg-edge" />
+  <text x="1110" y="203" font-size="7" class="dg-sub">auth</text>
+  <path d="M 1090 260 L 1090 280" marker-end="url(#arrow)" class="dg-edge" />
+  <text x="1105" y="273" font-size="7" class="dg-sub">send</text>
+  <path d="M 490 180 L 490 210" marker-end="url(#arrow)" class="dg-edge" />
+  <text x="505" y="198" font-size="7" class="dg-label">track</text>
+  <path d="M 670 260 L 675 390" stroke-dasharray="3,3" marker-end="url(#arrow)" class="dg-edge" />
+  <path d="M 790 260 L 805 390" stroke-dasharray="3,3" marker-end="url(#arrow)" class="dg-edge" />
+  <path d="M 910 260 L 830 390" stroke-dasharray="3,3" marker-end="url(#arrow)" class="dg-edge" />
+  <path d="M 790 260 L 780 465" stroke-dasharray="3,3" marker-end="url(#arrow)" class="dg-edge" />
+  <path d="M 910 260 L 680 465" stroke-dasharray="3,3" marker-end="url(#arrow)" class="dg-edge" />
 </svg>

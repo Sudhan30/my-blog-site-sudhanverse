@@ -24,7 +24,7 @@ function createStore<T>(filename: string, defaultValue: T): DataStore<T> {
                 const content = await readFile(filepath, "utf-8");
                 return JSON.parse(content);
             } catch {
-                return defaultValue;
+                return structuredClone(defaultValue);
             }
         },
         async write(data: T): Promise<void> {
@@ -35,7 +35,7 @@ function createStore<T>(filename: string, defaultValue: T): DataStore<T> {
 }
 
 // Likes data
-interface LikesData {
+export interface LikesData {
     [postSlug: string]: {
         count: number;
         users: string[];
@@ -46,23 +46,31 @@ export const likesStore = createStore<LikesData>("likes.json", {});
 
 // Comments data
 export interface CommentData {
-    id: string;
+    id: number;
     postSlug: string;
     displayName: string;
+    clientId?: string;
     content: string;
-    status: "pending" | "approved";
+    status: "pending" | "approved" | "rejected";
     createdAt: string;
+    likedBy: string[];
 }
 
-interface CommentsData {
+export interface CommentsData {
+    nextId: number;
     comments: CommentData[];
+    summaries: Record<string, { summary: string; commentCount: number; updatedAt: string }>;
 }
 
-export const commentsStore = createStore<CommentsData>("comments.json", { comments: [] });
+export const commentsStore = createStore<CommentsData>("comments.json", {
+    nextId: 1,
+    comments: [],
+    summaries: {}
+});
 
 // Newsletter data
-interface NewsletterData {
-    subscribers: { email: string; subscribedAt: string }[];
+export interface NewsletterData {
+    subscribers: { email: string; status: "active" | "unsubscribed"; subscribedAt: string }[];
 }
 
 export const newsletterStore = createStore<NewsletterData>("newsletter.json", { subscribers: [] });

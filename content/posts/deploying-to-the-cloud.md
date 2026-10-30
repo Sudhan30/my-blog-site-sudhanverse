@@ -1,10 +1,17 @@
 ---
 title: "Deploying to the Cloud: My Infrastructure Journey"
 date: 2025-10-20
+category: engineering
 tags: [cloud, deployment, infrastructure, devops, gcp, firebase]
 excerpt: "From GCS buckets and expensive load balancers to Firebase's serverless architecture. A journey through cost optimization, architecture decisions, and lessons learned deploying a production portfolio site."
 slug: my-cloud-site
 readTime: 9
+cover: /assets/images/firebase-portfolio-complete-architecture.svg
+badge: "Cloud & FinOps"
+highlights:
+  - "97% Load-Balancer Cost Cut"
+  - "Serverless Edge Hosting"
+  - "Automated CI/CD Pipeline"
 ---
 
 > "Cost optimization isn't about being cheap. It's about being smart with resources."

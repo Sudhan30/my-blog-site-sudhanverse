@@ -1,10 +1,17 @@
 ---
-title: "Teaching My Chat App to Query Databases — A Text-to-SQL Agent"
+title: "Teaching My Chat App to Query Databases — A Dual-Model Text-to-SQL Agent"
 date: 2026-03-11
-tags: [ai, llm, agent, sql, typescript, architecture]
-excerpt: "How I built a local text-to-SQL agent using Ollama tool calling and Gemma3, replacing the tedious SSH-psql-query workflow with natural language questions in a chat interface."
+category: engineering
+tags: [ai, llm, agent, sql, typescript, architecture, ollama]
+excerpt: "How I built a local text-to-SQL agent using two specialized models — Gemma3 for conversation and Qwen3 for tool calling — replacing the tedious SSH-psql-query workflow with natural language questions. Everything runs locally, nothing leaves my server."
 slug: text-to-sql-agent
-readTime: 7
+readTime: 9
+cover: /assets/images/data-agent-architecture.svg
+badge: "AI Agents & SQL"
+highlights:
+  - "Dual-Model Routing"
+  - "Read-Only SQL Boundary"
+  - "100% Local GPU Inference"
 ---
 
 > "Laziness is the mother of invention."
@@ -40,37 +47,130 @@ Before building anything, I evaluated the existing approaches. Each had a disqua
 | **MCP (Model Context Protocol)** | Designed for IDE and desktop integrations. Great for Claude Desktop or VS Code, but adds protocol complexity that is overkill for a web app with a single backend |
 | **ADK (Google Agent Development Kit)** | Python-based, tied to the Google ecosystem. My stack is Bun and TypeScript. Introducing a Python sidecar for a feature this simple felt wrong |
 | **Claude/GPT API with function calling** | Works well, but costs money per query. Every "how many likes today?" would be an API call to an external service. External dependency, recurring cost, and my data leaves my network |
-| **Local Ollama + Gemma3** | Free, private, already running in my cluster. No external dependency. Data never leaves the server |
+| **Local Ollama + open models** | Free, private, already running in my cluster. No external dependency. Data never leaves the server |
 
-The choice was obvious. Ollama already powers my chat system. Gemma3 12B supports tool calling natively. The infrastructure cost is zero — it is already running.
+The choice was obvious. Ollama already powers my chat system. The infrastructure cost is zero — it is already running.
+
+---
+
+## Why Two Models?
+
+Here is where it gets interesting. My first attempt used a single model — Gemma3 12B — for everything: understanding the question, generating SQL, and formatting the answer. It worked, but the approach had a fundamental tension.
+
+**Gemma3 12B** is an excellent conversational model. It understands context, nuance, and generates natural, well-formatted responses. But when asked to simultaneously handle tool calling — deciding when to use a tool, generating precise SQL syntax, and structuring the output in a machine-parseable format — it struggled. It does not support Ollama's native tool calling API at all, and prompt-based workarounds were unreliable.
+
+**Qwen3 8B** is the opposite. It is a model built with structured output and code generation as first-class capabilities. It natively supports Ollama's tool calling API, meaning it returns proper JSON function calls instead of free text that needs parsing. For SQL generation specifically, Qwen3 is remarkably precise — it respects schema definitions, uses correct date functions, and handles edge cases in query syntax.
+
+The insight was simple: **use each model for what it is best at**.
+
+| Capability | Gemma3 12B | Qwen3 8B |
+|-----------|-----------|---------|
+| Natural conversation | Excellent | Adequate but stiff |
+| Understanding user intent | Excellent | Good |
+| Native tool calling | Not supported | Native support |
+| SQL generation | Decent | Excellent |
+| Formatting results as markdown | Excellent | Adequate |
+| Structured JSON output | Unreliable | Precise |
+
+Instead of fighting one model's weaknesses, I paired two models that complement each other. Gemma3 handles the parts that need human-like understanding — figuring out what the user wants and presenting results naturally. Qwen3 handles the parts that need machine precision — generating the exact right SQL query and tool call.
 
 ---
 
 ## Architecture
 
-The architecture is a loop between the chat app and Ollama, with a safety layer between Ollama and the databases.
+The architecture is a pipeline between two models with a safety layer guarding the databases.
 
-![Data Agent Architecture](/assets/images/data-agent-architecture.svg?v=1)
+![Dual-Model Agent Architecture](/assets/images/data-agent-architecture.svg?v=2)
 
 Here is the flow:
 
 1. **User asks a question** in the chat UI — "How many comments did my blog get this week?"
-2. **Chat App** (Bun/Hono) builds a system prompt that includes the database schemas, SQL examples, and tool definitions
-3. **Request goes to Ollama** (Gemma3 12B) with tool definitions describing the available database query functions
-4. **Gemma3 decides**: is this a regular chat message, or does it need to call a tool?
-5. If tool call: the SQL goes through a **validation layer** (safety checks)
-6. Validated query executes against the appropriate database via a **read-only connection**
-7. Results flow back to Gemma3 as tool response context
-8. Gemma3 generates a **natural language answer** from the raw query results
+2. **Gemma3 12B** receives the question and determines intent. Is this a regular conversation, or does it need data?
+3. If data is needed, Gemma3 emits a structured **intent tag** — a description of what data is needed and which tool to use
+4. The chat app passes this intent to **Qwen3 8B** along with the full database schema context
+5. **Qwen3 generates a precise tool call** using native Ollama function calling — the SQL query, properly structured
+6. The SQL passes through the **safety layer** (validation, read-only user, timeouts)
+7. Query results flow back through the chat app
+8. **Gemma3 12B** receives the raw results and formats them into a **natural language answer** with markdown
 9. Answer streams back to the user via **SSE**
 
-The key insight is that Ollama's tool calling follows the same pattern as OpenAI's function calling. You define tools as JSON schemas, and the model decides when to use them. The difference is that it runs locally, for free.
+The key design decision is that Gemma3 never sees the full database schema. It only knows tool names and one-line descriptions — enough to detect intent, not enough to bloat its context window. Qwen3 gets the full schema and SQL examples, but never needs conversation history. Each model operates with a focused, minimal context.
+
+---
+
+## Intent Detection: How Gemma3 Decides
+
+Gemma3's system prompt includes lightweight tool awareness. When it determines that the user's question requires data retrieval, it responds with a structured tag instead of a conversational answer:
+
+```typescript
+// Gemma3 system prompt (simplified)
+`When the user's question needs data, respond with ONLY:
+<intent>{"needs_tool": true, "tool_hint": "query_blog_db",
+  "description": "Count of blog comments created today"}</intent>`
+```
+
+If no intent tag is found in the response, the chat app treats it as a normal conversation and streams the response directly. No tool calling overhead for regular chat. This means asking "tell me a joke" goes through a single model call — no performance penalty for non-data questions.
+
+The parsing is straightforward:
+
+```typescript
+function parseIntent(text: string): IntentResult | null {
+  const match = text.match(/<intent>\s*(\{[\s\S]*?\})\s*<\/intent>/);
+  if (!match) return null;
+
+  try {
+    const parsed = JSON.parse(match[1]);
+    if (typeof parsed.needs_tool === "boolean" && parsed.description) {
+      return parsed;
+    }
+    return null;
+  } catch {
+    return null;
+  }
+}
+```
+
+---
+
+## Tool Calling: How Qwen3 Generates SQL
+
+Once Gemma3 identifies the intent, Qwen3 takes over. It receives the intent description and the full database schema via Ollama's native tool calling API:
+
+```typescript
+const response = await fetch(`${OLLAMA_HOST}/api/chat`, {
+  method: "POST",
+  body: JSON.stringify({
+    model: "qwen3:8b",
+    messages: [
+      { role: "system", content: schemaContext + sqlExamples },
+      { role: "user", content: intent.description },
+    ],
+    tools: DATA_AGENT_TOOLS,  // Native Ollama tool calling
+    stream: false,
+    options: { temperature: 0, num_ctx: 4096 },
+  }),
+});
+
+// Qwen3 returns structured tool calls — not free text
+const toolCalls = data.message?.tool_calls;
+if (toolCalls?.length > 0) {
+  const tc = toolCalls[0];
+  return {
+    name: tc.function.name,        // "query_blog_db"
+    arguments: tc.function.arguments // { sql: "SELECT COUNT(*)..." }
+  };
+}
+```
+
+Notice `temperature: 0`. For SQL generation, you want deterministic output. The same question should always produce the same query. Qwen3 at zero temperature with the schema context is remarkably accurate — it gets date functions, aggregations, and JOIN conditions right on the first try.
+
+If a query fails at the database level (syntax error, missing column), the system retries once — sending the error message back to Qwen3 so it can fix the query. One retry, not an infinite loop.
 
 ---
 
 ## Schema Context: Teaching the Model Your Database
 
-The model needs to know what tables exist and what columns they have. This context is injected into the system prompt:
+Qwen3 needs to know what tables exist and what columns they have. This context is part of its system prompt:
 
 ```typescript
 export const SCHEMA_CONTEXT = `
@@ -97,39 +197,6 @@ SQL EXAMPLES:
 ```
 
 A second database with business metrics is also available to the agent. The schema context includes both databases so the model can route queries to the correct one based on the question.
-
----
-
-## Tool Definitions
-
-Tools are defined in the Ollama-compatible format — identical to OpenAI's function calling schema:
-
-```typescript
-export const DATA_AGENT_TOOLS = [
-  {
-    type: "function",
-    function: {
-      name: "query_blog_db",
-      description:
-        "Execute a read-only SQL query against the blog database. " +
-        "Contains tables: comments, likes, comment_summaries.",
-      parameters: {
-        type: "object",
-        properties: {
-          sql: {
-            type: "string",
-            description: "A SELECT SQL query to run against the blog database",
-          },
-        },
-        required: ["sql"],
-      },
-    },
-  },
-  // ... similar definition for the second database
-];
-```
-
-When the user asks "how many likes this week?", Gemma3 responds with a tool call instead of text. The tool call contains the function name and the SQL argument. The chat app intercepts this, executes the query, and feeds the result back.
 
 ---
 
@@ -192,58 +259,45 @@ Defense in depth. Each layer catches what the previous one might miss.
 
 ---
 
-## The Tool Call Loop
+## The Dual-Model Loop
 
-The most interesting part of the implementation is the tool call loop. The chat app makes a non-streaming request to Ollama with tool definitions. If the model responds with tool calls, the app executes them and feeds the results back. This can happen multiple times — up to three rounds — before the model gives a final natural language answer:
+The most interesting part of the implementation is how the two models coordinate. The chat app orchestrates the entire flow as an async generator:
 
 ```typescript
 export async function* chatWithTools(
   messages: ChatMessage[],
-  options: ChatOptions = {}
+  options: ChatOptions = {},
+  locationContext?: { city?: string; country?: string }
 ): AsyncGenerator<AgentStreamEvent, void, unknown> {
-  const MAX_TOOL_ROUNDS = 3;
-  let currentMessages = [...messages];
+  // Step 1: Gemma3 — understand intent
+  const response = await chat(messages, { model: CHAT_MODEL });
+  const intent = parseIntent(response);
 
-  for (let round = 0; round < MAX_TOOL_ROUNDS; round++) {
-    const response = await fetch(`${OLLAMA_HOST}/api/chat`, {
-      method: "POST",
-      body: JSON.stringify({
-        model,
-        messages: currentMessages,
-        tools: DATA_AGENT_TOOLS,
-        stream: false,
-      }),
-    });
-
-    const data = await response.json();
-
-    if (data.message?.tool_calls?.length > 0) {
-      // Execute each tool call
-      for (const toolCall of data.message.tool_calls) {
-        yield { type: "status", content: `Querying database...` };
-
-        const result = await handleToolCall(
-          toolCall.function.name,
-          toolCall.function.arguments
-        );
-
-        // Feed result back to model
-        currentMessages.push({
-          role: "tool",
-          content: JSON.stringify(result.success ? result.data : { error: result.error }),
-        });
-      }
-      continue; // Model may need another round
-    }
-
-    // No tool calls — stream the final answer
-    yield { type: "text", content: data.message.content };
+  if (!intent || !intent.needs_tool) {
+    // Direct conversation — no tool needed
+    yield { type: "text", content: response };
     return;
   }
+
+  // Step 2: Qwen3 — generate precise tool call
+  yield { type: "status", content: "Thinking..." };
+  const toolCall = await callToolModel(intent, locationContext);
+
+  // Step 3: Execute the tool through safety layer
+  yield { type: "status", content: "Querying database..." };
+  const result = await handleToolCall(toolCall.name, toolCall.arguments);
+
+  // Step 4: Gemma3 — format results as natural language
+  const formattingMessages = [
+    ...messages,
+    { role: "user", content: `Results:\n${JSON.stringify(result.data)}\n\nPresent clearly.` },
+  ];
+  const formatted = await chat(formattingMessages, { model: CHAT_MODEL });
+  yield { type: "text", content: formatted };
 }
 ```
 
-The async generator pattern (`AgentStreamEvent`) lets the frontend show status updates like "Querying database..." while the tool call is in progress, then stream the final answer naturally.
+For a normal conversation, this is a single model call. For a data question, it is three calls: Gemma3 (intent) → Qwen3 (SQL) → Gemma3 (formatting). On my hardware, the total round-trip for a data question is around 4-6 seconds — both models stay loaded in memory via Ollama's `keep_alive`, so there is no cold start penalty.
 
 ---
 
@@ -276,15 +330,47 @@ The agent also handles more complex questions naturally. "Which posts have the m
 
 ---
 
+## The Privacy Argument
+
+Here is what I care about most: **none of this leaves my server**.
+
+Every token generated by Gemma3 and Qwen3 is processed locally on my AMD UM790 mini PC. No API calls to OpenAI or Google or Anthropic. No data sent to any external service. My database queries, my results, my conversations — all contained within hardware I physically own.
+
+This is not just a philosophical preference. For a system that queries production databases, privacy is a hard requirement. I would never send raw SQL results through a third-party API. With local models, I do not have to make that trade-off. I get the full capability of LLM-powered tooling without any of the data exposure.
+
+The cost? Zero per query. The models run on hardware I already paid for. Compare that to cloud API pricing where every "how many comments today?" would cost a fraction of a cent — small individually, but it adds up, and the real cost is the dependency itself.
+
+---
+
+## The SLM Future
+
+There is a bigger picture here. What I have built is a concrete example of **small language model composition** — using multiple specialized SLMs together instead of one massive general-purpose model.
+
+Today it is Gemma3 + Qwen3. Tomorrow it could be:
+- A **reasoning model** for complex multi-step questions
+- A **code model** for generating not just SQL but API calls, scripts, or config changes
+- A **vision model** for analyzing charts and dashboards
+- A **summarization model** optimized for condensing large result sets
+
+The pattern is the same: detect intent with one model, execute with a specialist, format with another. Each model can be swapped independently as better options emerge. When Qwen4 ships with improved SQL generation, I swap one model and everything else stays the same.
+
+This is the direction the industry is heading. Not everyone needs a 400B parameter model for every task. A 12B model that understands what you are asking, paired with an 8B model that executes precisely, can outperform a single larger model at a fraction of the resource cost — and run entirely on consumer hardware.
+
+The open model ecosystem makes this possible. Gemma from Google, Qwen from Alibaba, Llama from Meta — all freely available, all runnable locally through Ollama. We are at the point where a single developer with a mini PC can build AI-powered tools that rival what required cloud infrastructure and API budgets a year ago.
+
+---
+
 ## Lessons Learned
 
-**Schema context matters more than model size.** Gemma3 12B writes accurate SQL not because it is a massive model, but because the system prompt gives it exact table schemas and SQL examples. A smaller model with good context beats a larger model guessing at column names.
+**Schema context matters more than model size.** Qwen3 8B writes accurate SQL not because it is a massive model, but because the system prompt gives it exact table schemas and SQL examples. A smaller model with good context beats a larger model guessing at column names.
 
-**Tool calling works surprisingly well locally.** I expected Ollama's tool calling to be flaky compared to cloud APIs. It has been reliable. Gemma3 correctly identifies when to call tools versus when to just respond conversationally.
+**Use each model for its strengths.** Fighting Gemma3 to produce structured JSON tool calls was a losing battle. Handing that job to Qwen3 — a model built for it — solved the problem immediately. Not every model needs to do everything.
 
 **The read-only constraint is freeing.** Once you know the worst case is a slow SELECT query that times out, the anxiety about LLM-generated SQL disappears. Defense in depth means no single failure is catastrophic.
 
 **Few-shot SQL examples are essential.** Without them, the model would sometimes use incorrect date functions or miss `::date` casts. Three or four examples per query pattern eliminated almost all syntax errors.
+
+**Local models have crossed the practical utility threshold.** Both Gemma3 12B and Qwen3 8B fit comfortably in 64GB RAM alongside a full K3s cluster. The performance is good enough for interactive use. The quality is good enough for production.
 
 ---
 
@@ -295,8 +381,9 @@ This is version one. The foundation is solid, but there are clear extensions:
 - **Caching frequent queries** — "How many comments today?" does not need to hit the database every time someone asks
 - **Scheduled digests** — The agent could generate a daily summary and push it via Gotify: "Yesterday: 15 comments, 42 likes, 3 new posts"
 - **More tools** — Beyond databases, the agent could check pod health, query Prometheus metrics, or trigger operational tasks
+- **More specialist models** — A dedicated reasoning model for complex analytical questions, or a vision model for chart analysis
 
-The broader takeaway is that local LLMs have crossed the threshold of practical utility for developer tooling. Gemma3 running on Ollama, on hardware I already own, is capable enough to replace a class of manual workflows that I used to do by hand. No API keys. No token costs. No data leaving my network.
+The broader takeaway is that we are entering an era where AI-powered developer tools do not require cloud APIs, vendor lock-in, or recurring costs. Two open models running on Ollama, on hardware I already own, are capable enough to replace a class of manual workflows I used to do by hand. No API keys. No token costs. No data leaving my network.
 
 The best tools are the ones you build because you got tired of doing something the hard way.
 

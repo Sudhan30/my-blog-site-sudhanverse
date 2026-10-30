@@ -3,6 +3,7 @@ import { join } from "path";
 import { homeRoute } from "./routes/home";
 import { postRoute } from "./routes/post";
 import { tagRoute } from "./routes/tag";
+import { categoryRoute } from "./routes/category";
 import { sitemapRoute } from "./routes/sitemap";
 import { rssRoute } from "./routes/rss";
 import { apiRouter } from "./routes/api";
@@ -32,7 +33,7 @@ serve({
         }
 
         // Static file serving
-        if (path.startsWith("/styles/") || path.startsWith("/assets/") || path === "/favicon.ico" || path === "/robots.txt") {
+        if (path.startsWith("/styles/") || path.startsWith("/assets/") || path === "/favicon.ico" || path === "/favicon.svg" || path === "/robots.txt") {
             const filePath = join(PUBLIC_DIR, path);
             const file = Bun.file(filePath);
             if (await file.exists()) {
@@ -43,7 +44,6 @@ serve({
                     let start = range[1] ? parseInt(range[1], 10) : size - parseInt(range[2], 10);
                     let end = range[1] && range[2] ? parseInt(range[2], 10) : size - 1;
                     start = Math.max(0, start);
-                    // Serve at most 2 MB per request; clients ask for the rest
                     end = Math.min(end, size - 1, start + RANGE_CHUNK - 1);
                     if (start > end || start >= size) {
                         return addSecurityHeaders(new Response(null, {
@@ -51,8 +51,6 @@ serve({
                             headers: { "Content-Range": `bytes */${size}` }
                         }));
                     }
-                    // Buffer the slice: Bun streams the whole file for a sliced BunFile body,
-                    // and re-wrapping a stream (addSecurityHeaders) drops Content-Length
                     const bytes = await file.slice(start, end + 1).arrayBuffer();
                     const headers = new Headers(addSecurityHeaders(new Response(null)).headers);
                     headers.set("Content-Type", file.type);
@@ -85,6 +83,15 @@ serve({
 
             if (path === "/rss.xml" || path === "/feed.xml") {
                 return rssRoute();
+            }
+
+            if (path === "/open-source" || path === "/hackathons" || path === "/engineering") {
+                return categoryRoute(path.slice(1));
+            }
+
+            const categoryMatch = path.match(/^\/category\/([^/]+)$/);
+            if (categoryMatch) {
+                return categoryRoute(decodeURIComponent(categoryMatch[1]));
             }
 
             const postMatch = path.match(/^\/post\/([^/]+)$/);

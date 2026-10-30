@@ -1,6 +1,7 @@
 ---
 title: "Recall Storm: 646,825 Tokens, 911 Files, One Generation (Gemini 4 Argon Hackathon)"
 date: 2026-10-25
+category: hackathon
 tags: [hackathon, gemini, long-context, ai-agents, verification]
 excerpt: "At the Gemini 4 Argon SF Hackathon we asked one continued generation to write a whole retail compliance system for California's Red No. 3 ban, then built a verifier to check it. Every seam held. The plan still had 21,459 mistakes. Here's what that taught me about long-context code."
 slug: recall-storm-gemini-hackathon
@@ -9,8 +10,12 @@ video: /assets/video/recall-storm.mp4
 cover: /assets/images/hackathons/recall-storm-cover.jpg
 poster: /assets/video/recall-storm-poster.jpg
 featured: true
-badge: "Demo video"
+badge: "Million Token Track"
 event: "Gemini 4 Argon SF Hackathon · Track 1: Million Token Engineering"
+highlights:
+  - "646,825 Tokens Generated"
+  - "911 Files in One Pass"
+  - "21,459 Violations Caught"
 ---
 
 > Consistent isn't correct.

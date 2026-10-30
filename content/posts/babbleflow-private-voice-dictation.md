@@ -1,11 +1,23 @@
 ---
 title: "BabbleFlow: Private Voice Dictation for Android, in English and Tamil"
 date: 2026-10-30
+category: open-source
 tags: [android, speech-to-text, privacy, open-source, llm, self-hosted]
 excerpt: "I talk faster than I type, in two languages, and I did not want every sentence going to someone else's server. So I built BabbleFlow: an open source Android dictation app that runs on your phone, on your own server, or on a cloud key you bring, with your history encrypted on the device."
 slug: babbleflow-private-voice-dictation
 readTime: 8
 featured: true
+cover: /assets/images/babbleflow/screens.png
+badge: "Open Source · v0.15.0"
+event: "Apache 2.0 · Android 11+ ARM64"
+repoUrl: "https://github.com/Sudhan30/babbleflow"
+releaseUrl: "https://github.com/Sudhan30/babbleflow/releases/latest"
+version: "v0.15.0"
+license: "Apache-2.0"
+highlights:
+  - "English & Tamil Dictation"
+  - "On-Phone / BYO Key / Self-Hosted"
+  - "62/63 Self-Correction Accuracy"
 ---
 
 I talk much faster than I type. On a phone the gap is worse, and it is worse again when half of what I say is in Tamil. The dictation built into most keyboards either sends every word to a server I do not control, or falls apart the moment I switch languages mid sentence.

@@ -1,6 +1,7 @@
 ---
 title: "HealthForce: One Cortex Agent for the Whole ER Team (Anthropic × Snowflake Hackathon Winner)"
 date: 2026-10-23
+category: hackathon
 tags: [hackathon, snowflake, ai-agents, claude, healthcare, data-governance]
 excerpt: "We won the Anthropic × Snowflake Intelligence at Work Hackathon with HealthForce: one Snowflake Cortex Agent that serves the paramedic, the ER doctor and the nurse on the same patient, identifies an unconscious patient from 1.42M synthetic records, and turns 'hang blood' into an exact, type-specific order."
 slug: healthforce-snowflake-anthropic-hackathon
@@ -9,8 +10,12 @@ cover: /assets/images/hackathons/healthforce-cover.jpg
 video: /assets/video/healthforce.mp4
 poster: /assets/video/healthforce-poster.jpg
 featured: true
-badge: "Winner"
+badge: "1st Place Winner"
 event: "Anthropic × Snowflake Intelligence at Work Hackathon"
+highlights:
+  - "1.42M Synthetic Records"
+  - "3-Role Cortex Agent"
+  - "Dynamic RBAC Masking"
 ---
 
 > "He's here. Pull off the gauze and hang blood."

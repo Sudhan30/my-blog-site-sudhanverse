@@ -1,9 +1,10 @@
 import { layout } from "../templates/layout";
-import { getPostBySlug } from "../lib/posts";
+import { getPostBySlug, CATEGORY_META } from "../lib/posts";
 import { renderMarkdown } from "../lib/markdown";
 import { secureHtml } from "../middleware/security";
 import { icon } from "../templates/icons";
-import { esc } from "../templates/post-list";
+import { esc, renderCategoryBadge } from "../templates/post-list";
+import { renderPostInteractiveBanner, renderPostInteractiveWidget } from "../templates/interactive-widgets";
 
 export async function postRoute(slug: string): Promise<Response> {
   const post = await getPostBySlug(slug);
@@ -19,17 +20,17 @@ export async function postRoute(slug: string): Promise<Response> {
     day: "numeric"
   });
 
-  // Use markdown rendering for all posts
-  const isCustomTemplate = false;
   const htmlContent = renderMarkdown(post.content);
 
   const tags = post.tags.map(t =>
-    `<a href="/tag/${encodeURIComponent(t)}">${esc(t)}</a>`
-  ).join(", ");
+    `<a href="/tag/${encodeURIComponent(t)}" class="article-tag-chip">#${esc(t)}</a>`
+  ).join("");
 
   const readTime = post.readTime || Math.max(1, Math.ceil(post.content.split(/\s+/).length / 220));
+  const categoryInfo = CATEGORY_META[post.category];
 
-  // Video takes the hero slot; otherwise the cover image if there is one
+  // Video takes the hero slot; otherwise the cover image if there is one (skip if cover is already embedded in markdown body)
+  const coverAlreadyInBody = post.cover && post.content.includes(post.cover);
   const heroMedia = post.video ? `
         <figure class="article-hero-media video-embed">
           <video controls playsinline preload="metadata"${post.poster || post.cover ? ` poster="${post.poster || post.cover}"` : ""}>
@@ -37,37 +38,64 @@ export async function postRoute(slug: string): Promise<Response> {
             Your browser can't play this video. <a href="${post.video}">Download it</a> instead.
           </video>
         </figure>
-  ` : post.cover ? `
+  ` : (post.cover && !coverAlreadyInBody) ? `
         <figure class="article-hero-media">
           <img src="${post.cover}" alt="${esc(post.title)}">
         </figure>
   ` : "";
 
   const eventLine = post.event
-    ? `<p class="article-event">${post.badge ? `${esc(post.badge)}, ` : ""}${esc(post.event)}</p>`
+    ? `<span class="article-event-pill">${icon("award", { size: 14 })} ${esc(post.event)}</span>`
     : "";
 
-  // Only show article header for non-custom template posts
-  const articleHeader = isCustomTemplate ? '' : `
+  const interactiveBanner = renderPostInteractiveBanner(post);
+  const interactiveWidget = renderPostInteractiveWidget(post.slug);
+
+  const articleHeader = `
         <header class="article-header">
-          <a href="/" class="back-link">${icon("arrow-left")} All writing</a>
+          <div class="article-breadcrumb-row">
+            <a href="/" class="back-link">${icon("arrow-left")} All writing</a>
+            <span class="breadcrumb-sep">/</span>
+            <a href="${categoryInfo.route}" class="back-link category-crumb">${esc(categoryInfo.label)}</a>
+          </div>
+          <div class="article-badges-row">
+            ${renderCategoryBadge(post.category, post.badge)}
+            ${eventLine}
+          </div>
           <h1 class="article-title">${esc(post.title)}</h1>
           <p class="article-dek">${esc(post.excerpt)}</p>
-          <div class="article-meta">
-            <img src="/assets/images/author-potrait-small.png" alt="" class="article-meta-avatar" width="32" height="32">
-            <div class="article-meta-text">
-              <span class="article-meta-name">Sudharsana Rajasekaran</span>
-              <span class="article-meta-sub"><time datetime="${post.date}">${date}</time> · ${readTime} min read</span>
+          <div class="article-meta-bar">
+            <div class="article-meta">
+              <img src="/assets/images/author-potrait-small.png" alt="" class="article-meta-avatar" width="36" height="36">
+              <div class="article-meta-text">
+                <span class="article-meta-name">Sudharsana Rajasekaran</span>
+                <span class="article-meta-sub"><time datetime="${post.date}">${date}</time> · ${readTime} min read</span>
+              </div>
+            </div>
+            <div class="article-quick-actions">
+              <button class="like-btn like-btn-trigger" id="like-btn-top" data-slug="${post.slug}" aria-label="Like this post" title="Like this post">
+                <span class="like-icon">${icon("thumbs-up")}</span>
+                <span class="like-count-display" id="like-count-top">0</span>
+              </button>
+              <a href="#comments-section" class="quick-action-btn" id="comment-jump-btn" title="Jump to comments">
+                ${icon("message-square", { size: 15 })}
+                <span id="comment-count-top">0</span>
+              </a>
+              <button class="quick-action-btn" id="share-btn-top" type="button" title="Copy article link" aria-label="Copy article link">
+                ${icon("share-2", { size: 15 })}
+                <span id="share-btn-label">Share</span>
+              </button>
             </div>
           </div>
-          ${eventLine}
         </header>
+        ${interactiveBanner}
         ${heroMedia}
+        ${interactiveWidget ? `<div class="article-interactive-slot">${interactiveWidget}</div>` : ""}
   `;
 
   const content = `
     <div class="reading-progress" id="reading-progress"></div>
-    <article class="article-page${isCustomTemplate ? ' custom-template' : ''}">
+    <article class="article-page" data-category="${post.category}">
       <div class="container article-container">
         ${articleHeader}
 
@@ -83,30 +111,34 @@ export async function postRoute(slug: string): Promise<Response> {
           </aside>
         </div>
 
-        ${tags ? `<p class="article-tags">Filed under ${tags}</p>` : ""}
+        ${tags ? `<div class="article-tags"><span class="article-tags-label">Topics</span><div class="article-tags-list">${tags}</div></div>` : ""}
 
         <!-- Author Section with Like Button -->
         <section class="author-section">
-          <img src="/assets/images/author-potrait-small.png" alt="Sudharsana" class="author-avatar" width="48" height="48" loading="lazy">
+          <img src="/assets/images/author-potrait-small.png" alt="Sudharsana" class="author-avatar" width="52" height="52" loading="lazy">
           <div class="author-info">
             <h3>Sudharsana Rajasekaran</h3>
-            <p>Data engineer building data systems and AI agents.</p>
+            <p>AI &amp; Data Engineer building local-first apps, autonomous agents, and self-hosted systems.</p>
             <div class="author-links">
               <a href="https://sudharsana.dev" target="_blank" rel="noopener" title="Portfolio" aria-label="Portfolio">${icon("globe")}</a>
               <a href="https://github.com/sudhan30" target="_blank" rel="noopener" title="GitHub" aria-label="GitHub">${icon("github")}</a>
               <a href="https://www.linkedin.com/in/sudharsanarajasekaran/" target="_blank" rel="noopener" title="LinkedIn" aria-label="LinkedIn">${icon("linkedin")}</a>
             </div>
           </div>
-          <button class="like-btn" id="like-btn" data-slug="${post.slug}" aria-label="Like this post">
-            <span class="like-icon">${icon("thumbs-up")}</span>
-            <span id="like-count">0</span>
-          </button>
+          <div class="author-cta-box">
+            <span class="author-cta-label">Enjoyed this write-up?</span>
+            <button class="like-btn like-btn-large like-btn-trigger" id="like-btn" data-slug="${post.slug}" aria-label="Like this post">
+              <span class="like-icon">${icon("thumbs-up")}</span>
+              <span class="like-btn-text">Applause</span>
+              <span class="like-count-display" id="like-count">0</span>
+            </button>
+          </div>
         </section>
 
         <!-- Comments Section -->
         <section class="comments-section" id="comments-section">
           <div class="comments-header">
-            <h2>Comments <span id="comment-count">(0)</span></h2>
+            <h2>Discussion <span id="comment-count">(0)</span></h2>
             <select id="comment-sort" class="comment-sort" aria-label="Sort comments">
               <option value="recent">Most Recent</option>
               <option value="oldest">Oldest First</option>
@@ -118,7 +150,7 @@ export async function postRoute(slug: string): Promise<Response> {
           <div id="comment-summary" class="comment-summary" style="display: none;">
             <div class="summary-header">
               ${icon("sparkles")}
-              <span>What readers are saying</span>
+              <span>AI Reader Pulse (Local Gemma)</span>
             </div>
             <p id="summary-text"></p>
             <div class="summary-meta">
@@ -130,14 +162,14 @@ export async function postRoute(slug: string): Promise<Response> {
           <form class="comment-form" id="comment-form">
             <input type="hidden" name="postSlug" value="${post.slug}">
             <div class="name-input-wrapper">
-              <input type="text" name="name" placeholder="Your name" class="comment-input" id="comment-name" aria-label="Your name">
+              <input type="text" name="name" placeholder="Your name (or keep your AI alias)" class="comment-input" id="comment-name" aria-label="Your name">
               <div class="name-error" id="name-error" style="display: none;" role="alert">
                 ${icon("alert-circle")}
                 <span id="name-error-text"></span>
               </div>
             </div>
-            <textarea name="comment" placeholder="Share your thoughts..." required class="comment-textarea" maxlength="2000" aria-label="Comment"></textarea>
-            <button type="submit" class="comment-submit">Post comment</button>
+            <textarea name="comment" placeholder="Share a question, architectural critique, or feedback..." required class="comment-textarea" maxlength="2000" aria-label="Comment"></textarea>
+            <button type="submit" class="comment-submit" id="comment-submit-btn">Post comment</button>
           </form>
 
           <div id="comments-list" class="comments-list">
@@ -160,9 +192,11 @@ export async function postRoute(slug: string): Promise<Response> {
         user: icon("user"),
         arrowLeft: icon("arrow-left"),
         arrowRight: icon("arrow-right"),
+        copy: icon("copy", { size: 14 }),
+        check: icon("check", { size: 14 }),
         x: icon("x", { size: 20 })
       })};
-      
+
       // Client ID management
       function getClientId() {
         let id = localStorage.getItem('blog-client-id');
@@ -170,7 +204,6 @@ export async function postRoute(slug: string): Promise<Response> {
           if (typeof crypto !== 'undefined' && crypto.randomUUID) {
             id = crypto.randomUUID();
           } else {
-             // Fallback for older browsers / non-secure contexts
             id = 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
               var r = Math.random() * 16 | 0, v = c == 'x' ? r : (r & 0x3 | 0x8);
               return v.toString(16);
@@ -181,7 +214,6 @@ export async function postRoute(slug: string): Promise<Response> {
         return id;
       }
 
-      // HTML escape function to prevent XSS attacks
       function escapeHtml(unsafe) {
         if (!unsafe) return '';
         return unsafe
@@ -192,7 +224,6 @@ export async function postRoute(slug: string): Promise<Response> {
           .replace(/'/g, "&#039;");
       }
 
-      // Relative time formatting
       function timeAgo(dateStr) {
         const now = new Date();
         const date = new Date(dateStr);
@@ -208,18 +239,16 @@ export async function postRoute(slug: string): Promise<Response> {
         return date.toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
       }
 
-      // Auto-generated display name with AI + fallback
       async function generateDisplayName() {
         let name = localStorage.getItem('blog-display-name');
         if (name) {
           return name;
         }
 
-        // Try Ollama-generated name first
         try {
           const response = await fetch('/api/generate-name', {
             method: 'GET',
-            signal: AbortSignal.timeout(15000) // 15s timeout for Ollama generation
+            signal: AbortSignal.timeout(8000)
           });
 
           if (response.ok) {
@@ -227,19 +256,14 @@ export async function postRoute(slug: string): Promise<Response> {
             if (data.name) {
               name = data.name;
               localStorage.setItem('blog-display-name', name);
-
-              // Track this auto-generated name for future replacement
               trackAutoGeneratedName(name);
-
-              console.log('✨ AI-generated name:', name);
               return name;
             }
           }
         } catch (error) {
-          console.log('⚠️  AI generation unavailable, using fallback');
+          // Fallback to local random generator
         }
 
-        // Fallback: Enhanced random generation
         const adjectives = ['Swift','Clever','Brave','Silent','Noble','Wild','Cosmic',
           'Ancient','Mystic','Golden','Silver','Crystal','Thunder','Shadow','Lunar',
           'Solar','Arctic','Tropical','Desert','Ocean','Forest','Mountain','Storm',
@@ -250,10 +274,8 @@ export async function postRoute(slug: string): Promise<Response> {
           'Koala','Panda','Otter','Eagle','Raven','Bison','Cobra','Finch','Crane','Viper',
           'Tiger','Lion','Leopard','Cheetah','Jaguar','Panther','Falcon','Sparrow','Robin',
           'Dolphin','Whale','Shark','Penguin','Albatross','Pelican','Heron','Stork',
-          'Beaver','Badger','Marten','Weasel','Ferret','Mink','Mongoose','Raccoon',
-          'Phoenix','Dragon','Griffin','Pegasus','Unicorn','Sphinx','Hydra','Kraken'];
+          'Phoenix','Dragon','Griffin','Pegasus'];
 
-        // Use crypto for better randomness
         const randomIndex = (max) => {
           const array = new Uint32Array(1);
           crypto.getRandomValues(array);
@@ -266,15 +288,10 @@ export async function postRoute(slug: string): Promise<Response> {
 
         name = adjective + '-' + animal + '-' + number;
         localStorage.setItem('blog-display-name', name);
-
-        // Track this auto-generated name for future replacement
         trackAutoGeneratedName(name);
-
-        console.log('🎲 Fallback name:', name);
         return name;
       }
 
-      // Track auto-generated names so we can replace them later with custom names
       function trackAutoGeneratedName(name) {
         const previousNames = JSON.parse(localStorage.getItem('blog-previous-names') || '[]');
         if (!previousNames.includes(name)) {
@@ -286,104 +303,171 @@ export async function postRoute(slug: string): Promise<Response> {
       const clientId = getClientId();
       let displayName = localStorage.getItem('blog-display-name') || 'Anonymous';
 
-      // Aggressively generate display name on page load and update UI
       (async () => {
         displayName = await generateDisplayName();
-
-        // Update comment form name input field with generated name
         const nameInput = document.getElementById('comment-name');
         if (nameInput && displayName !== 'Anonymous') {
           nameInput.placeholder = displayName;
           nameInput.value = displayName;
 
-          // Add visual indicator showing the AI-generated name
           const existingBadge = document.querySelector('.name-badge');
           if (!existingBadge) {
             const badge = document.createElement('div');
             badge.className = 'name-badge';
-            badge.innerHTML = ICONS.user + ' Your username: <strong>' + escapeHtml(displayName) + '</strong>';
+            badge.innerHTML = ICONS.user + ' Posting as: <strong>' + escapeHtml(displayName) + '</strong> <span class="name-badge-hint">(editable above)</span>';
             nameInput.parentElement.appendChild(badge);
           }
         }
       })();
+
+      // Synchronized Top + Bottom Like buttons
       let hasLiked = localStorage.getItem('liked-' + slug) === 'true';
-      
-      // Like functionality
-      const likeBtn = document.getElementById('like-btn');
-      const likeCount = document.getElementById('like-count');
-      
-      async function loadLikes() {
-        const res = await fetch('/api/posts/' + slug + '/likes');
-        const data = await res.json();
-        likeCount.textContent = data.count || 0;
-        updateLikeBtn();
-      }
-      
-      function updateLikeBtn() {
-        if (hasLiked) {
-          likeBtn.classList.add('liked');
-          likeBtn.querySelector('.like-icon').innerHTML = ICONS.thumbsFilled;
-        } else {
-          likeBtn.classList.remove('liked');
-          likeBtn.querySelector('.like-icon').innerHTML = ICONS.thumbs;
-        }
-      }
-      
-      likeBtn.addEventListener('click', async () => {
-        const method = hasLiked ? 'DELETE' : 'POST';
-        const res = await fetch('/api/posts/' + slug + '/likes', { 
-            method,
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ clientId })
+      let currentLikesCount = 0;
+      let isLikePending = false;
+      const likeButtons = document.querySelectorAll('.like-btn-trigger');
+      const likeCountDisplays = document.querySelectorAll('.like-count-display');
+
+      function updateLikeButtonsUI(animate) {
+        likeCountDisplays.forEach(el => {
+          el.textContent = String(currentLikesCount);
         });
-        const data = await res.json();
-        likeCount.textContent = data.count;
-        
-        // Update local state based on success
-        if (!data.error) {
-            hasLiked = !hasLiked;
-            localStorage.setItem('liked-' + slug, hasLiked);
-            updateLikeBtn();
-        } else {
-            console.error('Like failed:', data.error);
+        likeButtons.forEach(btn => {
+          const iconEl = btn.querySelector('.like-icon');
+          if (hasLiked) {
+            btn.classList.add('liked');
+            if (iconEl) iconEl.innerHTML = ICONS.thumbsFilled;
+          } else {
+            btn.classList.remove('liked');
+            if (iconEl) iconEl.innerHTML = ICONS.thumbs;
+          }
+          if (animate) {
+            btn.classList.remove('like-burst');
+            void btn.offsetWidth;
+            btn.classList.add('like-burst');
+          }
+        });
+      }
+
+      async function loadLikes() {
+        try {
+          const res = await fetch('/api/posts/' + encodeURIComponent(slug) + '/likes?clientId=' + encodeURIComponent(clientId));
+          if (!res.ok) return;
+          const data = await res.json();
+          currentLikesCount = typeof data.count === 'number' ? data.count : 0;
+          if (typeof data.liked === 'boolean') {
+            hasLiked = data.liked;
+            localStorage.setItem('liked-' + slug, String(hasLiked));
+          }
+          updateLikeButtonsUI(false);
+        } catch (err) {
+          console.error('Error loading likes:', err);
         }
+      }
+
+      likeButtons.forEach(btn => {
+        btn.addEventListener('click', async () => {
+          if (isLikePending) return;
+          isLikePending = true;
+
+          const previousLiked = hasLiked;
+          const previousCount = currentLikesCount;
+          const method = previousLiked ? 'DELETE' : 'POST';
+
+          // Optimistic UI update
+          hasLiked = !previousLiked;
+          currentLikesCount = Math.max(0, previousCount + (hasLiked ? 1 : -1));
+          localStorage.setItem('liked-' + slug, String(hasLiked));
+          updateLikeButtonsUI(true);
+
+          try {
+            const res = await fetch('/api/posts/' + encodeURIComponent(slug) + '/likes', {
+              method,
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ clientId })
+            });
+            const data = await res.json();
+            if (res.ok && !data.error) {
+              if (typeof data.count === 'number') {
+                currentLikesCount = data.count;
+              }
+              if (typeof data.liked === 'boolean') {
+                hasLiked = data.liked;
+                localStorage.setItem('liked-' + slug, String(hasLiked));
+              }
+              updateLikeButtonsUI(false);
+            } else {
+              // Rollback on server error
+              hasLiked = previousLiked;
+              currentLikesCount = previousCount;
+              localStorage.setItem('liked-' + slug, String(hasLiked));
+              updateLikeButtonsUI(false);
+            }
+          } catch (err) {
+            hasLiked = previousLiked;
+            currentLikesCount = previousCount;
+            localStorage.setItem('liked-' + slug, String(hasLiked));
+            updateLikeButtonsUI(false);
+          } finally {
+            isLikePending = false;
+          }
+        });
       });
-      
+
       loadLikes();
-      
+
+      // Share button
+      const shareBtn = document.getElementById('share-btn-top');
+      const shareBtnLabel = document.getElementById('share-btn-label');
+      if (shareBtn) {
+        shareBtn.addEventListener('click', async () => {
+          const shareUrl = window.location.href;
+          try {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+              await navigator.clipboard.writeText(shareUrl);
+              if (shareBtnLabel) shareBtnLabel.textContent = 'Copied!';
+              shareBtn.classList.add('copied');
+              setTimeout(() => {
+                if (shareBtnLabel) shareBtnLabel.textContent = 'Share';
+                shareBtn.classList.remove('copied');
+              }, 2000);
+            }
+          } catch (e) {}
+        });
+      }
+
       // Comments functionality
       const commentForm = document.getElementById('comment-form');
       const commentsList = document.getElementById('comments-list');
       const commentCount = document.getElementById('comment-count');
+      const commentCountTop = document.getElementById('comment-count-top');
       const commentSort = document.getElementById('comment-sort');
       let currentPage = 1;
       let currentSort = 'recent';
       const commentsPerPage = 10;
 
       async function loadComments(page = 1, sort = currentSort) {
-        const res = await fetch(\`/api/posts/\${slug}/comments?page=\${page}&limit=\${commentsPerPage}&sort=\${sort}&clientId=\${clientId}&_t=\${Date.now()}\`);
-        const data = await res.json();
-        const { comments, pagination } = data;
-        const total = pagination?.total || 0;
-        currentPage = page;
-        currentSort = sort;
-
-        commentCount.textContent = '(' + total + ')';
-
-        if (!comments || comments.length === 0) {
-          commentsList.innerHTML = '<p class="no-comments">No comments yet. Be the first to share your thoughts!</p>';
-          renderPagination(pagination);
-          return;
-        }
-
-        // Get list of previous auto-generated names used by this user
-        const previousNames = JSON.parse(localStorage.getItem('blog-previous-names') || '[]');
-        const currentName = localStorage.getItem('blog-display-name');
-
         try {
-          const html = comments.map((c, index) => {
-            // Replace previous auto-generated names with current custom name
-            let authorName = c.display_name;
+          const res = await fetch(\`/api/posts/\${encodeURIComponent(slug)}/comments?page=\${page}&limit=\${commentsPerPage}&sort=\${sort}&clientId=\${encodeURIComponent(clientId)}&_t=\${Date.now()}\`);
+          const data = await res.json();
+          const { comments, pagination } = data;
+          const total = pagination?.total || 0;
+          currentPage = page;
+          currentSort = sort;
+
+          if (commentCount) commentCount.textContent = '(' + total + ')';
+          if (commentCountTop) commentCountTop.textContent = String(total);
+
+          if (!comments || comments.length === 0) {
+            commentsList.innerHTML = '<p class="no-comments">No comments yet. Start the technical discussion below!</p>';
+            renderPagination(pagination);
+            return;
+          }
+
+          const previousNames = JSON.parse(localStorage.getItem('blog-previous-names') || '[]');
+          const currentName = localStorage.getItem('blog-display-name');
+
+          const html = comments.map((c) => {
+            let authorName = c.display_name || 'Anonymous';
             if (currentName && previousNames.includes(c.display_name)) {
               authorName = currentName;
             }
@@ -392,18 +476,18 @@ export async function postRoute(slug: string): Promise<Response> {
             const userLiked = c.user_liked || false;
             const likeIcon = userLiked ? ICONS.heartFilled : ICONS.heart;
             const likedClass = userLiked ? 'liked' : '';
-
-            // Escape HTML in content to prevent injection
-            const escapedContent = c.content.replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            const escapedContent = escapeHtml(c.content || '');
+            const initials = authorName.slice(0, 2).toUpperCase();
 
             return \`
               <div class="comment">
                 <div class="comment-header">
                   <div class="comment-author-info">
+                    <span class="comment-avatar-mini" aria-hidden="true">\${escapeHtml(initials)}</span>
                     <span class="comment-author">\${escapeHtml(authorName)}</span>
                     <span class="comment-date">\${timeAgo(c.created_at)}</span>
                   </div>
-                  <button class="comment-like-btn \${likedClass}" data-comment-id="\${c.id}" data-liked="\${userLiked}">
+                  <button class="comment-like-btn \${likedClass}" data-comment-id="\${c.id}" data-liked="\${userLiked}" aria-label="Like comment">
                     <span class="like-icon">\${likeIcon}</span>
                     <span class="like-count">\${likeCount > 0 ? likeCount : ''}</span>
                   </button>
@@ -414,19 +498,17 @@ export async function postRoute(slug: string): Promise<Response> {
           }).join('');
 
           commentsList.innerHTML = html;
+
+          document.querySelectorAll('.comment-like-btn').forEach(btn => {
+            btn.addEventListener('click', handleCommentLike);
+          });
+
+          renderPagination(pagination);
         } catch (error) {
-          console.error('❌ Error rendering comments:', error);
+          console.error('Error loading comments:', error);
         }
-
-        // Add event listeners to like buttons
-        document.querySelectorAll('.comment-like-btn').forEach(btn => {
-          btn.addEventListener('click', handleCommentLike);
-        });
-
-        renderPagination(pagination);
       }
 
-      // Handle comment like/unlike
       async function handleCommentLike(e) {
         const btn = e.currentTarget;
         const commentId = btn.dataset.commentId;
@@ -461,10 +543,9 @@ export async function postRoute(slug: string): Promise<Response> {
         }
       }
 
-      // Sort dropdown change listener
       commentSort.addEventListener('change', (e) => {
         currentSort = e.target.value;
-        currentPage = 1; // Reset to first page
+        currentPage = 1;
         loadComments(currentPage, currentSort);
       });
 
@@ -480,15 +561,12 @@ export async function postRoute(slug: string): Promise<Response> {
         const { page, totalPages } = pagination;
         let html = '<div class="pagination">';
 
-        // Previous button
         if (page > 1) {
           html += \`<button class="page-btn" data-page="\${page - 1}">\${ICONS.arrowLeft} Previous</button>\`;
         }
 
-        // Page numbers
         html += '<span class="page-info">Page ' + page + ' of ' + totalPages + '</span>';
 
-        // Next button
         if (page < totalPages) {
           html += \`<button class="page-btn" data-page="\${page + 1}">Next \${ICONS.arrowRight}</button>\`;
         }
@@ -496,110 +574,104 @@ export async function postRoute(slug: string): Promise<Response> {
         html += '</div>';
         paginationContainer.innerHTML = html;
 
-        // Attach event listeners to pagination buttons
         paginationContainer.querySelectorAll('.page-btn').forEach(btn => {
           btn.addEventListener('click', () => {
             const newPage = parseInt(btn.dataset.page, 10);
             loadComments(newPage, currentSort);
-            // Scroll to comments section
             document.getElementById('comments-section')?.scrollIntoView({ behavior: 'smooth' });
           });
         });
       }
-      
+
       commentForm.addEventListener('submit', async (e) => {
         e.preventDefault();
+        const submitBtn = document.getElementById('comment-submit-btn');
         const formData = new FormData(commentForm);
         const customName = formData.get('name')?.trim();
         const finalName = customName || displayName;
 
-        const res = await fetch('/api/posts/' + slug + '/comments', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            name: finalName,
-            comment: formData.get('comment'),
-            clientId: clientId
-          })
-        });
+        if (submitBtn) {
+          submitBtn.disabled = true;
+          submitBtn.textContent = 'Posting...';
+        }
 
-        if (res.ok) {
-          // If user provided a custom name, save it and update all their comments in DB
-          if (customName && customName !== displayName) {
-            // Track the old name before replacing it
-            trackAutoGeneratedName(displayName);
+        try {
+          const res = await fetch('/api/posts/' + encodeURIComponent(slug) + '/comments', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              name: finalName,
+              comment: formData.get('comment'),
+              clientId: clientId
+            })
+          });
 
-            localStorage.setItem('blog-display-name', customName);
-            displayName = customName;
+          if (res.ok) {
+            if (customName && customName !== displayName) {
+              trackAutoGeneratedName(displayName);
+              localStorage.setItem('blog-display-name', customName);
+              displayName = customName;
 
-            // Update all user's comments in the database
-            try {
-              const updateRes = await fetch('/api/update-display-name', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                  clientId: clientId,
-                  newDisplayName: customName
-                })
-              });
-
-              if (updateRes.ok) {
-                const data = await updateRes.json();
-                console.log('✅ Updated', data.updatedCount, 'comments in database');
+              try {
+                await fetch('/api/update-display-name', {
+                  method: 'POST',
+                  headers: { 'Content-Type': 'application/json' },
+                  body: JSON.stringify({
+                    clientId: clientId,
+                    newDisplayName: customName
+                  })
+                });
+              } catch (error) {
+                console.error('Failed to update comments in database:', error);
               }
-            } catch (error) {
-              console.error('Failed to update comments in database:', error);
+
+              const nameInput = document.getElementById('comment-name');
+              if (nameInput) {
+                nameInput.placeholder = customName;
+                nameInput.value = customName;
+              }
+
+              const badge = document.querySelector('.name-badge');
+              if (badge) {
+                badge.innerHTML = ICONS.user + ' Posting as: <strong>' + escapeHtml(customName) + '</strong>';
+              }
             }
 
-            // Update the name input field
+            commentForm.reset();
             const nameInput = document.getElementById('comment-name');
             if (nameInput) {
-              nameInput.placeholder = customName;
-              nameInput.value = customName;
+              nameInput.value = displayName;
             }
+            await loadComments();
+            loadSummary();
+          } else {
+            const errorData = await res.json();
+            const errorMessage = errorData.error || 'Failed to post comment';
 
-            // Update the name badge
-            const badge = document.querySelector('.name-badge');
-            if (badge) {
-              badge.innerHTML = ICONS.user + ' Your username: <strong>' + escapeHtml(customName) + '</strong>';
+            const nameError = document.getElementById('name-error');
+            const nameErrorText = document.getElementById('name-error-text');
+            const nameInput = document.getElementById('comment-name');
+
+            if (nameError && nameErrorText && nameInput) {
+              nameErrorText.textContent = errorMessage;
+              nameError.style.display = 'flex';
+              nameInput.classList.add('input-error');
+              nameInput.focus();
+
+              setTimeout(() => {
+                nameError.style.display = 'none';
+                nameInput.classList.remove('input-error');
+              }, 5000);
             }
-
-            console.log('✅ Custom name saved:', customName);
           }
-
-          commentForm.reset();
-          // Restore the name field with the saved name
-          const nameInput = document.getElementById('comment-name');
-          if (nameInput) {
-            nameInput.value = displayName;
-          }
-          loadComments(); // Reload comments to show updated names
-        } else {
-          // Handle errors
-          const errorData = await res.json();
-          const errorMessage = errorData.error || 'Failed to post comment';
-
-          // Show inline error message
-          const nameError = document.getElementById('name-error');
-          const nameErrorText = document.getElementById('name-error-text');
-          const nameInput = document.getElementById('comment-name');
-
-          if (nameError && nameErrorText && nameInput) {
-            nameErrorText.textContent = errorMessage;
-            nameError.style.display = 'flex';
-            nameInput.classList.add('input-error');
-            nameInput.focus();
-
-            // Hide error after 5 seconds
-            setTimeout(() => {
-              nameError.style.display = 'none';
-              nameInput.classList.remove('input-error');
-            }, 5000);
+        } finally {
+          if (submitBtn) {
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Post comment';
           }
         }
       });
 
-      // Comment summary functionality
       const summarySection = document.getElementById('comment-summary');
       const summaryText = document.getElementById('summary-text');
       const summaryCommentCount = document.getElementById('summary-comment-count');
@@ -607,25 +679,52 @@ export async function postRoute(slug: string): Promise<Response> {
 
       async function loadSummary() {
         try {
-          const res = await fetch('/api/posts/' + slug + '/summary');
+          const res = await fetch('/api/posts/' + encodeURIComponent(slug) + '/summary');
           const data = await res.json();
 
           if (data.summary) {
             summaryText.textContent = data.summary;
-            summaryCommentCount.textContent = 'Based on ' + data.commentCount + ' comments';
+            summaryCommentCount.textContent = 'Synthesized from ' + data.commentCount + ' reader comments';
             summaryDate.textContent = 'Updated ' + new Date(data.updatedAt).toLocaleDateString();
             summarySection.style.display = 'block';
           } else {
             summarySection.style.display = 'none';
           }
         } catch (err) {
-          console.error('Failed to load summary:', err);
           summarySection.style.display = 'none';
         }
       }
 
       loadComments();
       loadSummary();
+
+      // Add 1-click Copy button to all code blocks in article content
+      (function() {
+        document.querySelectorAll('.article-content pre').forEach(function(pre) {
+          if (pre.querySelector('.code-copy-btn')) return;
+          pre.style.position = 'relative';
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'code-copy-btn';
+          btn.setAttribute('aria-label', 'Copy code');
+          btn.innerHTML = ICONS.copy + '<span>Copy</span>';
+          btn.addEventListener('click', function() {
+            const code = pre.querySelector('code');
+            const text = code ? code.innerText : pre.innerText;
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+              navigator.clipboard.writeText(text).then(function() {
+                btn.classList.add('copied');
+                btn.innerHTML = ICONS.check + '<span>Copied</span>';
+                setTimeout(function() {
+                  btn.classList.remove('copied');
+                  btn.innerHTML = ICONS.copy + '<span>Copy</span>';
+                }, 1800);
+              });
+            }
+          });
+          pre.appendChild(btn);
+        });
+      })();
 
       // Fade the right edge of tables that scroll horizontally
       (function() {
@@ -679,7 +778,6 @@ export async function postRoute(slug: string): Promise<Response> {
             const first = heads.find(function(h) { return visible.has(h.id); });
             if (first) setCurrent(first.id);
             else {
-              // Between headings: keep the last heading that is above the viewport
               const above = heads.filter(function(h) { return h.getBoundingClientRect().top < 120; });
               if (above.length) setCurrent(above[above.length - 1].id);
             }
@@ -690,7 +788,6 @@ export async function postRoute(slug: string): Promise<Response> {
 
       // Image lightbox functionality
       (function() {
-        // Create lightbox modal HTML
         const lightboxHTML = \`
           <div id="lightbox" class="lightbox" style="display: none;">
             <div class="lightbox-backdrop"></div>
@@ -707,7 +804,6 @@ export async function postRoute(slug: string): Promise<Response> {
         const lightboxClose = lightbox.querySelector('.lightbox-close');
         const lightboxBackdrop = lightbox.querySelector('.lightbox-backdrop');
 
-        // Use event delegation for images (works even for images that load later)
         const articleContent = document.querySelector('.article-content');
         if (articleContent) {
           articleContent.addEventListener('click', function(e) {
@@ -722,7 +818,6 @@ export async function postRoute(slug: string): Promise<Response> {
           });
         }
 
-        // Close lightbox functions
         function closeLightbox() {
           lightbox.style.display = 'none';
           document.body.style.overflow = '';
@@ -731,7 +826,6 @@ export async function postRoute(slug: string): Promise<Response> {
         lightboxClose.addEventListener('click', closeLightbox);
         lightboxBackdrop.addEventListener('click', closeLightbox);
 
-        // Close on ESC key
         document.addEventListener('keydown', function(e) {
           if (e.key === 'Escape' && lightbox.style.display === 'flex') {
             closeLightbox();

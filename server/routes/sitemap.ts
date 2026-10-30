@@ -1,4 +1,4 @@
-import { getAllPosts } from "../lib/posts";
+import { getAllPosts, CATEGORY_META } from "../lib/posts";
 import { addSecurityHeaders } from "../middleware/security";
 
 const SITE_URL = "https://blog.sudharsana.dev";
@@ -15,6 +15,14 @@ export async function sitemapRoute(): Promise<Response> {
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>`,
+
+        // Category Pillars
+        ...Object.values(CATEGORY_META).map(cat => `  <url>
+    <loc>${SITE_URL}/category/${cat.slug}</loc>
+    <lastmod>${today}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
+  </url>`),
 
         // Posts
         ...posts.map(post => `  <url>

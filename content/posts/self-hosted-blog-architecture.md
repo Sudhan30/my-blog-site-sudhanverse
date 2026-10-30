@@ -1,10 +1,17 @@
 ---
 title: "Building a Production K3s Blog: Architecture Deep Dive"
 date: 2025-09-15
+category: engineering
 tags: [kubernetes, k3s, self-hosting, infrastructure, monitoring, gitops, devops]
 excerpt: "From a mini PC to a full production blog platform. Deep dive into the K3s architecture, monitoring stack, GitOps deployment, and lessons learned running a self-hosted blog on a homelab cluster."
 slug: k3s-blog-architecture
 readTime: 12
+cover: /assets/images/k3s-blog-complete-architecture.svg
+badge: "Kubernetes & GitOps"
+highlights:
+  - "Self-Hosted K3s + FluxCD"
+  - "Prometheus + Grafana + Loki"
+  - "35W Idle Homelab Cluster"
 ---
 
 > "The best way to learn infrastructure is to own every layer of it."

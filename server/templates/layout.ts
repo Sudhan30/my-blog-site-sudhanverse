@@ -22,14 +22,13 @@ export function layout(options: LayoutOptions): string {
   const fullTitle = options.title === "Home" ? `Resolving Dependencies, One Idea at a Time. | ${SITE_NAME}` : `${title} | ${SITE_NAME}`;
   const canonicalUrl = esc(options.url.startsWith("http") ? options.url : `${SITE_URL}${options.url}`);
 
-  // JSON.stringify is not enough in a <script>: "<" would let "</script>" end the block
   const jsonLd = JSON.stringify({
     "@context": "https://schema.org",
     "@type": "Blog",
     name: "Resolving Dependencies, One Idea at a Time.",
     description: options.description,
     url: SITE_URL,
-    author: { "@type": "Person", name: "Sudharsana" }
+    author: { "@type": "Person", name: "Sudharsana Rajasekaran", url: "https://sudharsana.dev" }
   }).replace(/</g, "\\u003c");
 
   return `<!DOCTYPE html>
@@ -50,15 +49,9 @@ export function layout(options: LayoutOptions): string {
         const theme = savedTheme || (systemDark ? 'dark' : 'light');
         document.documentElement.setAttribute('data-theme', theme);
       }
-
-      // Apply theme immediately
       applyTheme();
-
-      // Reapply theme when page is restored from bfcache (back/forward navigation)
       window.addEventListener('pageshow', function(event) {
-        if (event.persisted) {
-          applyTheme();
-        }
+        if (event.persisted) applyTheme();
       });
     })();
   </script>
@@ -96,10 +89,10 @@ export function layout(options: LayoutOptions): string {
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
   
   <!-- Styles -->
-  <link rel="stylesheet" href="/styles/main.css?v=2026102701">
+  <link rel="stylesheet" href="/styles/main.css?v=2026103001">
   
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
@@ -114,14 +107,18 @@ export function layout(options: LayoutOptions): string {
   <!-- Header -->
   <header class="site-header" id="site-header">
     <div class="header-container">
-      <a href="/" class="logo" aria-label="Home">Sudharsana Rajasekaran</a>
+      <a href="/" class="logo" aria-label="Home">
+        <span class="logo-dot" aria-hidden="true"></span>
+        <span>Sudharsana Rajasekaran</span>
+      </a>
 
       <nav class="main-nav" id="main-nav" aria-label="Primary">
-        <a href="/" class="nav-link">Writing</a>
-        <a href="/tag/hackathon" class="nav-link">Hackathons</a>
-        <a href="https://sudharsana.dev" target="_blank" rel="noopener" class="nav-link">Portfolio</a>
+        <a href="/" class="nav-link">All</a>
+        <a href="/category/open-source" class="nav-link nav-link-oss">Open Source</a>
+        <a href="/category/hackathons" class="nav-link nav-link-hackathon">Hackathons</a>
+        <a href="/category/engineering" class="nav-link nav-link-eng">Blog Posts</a>
+        <a href="https://sudharsana.dev" target="_blank" rel="noopener" class="nav-link">Portfolio ${icon("external-link", { size: 12 })}</a>
         <a href="https://github.com/sudhan30" target="_blank" rel="noopener" class="nav-link">GitHub</a>
-        <a href="https://www.linkedin.com/in/sudharsanarajasekaran/" target="_blank" rel="noopener" class="nav-link">LinkedIn</a>
       </nav>
 
       <div class="header-actions">
@@ -161,8 +158,11 @@ export function layout(options: LayoutOptions): string {
   <!-- Footer -->
   <footer class="site-footer">
     <div class="footer-container">
-      <p class="footer-copy">&copy; ${new Date().getFullYear()} Sudharsana Rajasekaran</p>
+      <p class="footer-copy">&copy; ${new Date().getFullYear()} Sudharsana Rajasekaran · Built with Bun &amp; self-hosted on K3s</p>
       <nav class="footer-links" aria-label="Footer">
+        <a href="/category/open-source">Open Source</a>
+        <a href="/category/hackathons">Hackathons</a>
+        <a href="/category/engineering">Engineering</a>
         <a href="/rss.xml">RSS</a>
         <a href="https://github.com/sudhan30" target="_blank" rel="noopener">GitHub</a>
         <a href="https://www.linkedin.com/in/sudharsanarajasekaran/" target="_blank" rel="noopener">LinkedIn</a>
@@ -174,7 +174,7 @@ export function layout(options: LayoutOptions): string {
 
   <!-- Cookie Consent -->
   <div id="cookie-consent" class="cookie-consent" role="region" aria-label="Cookie consent" style="display: none;">
-    <p>I use Google Analytics to understand how readers engage with the blog. You can accept or decline analytics tracking.</p>
+    <p>I use Google Analytics and self-hosted telemetry to understand how readers engage with the blog. You can accept or decline analytics tracking.</p>
     <div class="cookie-actions">
       <button onclick="acceptCookies()" class="btn btn-primary">Accept</button>
       <button onclick="declineCookies()" class="btn btn-ghost">Decline</button>
@@ -183,7 +183,7 @@ export function layout(options: LayoutOptions): string {
 
   <!-- Scripts -->
   <script>
-    // Theme Toggle (theme is already applied by inline script in head)
+    // Theme Toggle
     const themeToggle = document.getElementById('theme-toggle');
     const html = document.documentElement;
 
@@ -208,7 +208,7 @@ export function layout(options: LayoutOptions): string {
     document.querySelectorAll('.main-nav a[href^="/"]').forEach((a) => {
       const href = a.getAttribute('href');
       const path = window.location.pathname;
-      if (href === '/' ? (path === '/' || path.startsWith('/post/')) : path === href) a.setAttribute('aria-current', 'page');
+      if (href === '/' ? path === '/' : path === href) a.setAttribute('aria-current', 'page');
     });
 
     // Header state on scroll
@@ -219,7 +219,6 @@ export function layout(options: LayoutOptions): string {
 
     // Reading Progress
     const progressBar = document.getElementById('reading-progress');
-    
     if (progressBar) {
       const updateProgress = () => {
         const docHeight = document.documentElement.scrollHeight - window.innerHeight;
@@ -229,6 +228,25 @@ export function layout(options: LayoutOptions): string {
       updateProgress();
       window.addEventListener('scroll', updateProgress, { passive: true });
     }
+
+    // Scroll-reveal entrance animation observer
+    (function() {
+      const els = document.querySelectorAll('.reveal-on-scroll');
+      if (!els.length) return;
+      if (!('IntersectionObserver' in window) || window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        els.forEach(el => el.classList.add('is-visible'));
+        return;
+      }
+      const io = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-visible');
+            io.unobserve(entry.target);
+          }
+        });
+      }, { threshold: 0.06, rootMargin: '0px 0px -24px 0px' });
+      els.forEach(el => io.observe(el));
+    })();
     
     // Feedback Modal
     const feedbackBtn = document.getElementById('feedback-btn');
@@ -248,11 +266,9 @@ export function layout(options: LayoutOptions): string {
     };
 
     feedbackClose.addEventListener('click', closeFeedback);
-
     feedbackModal.addEventListener('click', (e) => {
       if (e.target === feedbackModal) closeFeedback();
     });
-
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && feedbackModal.classList.contains('open')) closeFeedback();
     });
@@ -311,14 +327,10 @@ export function layout(options: LayoutOptions): string {
       window.dataLayer = window.dataLayer || [];
       function gtag(){dataLayer.push(arguments);}
       gtag('js', new Date());
-      gtag('config', 'G-F2C1BRDZDW', {
-        'anonymize_ip': true
-      });
-
-      console.log('✅ Google Analytics loaded with user consent');
+      gtag('config', 'G-F2C1BRDZDW', { 'anonymize_ip': true });
     }
 
-    // In-House Telemetry Service for Blog
+    // In-House Telemetry Service
     function initTelemetry() {
       const telemetry = {
         userId: localStorage.getItem('blog_user_id') || generateId(),
@@ -329,11 +341,8 @@ export function layout(options: LayoutOptions): string {
         init() {
           localStorage.setItem('blog_user_id', this.userId);
           sessionStorage.setItem('blog_session_id', this.sessionId);
-
-          // Track page view
           this.trackPageView();
 
-          // Track scroll depth
           let maxScroll = 0;
           window.addEventListener('scroll', () => {
             const scrollPercent = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
@@ -342,7 +351,6 @@ export function layout(options: LayoutOptions): string {
             }
           });
 
-          // Track time on page and scroll depth on unload
           window.addEventListener('beforeunload', () => {
             const timeOnPage = Math.round((Date.now() - this.pageLoadTime) / 1000);
             this.trackEvent('page_exit', {
@@ -353,7 +361,6 @@ export function layout(options: LayoutOptions): string {
             this.flush();
           });
 
-          // Track link clicks
           document.addEventListener('click', (e) => {
             const link = e.target.closest('a');
             if (link) {
@@ -363,8 +370,6 @@ export function layout(options: LayoutOptions): string {
               });
             }
           });
-
-          console.log('✅ In-house telemetry initialized with user consent');
         },
 
         trackPageView() {
@@ -385,16 +390,11 @@ export function layout(options: LayoutOptions): string {
               viewport: { width: window.innerWidth, height: window.innerHeight }
             }
           });
-
-          // Auto-flush if we have 5+ events
-          if (this.events.length >= 5) {
-            this.flush();
-          }
+          if (this.events.length >= 5) this.flush();
         },
 
         flush() {
           if (this.events.length === 0) return;
-
           const data = {
             sessionId: this.sessionId,
             userId: this.userId,
@@ -403,11 +403,7 @@ export function layout(options: LayoutOptions): string {
             events: [...this.events]
           };
           this.events = [];
-
-          // Send to our in-house API endpoint
           const url = '/api/telemetry';
-
-          // Use sendBeacon for reliability on page unload
           if (navigator.sendBeacon) {
             navigator.sendBeacon(url, JSON.stringify(data));
           } else {
@@ -416,7 +412,7 @@ export function layout(options: LayoutOptions): string {
               headers: { 'Content-Type': 'application/json' },
               body: JSON.stringify(data),
               keepalive: true
-            }).catch(err => console.error('Telemetry error:', err));
+            }).catch(() => {});
           }
         }
       };
