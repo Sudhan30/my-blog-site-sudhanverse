@@ -90,7 +90,7 @@ export function layout(options: LayoutOptions): string {
   <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
   
   <!-- Styles -->
-  <link rel="stylesheet" href="/styles/main.css?v=2026103002">
+  <link rel="stylesheet" href="/styles/main.css?v=2026103003">
   
   <!-- Favicon -->
   <link rel="icon" type="image/svg+xml" href="/favicon.svg">
