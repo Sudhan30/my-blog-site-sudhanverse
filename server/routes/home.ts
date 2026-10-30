@@ -22,7 +22,7 @@ export async function homeRoute(_req: Request): Promise<Response> {
       `<span class="meta-date">${badge || event ? sep : ""}<time datetime="${post.date}">${fmtFull(post.date)}</time></span>`
     ].join("");
     return `
-        <article class="featured-item">
+        <article class="featured-item" data-tags="${esc(post.tags.join(","))}">
           <a href="/post/${post.slug}" class="featured-link">
             <div class="featured-media">
               ${post.cover ? `<img src="${post.cover}" alt="" loading="${i < 2 ? "eager" : "lazy"}">` : ""}
@@ -41,36 +41,83 @@ export async function homeRoute(_req: Request): Promise<Response> {
   const moreTags = sortedTags.slice(8).map(tagLink).join("");
 
   const content = `
-    <section class="hero">
-      <div class="container">
-        <h1 class="hero-title">Resolving dependencies, one idea at a time.</h1>
-        <p class="hero-subtitle">A logbook of building data systems and AI agents in the real world: production lessons, homelab infrastructure, and the things I ship in a day at hackathons.</p>
-        <div class="byline">
-          <img src="/assets/images/author-potrait-small.png" alt="" class="byline-avatar" width="40" height="40" fetchpriority="high">
-          <div class="byline-text">
-            <span class="byline-name">Sudharsana Rajasekaran</span>
-            <span class="byline-role">Data engineer, builder</span>
+    <div class="home-experience">
+    <section class="hero studio-hero" id="top">
+      <div class="container studio-shell">
+        <div class="studio-copy" data-reveal>
+          <div class="studio-kicker"><span class="spark" aria-hidden="true">✳</span><span>DATA FOUNDATIONS · APPLIED AI · HUMAN CURIOSITY</span></div>
+          <h1>Ideas are easy.<br><em>Building them</em> is the interesting part.</h1>
+          <p class="studio-description">I’m <strong>Sudharsana Rajasekaran</strong>, a Staff Data Engineer working across data platforms, AI agents, solutions architecture and production systems. These are the notes from everything I build, question and learn along the way.</p>
+          <div class="studio-actions">
+            <a class="studio-primary" href="#latest">Explore the writing <span aria-hidden="true">↘</span></a>
+            <a class="studio-secondary" href="#interactive-lab">Follow a system <span aria-hidden="true">↗</span></a>
+            <button class="studio-show-search" type="button" data-search-open aria-label="Search articles">⌘ K · SEARCH</button>
           </div>
-          <div class="byline-links">
-            <a href="https://github.com/sudhan30" target="_blank" rel="noopener" aria-label="GitHub" title="GitHub">${icon("github")}</a>
-            <a href="https://www.linkedin.com/in/sudharsanarajasekaran/" target="_blank" rel="noopener" aria-label="LinkedIn" title="LinkedIn">${icon("linkedin")}</a>
-            <a href="https://sudharsana.dev" target="_blank" rel="noopener" aria-label="Portfolio" title="Portfolio">${icon("globe")}</a>
+          <div class="studio-signal">
+            <img src="/assets/images/author-potrait-small.png" alt="Portrait of Sudharsana Rajasekaran" width="39" height="39" fetchpriority="high">
+            <span><strong>Engineer. Builder. Always a student.</strong><small>Independent field notes, real systems, honest trade-offs.</small></span>
           </div>
+        </div>
+        <div class="studio-machine" aria-hidden="true">
+          <div class="ring"></div><div class="studio-core"><strong>sr.</strong><small>BUILD · LEARN · SHARE</small></div>
+          <div class="machine-note one"><small>01 / FOUNDATION</small>Data platforms</div>
+          <div class="machine-note two"><small>02 / INTELLIGENCE</small>AI &amp; agents</div>
+          <div class="machine-note three"><small>03 / REALITY</small>Production systems</div>
+          <span class="machine-dot d1"></span><span class="machine-dot d2"></span><span class="machine-dot d3"></span>
         </div>
       </div>
     </section>
 
     <div class="container">
       ${featured.length ? `
-      <section class="featured-section" aria-labelledby="featured-heading">
-        <h2 class="section-title" id="featured-heading">Hackathon builds</h2>
+      <section class="featured-section studio-section" id="featured" aria-labelledby="featured-heading">
+        <div class="section-label">01 / THE LATEST</div><div class="studio-section-top"><h2 class="home-heading" id="featured-heading">Things worth <em>building.</em></h2>
+        <p class="studio-note">Field reports from shipped experiments, hackathons and systems that actually run.</p></div>
         <div class="featured-grid">${featuredItems}
         </div>
       </section>` : ""}
 
-      <section class="writing-section" id="latest" aria-labelledby="writing-heading">
-        <h2 class="section-title" id="writing-heading">Writing</h2>
+      <div class="studio-interlude" data-reveal>
+        <div class="section-label">A NOTE TO THE READER</div>
+        <blockquote>The best engineering lessons rarely come from the happy path. They come from <em>building, breaking, questioning</em> and finding a better way through.</blockquote>
+      </div>
+      <section class="studio-lab" id="interactive-lab" aria-labelledby="lab-heading" data-reveal>
+        <div class="section-label">02 / AN INTERACTIVE DETOUR</div>
+        <h2 id="lab-heading">Follow a system.<br>See the decisions.</h2>
+        <p class="lab-intro">Like the interactive sketches on my portfolio, this is a conceptual look at the choices between data, agents and operations. Choose a journey to see how the responsibilities change.</p>
+        <div class="lab-panel">
+          <div class="lab-tabs" role="tablist" aria-label="Choose a system journey">
+            <button type="button" class="lab-tab" role="tab" aria-selected="true" aria-controls="lab-canvas" tabindex="0" data-scenario="data"><span>01</span>Data platform</button>
+            <button type="button" class="lab-tab" role="tab" aria-selected="false" aria-controls="lab-canvas" tabindex="-1" data-scenario="agent"><span>02</span>AI agent</button>
+            <button type="button" class="lab-tab" role="tab" aria-selected="false" aria-controls="lab-canvas" tabindex="-1" data-scenario="operations"><span>03</span>Production</button>
+          </div>
+          <div>
+            <div class="lab-canvas" id="lab-canvas" role="tabpanel" aria-label="System journey">
+              <div class="lab-track" role="group" aria-label="Stages of the selected system">
+                <div class="lab-node"><strong>Ingest</strong><small>Raw signals</small></div>
+                <div class="lab-node"><strong>Resolve</strong><small>Identity</small></div>
+                <div class="lab-node"><strong>Model</strong><small>Golden record</small></div>
+                <div class="lab-node"><strong>Serve</strong><small>Decisions</small></div>
+              </div>
+            </div>
+            <div class="lab-narrative">
+              <div aria-live="polite" aria-atomic="true">
+                <h3 id="lab-title">Make the identity trustworthy.</h3>
+                <p id="lab-description">A useful data product begins with the signals: standardize records, resolve who they represent, and only then publish a shared view. The order matters more than the diagram.</p>
+              </div>
+              <button class="lab-replay" id="lab-replay" type="button">Replay journey ↻</button>
+            </div>
+          </div>
+        </div>
+      </section>
+      <section class="writing-section" id="latest" aria-labelledby="writing-heading" data-reveal>
+        <div class="section-label">03 / NOTES FROM THE WORKBENCH</div><h2 class="section-title" id="writing-heading">The writing archive.</h2>
+        <div class="journal-toolbar"><div class="journal-filters" role="group" aria-label="Filter writing by category">
+            <button type="button" class="journal-filter" data-filter="all" aria-pressed="true">Everything</button><button type="button" class="journal-filter" data-filter="ai" aria-pressed="false">AI &amp; agents</button><button type="button" class="journal-filter" data-filter="systems" aria-pressed="false">Systems</button><button type="button" class="journal-filter" data-filter="cloud" aria-pressed="false">Cloud</button>
+          </div><label class="journal-search"><span aria-hidden="true">⌕</span><input id="journal-filter-input" type="search" placeholder="Find an idea…" aria-label="Search the article archive"></label></div>
+        <p id="journal-count" class="journal-count" role="status"></p>
         ${postRows(rest, { groupByYear: true })}
+        <p id="journal-empty" class="journal-empty" hidden>No notes in this category yet. Try another filter.</p>
       </section>
 
       <section class="closing">
@@ -101,6 +148,12 @@ export async function homeRoute(_req: Request): Promise<Response> {
       </section>
     </div>
 
+    <dialog class="journal-search-dialog" id="journal-search-dialog" aria-label="Search all writing">
+      <div class="search-dialog-header"><span aria-hidden="true">⌕</span><input type="search" id="journal-global-search" aria-label="Search articles" placeholder="Search topics, articles and builds…" autocomplete="off"><button type="button" data-search-close aria-label="Close search">×</button></div>
+      <div class="search-dialog-results" id="journal-search-results"></div>
+      <div class="search-dialog-hint">PRESS ESC TO CLOSE · CMD/CTRL + K TO SEARCH</div>
+    </dialog>
+    </div>
     <script>
       // Newsletter form
       document.getElementById('newsletter-form').addEventListener('submit', async (e) => {
