@@ -152,7 +152,7 @@ export function renderHackathonCards(posts: PostSummary[], stats?: Record<string
             ${highlights ? `<div class="hackathon-chips">${highlights}</div>` : ""}
 
             <div class="hackathon-card-footer">
-              <span class="read-story-cta">Read build story &amp; interactive demo ${icon("arrow-right", { size: 15 })}</span>
+              <span class="read-story-cta">Read story &amp; demo ${icon("arrow-right", { size: 15 })}</span>
               <div class="hackathon-meta-right">
                 <span>${readingTime(post)} min</span>
                 ${renderEngagementStats(post.slug, stats)}
@@ -203,7 +203,7 @@ export function renderEngineeringCards(posts: PostSummary[], stats?: Record<stri
 
           ${post.cover ? `
             <div class="eng-card-Diagram" aria-hidden="true">
-              <img src="${esc(post.cover)}?v=2026103004" alt="" loading="lazy">
+              <img src="${esc(post.cover)}?v=2026103005" alt="" loading="lazy">
             </div>
           ` : ""}
         </a>

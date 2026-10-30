@@ -43,7 +43,7 @@ export async function tagRoute(tag: string): Promise<Response> {
 
     const response = secureHtml(html);
     const headers = new Headers(response.headers);
-    headers.set("Cache-Control", "public, max-age=60");
+    headers.set("Cache-Control", "public, max-age=0, must-revalidate");
 
     return new Response(response.body, {
         status: response.status,

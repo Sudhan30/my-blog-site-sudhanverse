@@ -10,7 +10,12 @@ export async function postRoute(slug: string): Promise<Response> {
   const post = await getPostBySlug(slug);
 
   if (!post) {
-    return secureHtml("Post not found", 404);
+    return secureHtml(layout({
+      title: "Post Not Found",
+      description: "The requested blog post could not be found.",
+      url: `/post/${slug}`,
+      content: `<div class="container"><div class="no-posts" style="padding: 64px 0;"><h2>Post not found</h2><p>The article you're looking for doesn't exist or may have moved.</p><a href="/" class="text-link">Back to home ${icon("arrow-right")}</a></div></div>`
+    }), 404);
   }
 
   const date = new Date(post.date).toLocaleDateString("en-US", {
@@ -31,7 +36,7 @@ export async function postRoute(slug: string): Promise<Response> {
 
   // Video takes the hero slot; otherwise the cover image if there is one (skip if cover is already embedded in markdown body)
   const coverAlreadyInBody = post.cover && post.content.includes(post.cover);
-  const coverSrc = post.cover ? (post.cover.endsWith(".svg") ? `${post.cover}?v=2026103004` : post.cover) : "";
+  const coverSrc = post.cover ? (post.cover.endsWith(".svg") ? `${post.cover}?v=2026103005` : post.cover) : "";
   const heroMedia = post.video ? `
         <figure class="article-hero-media video-embed">
           <video controls playsinline preload="metadata"${post.poster || post.cover ? ` poster="${post.poster || coverSrc}"` : ""}>
@@ -57,7 +62,7 @@ export async function postRoute(slug: string): Promise<Response> {
           <div class="article-breadcrumb-row">
             <a href="/" class="back-link">${icon("arrow-left")} All writing</a>
             <span class="breadcrumb-sep">/</span>
-            <a href="${categoryInfo.route}" class="back-link category-crumb">${esc(categoryInfo.label)}</a>
+            <a href="/category/${categoryInfo.slug}" class="back-link category-crumb">${esc(categoryInfo.label)}</a>
           </div>
           <div class="article-badges-row">
             ${renderCategoryBadge(post.category, post.badge)}
@@ -847,7 +852,7 @@ export async function postRoute(slug: string): Promise<Response> {
 
   const response = secureHtml(html);
   const headers = new Headers(response.headers);
-  headers.set("Cache-Control", "public, max-age=60");
+  headers.set("Cache-Control", "public, max-age=0, must-revalidate");
 
   return new Response(response.body, {
     status: response.status,
