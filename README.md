@@ -4,7 +4,7 @@ The source code powering **[blog.sudharsana.dev](https://blog.sudharsana.dev)** 
 
 ## Three-Pillar Content Architecture
 
-1. **Open Source (`/category/open-source`)** — Flagship open-source launches such as **BabbleFlow** (native Kotlin + Jetpack Compose Android voice keyboard with Whisper + Gemma 4), complete with interactive pipeline & routing simulators.
+1. **Open Source (`/category/open-source`)** — Flagship launches such as **BabbleScribe** (native Kotlin + Jetpack Compose Android voice typing with Whisper + Gemma 4, now an engineering post), complete with interactive pipeline & routing simulators.
 2. **Hackathons (`/category/hackathons`)** — Winning builds from AI hackathons (**HealthForce** 1st Place Snowflake × Anthropic, **Recall Storm** 3rd Place Google DeepMind Gemini 3) with playable agent workflow visualizers.
 3. **Engineering Deep Dives (`/category/engineering`)** — Self-hosted K3s infrastructure, LangGraph Text-to-SQL agents, and AI systems architecture.
 
@@ -14,7 +14,7 @@ The source code powering **[blog.sudharsana.dev](https://blog.sudharsana.dev)** 
 - **Production PostgreSQL Mode**: Automatically initializes and reconciles its PostgreSQL schema on startup when `DATABASE_URL` is provided.
 - **Full Engagement System**: Post likes (with optimistic UI & server reconciliation), threaded/paginated comments, comment likes, custom username syncing, and newsletter subscriptions.
 - **Local AI Integration (Ollama)**: Generates whimsical reader aliases and synthesizes "AI Reader Pulse" summaries of article discussions using local Gemma models (`OLLAMA_MODEL`, defaults to `gemma4:latest`), with deterministic fallbacks when Ollama is offline.
-- **Interactive Post Playgrounds**: Embedded interactive simulators for BabbleFlow, HealthForce, Recall Storm, and Text-to-SQL LangGraph directly inside articles.
+- **Interactive Post Playgrounds**: Embedded interactive simulators for BabbleScribe, HealthForce, Recall Storm, and Text-to-SQL LangGraph directly inside articles.
 
 ## Quick Start (Standalone / Open Source)
 

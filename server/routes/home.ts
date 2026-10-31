@@ -246,7 +246,7 @@ export async function homeRoute(_req: Request): Promise<Response> {
 
   const html = layout({
     title: "Home",
-    description: "Sudharsana Rajasekaran's engineering logbook: privacy-first open source releases (BabbleFlow), winning AI hackathon builds, and production data & Kubernetes architecture deep dives.",
+    description: "Sudharsana Rajasekaran's engineering logbook: privacy-first Android voice typing (BabbleScribe), winning AI hackathon builds, and production data & Kubernetes architecture deep dives.",
     url: "/",
     content
   });

@@ -94,6 +94,14 @@ serve({
                 return categoryRoute(decodeURIComponent(categoryMatch[1]));
             }
 
+            // Renamed post: exact match only, fixed target, so this cannot become an open redirect
+            if (path === "/post/babbleflow-private-voice-dictation") {
+                return addSecurityHeaders(new Response(null, {
+                    status: 301,
+                    headers: { Location: "/post/babblescribe-private-voice-typing" }
+                }));
+            }
+
             const postMatch = path.match(/^\/post\/([^/]+)$/);
             if (postMatch) {
                 return postRoute(postMatch[1]);
