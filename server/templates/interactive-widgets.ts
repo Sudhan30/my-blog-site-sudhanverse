@@ -3,7 +3,7 @@ import type { Post } from "../lib/posts";
 import { esc } from "../lib/escape";
 
 /**
- * Renders an Open Source release banner at the top of open-source posts (e.g. BabbleFlow)
+ * Renders an Open Source release banner at the top of open-source posts (e.g. BabbleScribe)
  * and interactive playable widgets tailored to each flagship post.
  */
 export function renderPostInteractiveBanner(post: Post): string {
@@ -37,8 +37,8 @@ export function renderPostInteractiveBanner(post: Post): string {
 }
 
 export function renderPostInteractiveWidget(slug: string): string {
-  if (slug === "babbleflow-private-voice-dictation") {
-    return renderBabbleFlowWidget();
+  if (slug === "babblescribe-private-voice-typing") {
+    return renderBabbleScribeWidget();
   }
   if (slug === "healthforce-snowflake-anthropic-hackathon") {
     return renderHealthForceWidget();
@@ -52,15 +52,15 @@ export function renderPostInteractiveWidget(slug: string): string {
   return "";
 }
 
-function renderBabbleFlowWidget(): string {
+function renderBabbleScribeWidget(): string {
   return `
-    <section class="interactive-lab lab-oss reveal-on-scroll" id="babbleflow-lab" aria-label="Interactive BabbleFlow Simulator">
+    <section class="interactive-lab lab-oss reveal-on-scroll" id="babblescribe-lab" aria-label="Interactive BabbleScribe Simulator">
       <div class="lab-header">
         <div class="lab-title-group">
-          <span class="lab-kicker">${icon("mic", { size: 14 })} INTERACTIVE PLAYGROUND · BABBLEFLOW v0.15.0</span>
-          <h3 class="lab-title">Explore How BabbleFlow Routes Audio &amp; Fixes Spoken Self-Corrections</h3>
+          <span class="lab-kicker">${icon("mic", { size: 14 })} INTERACTIVE PLAYGROUND · BABBLESCRIBE</span>
+          <h3 class="lab-title">Explore How BabbleScribe Routes Audio &amp; Fixes Spoken Self-Corrections</h3>
         </div>
-        <div class="lab-mode-tabs" role="tablist" aria-label="BabbleFlow Playground Modes">
+        <div class="lab-mode-tabs" role="tablist" aria-label="BabbleScribe Playground Modes">
           <button type="button" class="lab-tab active" role="tab" aria-selected="true" data-bf-tab="correction">
             1. Self-Correction Verifier (62/63)
           </button>
@@ -73,7 +73,7 @@ function renderBabbleFlowWidget(): string {
       <!-- TAB 1: Self-Correction Verifier -->
       <div class="lab-panel active" data-bf-panel="correction">
         <p class="lab-intro">
-          Tap a real dictation below to watch how BabbleFlow's updated cleanup instructions and shape-aware negation guardrail handle mid-sentence corrections in English and Tamil without losing true negations:
+          Tap a real dictation below to watch how BabbleScribe's updated cleanup instructions and shape-aware negation guardrail handle mid sentence corrections without losing true negations:
         </p>
 
         <div class="bf-scenario-pills" role="group" aria-label="Dictation test cases">
@@ -86,7 +86,7 @@ function renderBabbleFlowWidget(): string {
             "with Sarah, no no, with Priya"
           </button>
           <button type="button" class="bf-scenario-btn" data-bf-case="2">
-            <span class="bf-case-tag">Tamil + English</span>
+            <span class="bf-case-tag">Tamil Example</span>
             "9 மணிக்கு, இல்ல 10 மணிக்கு"
           </button>
           <button type="button" class="bf-scenario-btn" data-bf-case="3">
@@ -119,7 +119,7 @@ function renderBabbleFlowWidget(): string {
             <div class="bf-comp-card bf-comp-new">
               <div class="bf-comp-head">
                 <span class="bf-status-dot status-ok"></span>
-                <span>v0.15.0 Faithful Cleanup + Guardrail (62/63)</span>
+                <span>Faithful Cleanup + Guardrail (62/63)</span>
               </div>
               <p class="bf-comp-output" id="bf-new-output">"Hey, can we schedule a meeting in 10 minutes?"</p>
               <p class="bf-comp-reason" id="bf-new-reason">Guardrail Pass: Recognizes spoken repair ("No, no. 10 minutes"), drops superseded number 20, and verifies no invented numbers or dropped negations.</p>
@@ -131,7 +131,7 @@ function renderBabbleFlowWidget(): string {
       <!-- TAB 2: Speech Flow & Privacy Simulator -->
       <div class="lab-panel" data-bf-panel="routing" hidden>
         <p class="lab-intro">
-          Simulate network conditions or toggle the <strong>"Phone &amp; my server only"</strong> hardware-enforced privacy switch to see how BabbleFlow routes your voice across providers:
+          Simulate network conditions or toggle the <strong>"Phone &amp; my server only"</strong> hardware-enforced privacy switch to see how BabbleScribe routes your voice across providers:
         </p>
 
         <div class="bf-routing-controls">
@@ -154,7 +154,7 @@ function renderBabbleFlowWidget(): string {
               <span class="bf-node-badge" id="bf-badge-server">Active Handler</span>
             </div>
             <h4>Home GPU Server</h4>
-            <p>Whisper large-v3 + Tamil ASR + local Gemma cleanup over verified LAN/Tailscale IP.</p>
+            <p>Whisper large-v3 + a tuned speech model + local Gemma cleanup over verified LAN/Tailscale IP.</p>
           </div>
 
           <div class="bf-node" data-node="cloud">
@@ -163,7 +163,7 @@ function renderBabbleFlowWidget(): string {
               <span class="bf-node-badge" id="bf-badge-cloud">Standby Fallback</span>
             </div>
             <h4>BYO Cloud Key</h4>
-            <p>Direct to Groq / OpenAI / OpenRouter with Keystore key. Zero BabbleFlow middleman.</p>
+            <p>Direct to Groq / OpenAI / OpenRouter with Keystore key. No middleman of mine.</p>
           </div>
 
           <div class="bf-node" data-node="phone">
@@ -183,7 +183,7 @@ function renderBabbleFlowWidget(): string {
 
       <script>
         (function() {
-          const lab = document.getElementById('babbleflow-lab');
+          const lab = document.getElementById('babblescribe-lab');
           if (!lab) return;
 
           // Tab switching
@@ -224,7 +224,7 @@ function renderBabbleFlowWidget(): string {
             {
               raw: '"நாளைக்கு காலைல 9 மணிக்கு, இல்ல 10 மணிக்கு call பண்ணு."',
               oldOut: '"நாளைக்கு காலைல 9 மணிக்கு, இல்ல 10 மணிக்கு call பண்ணு."',
-              oldWhy: 'Why it failed: Bilingual Tamil correction marker ("இல்ல" / illa) was treated as a literal negation and kept alongside both timestamps.',
+              oldWhy: 'Why it failed: Tamil correction marker ("இல்ல" / illa) was treated as a literal negation and kept alongside both timestamps.',
               newOut: '"நாளைக்கு காலைல 10 மணிக்கு call பண்ணு."',
               newWhy: 'Guardrail Pass: Recognizes Tamil self-correction marker ("இல்ல 10 மணிக்கு") and cleanly outputs the corrected 10 AM time.'
             },
@@ -579,7 +579,7 @@ function renderTextToSqlWidget(): string {
               <span class="bf-status-dot status-ok" id="sql-step2-dot"></span>
               <span id="sql-step2-title">2. Gemma Conversational Synthesis</span>
             </div>
-            <p class="bf-comp-output" id="sql-answer-out">"In the last 7 days, your blog received 14 new likes and 6 approved reader comments, led by the BabbleFlow launch post."</p>
+            <p class="bf-comp-output" id="sql-answer-out">"In the last 7 days, your blog received 14 new likes and 6 approved reader comments, led by the BabbleScribe launch post."</p>
             <p class="bf-comp-reason" id="sql-answer-why">Replaced a 5-step SSH → kubectl exec → psql ritual with a 2-second natural language answer running 100% on local homelab GPU.</p>
           </div>
         </div>
@@ -595,7 +595,7 @@ function renderTextToSqlWidget(): string {
               qWhy: "Boundary Check: Validator enforces SELECT-only, injects LIMIT 100, and executes under read-only Postgres role (readonly_agent) with 5s timeout.",
               dot: "status-ok",
               s2Title: "2. Gemma Conversational Synthesis",
-              aOut: '"In the last 7 days, your blog received 14 new likes and 6 approved reader comments, led by the BabbleFlow launch post."',
+              aOut: '"In the last 7 days, your blog received 14 new likes and 6 approved reader comments, led by the BabbleScribe launch post."',
               aWhy: "Replaced a 5-step SSH → kubectl exec → psql ritual with a 2-second natural language answer running 100% on local homelab GPU."
             },
             {

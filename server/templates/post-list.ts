@@ -41,7 +41,7 @@ export function renderEngagementStats(slug: string, stats?: Record<string, PostE
 }
 
 /**
- * Rich Open Source Spotlight Showcase (for BabbleFlow and future OSS releases)
+ * Rich Open Source Spotlight Showcase (for future OSS releases)
  */
 export function renderOpenSourceSpotlight(posts: PostSummary[], stats?: Record<string, PostEngagement>): string {
   if (!posts.length) return "";
@@ -110,7 +110,7 @@ export function renderOpenSourceSpotlight(posts: PostSummary[], stats?: Record<s
           <div class="oss-visual-frame">
             ${post.cover ? `<img src="${esc(post.cover)}" alt="${esc(post.title)}" loading="eager" class="oss-main-img">` : ""}
             <div class="oss-floating-pill">
-              <img src="/assets/images/babbleflow/pill.png" alt="BabbleFlow floating microphone states" loading="lazy">
+              <img src="/assets/images/babblescribe/pill.png" alt="BabbleScribe floating microphone states" loading="lazy">
             </div>
           </div>
         </a>
