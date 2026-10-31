@@ -101,6 +101,6 @@ If you would like to help test it before launch, get in touch with me on [Linked
 - **Suggested titles** for longer notes.
 - **A usage page** that shows each provider's calls, time and cost, so you can see where your voice went and what it cost.
 
-If you try it, I would love to hear what you dictate with it, and what it gets wrong.
+Once you can try it, I would love to hear what you dictate with it, and what it gets wrong.
 
 *BabbleScribe is not affiliated with ElevenLabs, OpenAI, OpenRouter, Groq, Anthropic or Google.*
