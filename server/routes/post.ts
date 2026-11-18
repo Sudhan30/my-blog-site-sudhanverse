@@ -41,6 +41,7 @@ export async function postRoute(slug: string): Promise<Response> {
         <figure class="article-hero-media video-embed">
           <video controls playsinline preload="metadata"${post.poster || post.cover ? ` poster="${post.poster || coverSrc}"` : ""}>
             <source src="${post.video}" type="video/mp4">
+            ${post.captions ? `<track kind="captions" src="${post.captions}" srclang="en" label="English" default>` : ""}
             Your browser can't play this video. <a href="${post.video}">Download it</a> instead.
           </video>
         </figure>

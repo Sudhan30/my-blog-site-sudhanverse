@@ -53,6 +53,10 @@ excerpt: "One-sentence summary shown on cards and SEO meta tags."
 slug: "my-post-slug"
 featured: true
 cover: "/assets/images/my-post/cover.png"
+video: "/assets/video/my-post.mp4"      # optional, self-hosted mp4; replaces the cover on the post page
+poster: "/assets/video/my-post-poster.jpg"
+captions: "/assets/video/my-post.vtt"  # optional WebVTT captions for the video
+readTime: 8                            # optional, minutes
 badge: "Open Source · v1.0.0"
 event: "Optional Event or Subtitle"
 repoUrl: "https://github.com/..."

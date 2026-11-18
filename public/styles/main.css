@@ -4561,3 +4561,34 @@ time {
     gap: 12px;
   }
 }
+
+/* Collapsible video transcript inside a post body */
+.transcript {
+  margin: 24px 0;
+  border: 1px solid var(--hairline);
+  border-radius: 12px;
+  background: var(--bg-subtle);
+  padding: 0 20px;
+}
+.transcript > summary {
+  cursor: pointer;
+  padding: 14px 0;
+  font-weight: 600;
+  color: var(--text);
+}
+.transcript > summary:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+.transcript[open] > summary {
+  border-bottom: 1px solid var(--hairline);
+  margin-bottom: 12px;
+}
+.transcript p { font-size: 0.95em; }
+.transcript p strong:first-child {
+  font-family: "Geist Mono", ui-monospace, monospace;
+  font-weight: 500;
+  color: var(--text-muted);
+  margin-right: 6px;
+}
