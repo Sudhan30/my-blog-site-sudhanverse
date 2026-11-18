@@ -58,6 +58,7 @@ export interface Post {
     cover?: string;
     video?: string;
     poster?: string;
+    captions?: string;
     featured?: boolean;
     badge?: string;
     event?: string;
@@ -113,6 +114,7 @@ export async function getAllPosts(): Promise<Post[]> {
             cover: data.cover,
             video: data.video,
             poster: data.poster,
+            captions: data.captions,
             featured: data.featured === true,
             badge: data.badge,
             event: data.event,

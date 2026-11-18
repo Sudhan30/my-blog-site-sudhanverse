@@ -1,0 +1,152 @@
+WEBVTT
+
+00:00.250 --> 00:01.408
+Thursday afternoon.
+
+00:01.458 --> 00:04.650
+Marisol has a nonpayment hearing on Monday at 9:30.
+
+00:04.700 --> 00:09.736
+Her radiators have been cold since early November, there's black mold around the
+
+00:09.786 --> 00:12.724
+tub, and water comes through the bathroom wall.
+
+00:12.774 --> 00:15.521
+The city has already cited these conditions.
+
+00:15.571 --> 00:17.301
+Her court file doesn't know.
+
+00:17.351 --> 00:19.526
+Dev, the paralegal, has 20 minutes.
+
+00:19.576 --> 00:20.480
+This is Hearth.
+
+00:22.173 --> 00:25.859
+Vivo en la cuadra mil de Saint Nicholas Avenue, en Manhattan.
+<i>I live on the 1000 block of St. Nicholas Avenue in Manhattan.</i>
+
+00:25.959 --> 00:29.645
+Tengo corte el lunes 23 de noviembre a las 9:30.
+<i>My court date is Monday, November 23 at 9:30.</i>
+
+00:29.745 --> 00:33.431
+Los radiadores están fríos desde principios de noviembre,
+<i>The radiators have been cold since early November,</i>
+
+00:33.531 --> 00:37.217
+hay moho negro alrededor de la bañera y entra agua por la pared del baño.
+<i>there's black mold around the tub, and water comes through the bathroom wall.</i>
+
+00:37.717 --> 00:42.890
+70% of households in her census tract are Hispanic, so intake works in Spanish.
+
+00:42.940 --> 00:48.178
+Google Cloud Speech-to-Text transcribes what she says, and Hearth answers Dev in
+
+00:48.228 --> 00:48.707
+English.
+
+00:49.607 --> 00:51.826
+Tenants say the radiators are cold.
+
+00:51.876 --> 00:52.928
+Inspectors write:
+
+00:52.978 --> 00:55.327
+provide access to the heating system.
+
+00:55.377 --> 00:58.763
+BigQuery vector search matches meaning, not keywords.
+
+00:58.813 --> 01:03.625
+Three open violations on her block, including an immediately hazardous heat
+
+01:03.675 --> 01:06.413
+violation the landlord had 24 hours to fix.
+
+01:06.463 --> 01:10.886
+But one of the top matches was a mold case that was already repaired.
+
+01:10.936 --> 01:12.377
+Vector search proposes.
+
+01:12.427 --> 01:16.397
+Our rules decide, and Hearth shows what it set aside, and why.
+
+01:17.297 --> 01:19.193
+Dev can challenge any decision.
+
+01:19.243 --> 01:24.213
+Citing a repaired condition would hurt her in court, and Hearth explains exactly
+
+01:24.263 --> 01:24.527
+that.
+
+01:25.427 --> 01:26.674
+Snap the court notice.
+
+01:26.724 --> 01:31.331
+Gemini reads the index number, the hearing, and the arrears, never the tenant's
+
+01:31.381 --> 01:31.625
+name.
+
+01:31.675 --> 01:35.457
+One click puts it into the case, and Hearth rechecks her options.
+
+01:36.357 --> 01:41.188
+Four NYC relief programs, each checked by deterministic rules, not guessed by the
+
+01:41.238 --> 01:41.549
+model:
+
+01:41.599 --> 01:46.370
+income against 200% of poverty, arrears against the cap, an open violation where
+
+01:46.420 --> 01:46.912
+required.
+
+01:46.962 --> 01:51.854
+Her daughter's asthma is noted for the attorney, never used to decide eligibility.
+
+01:51.904 --> 01:54.987
+And the countdown never lets Dev forget the hearing.
+
+01:55.887 --> 01:58.597
+As they talk, the worksheet fills itself in:
+
+01:58.647 --> 02:02.925
+the records, the defenses, the referrals, and what still needs proof.
+
+02:02.975 --> 02:04.869
+The paralegal stays in control.
+
+02:04.919 --> 02:09.009
+Edit anything, and download it as a fillable PDF for the attorney.
+
+02:09.059 --> 02:14.152
+Every case is saved in Firestore, sorted by the next hearing, with the next action
+
+02:14.202 --> 02:14.717
+for each.
+
+02:15.617 --> 02:20.618
+Real census and city records, with modeled eviction filings labeled as modeled.
+
+02:20.668 --> 02:22.216
+We audited our own rules:
+
+02:22.266 --> 02:27.203
+requiring a 311 ticket would skip 37 high-pressure tracts with 33,980 severely
+
+02:27.253 --> 02:32.254
+rent-burdened households, so those families are routed to inspections and funds
+
+02:32.304 --> 02:34.108
+that don't need an open case.
+
+02:34.158 --> 02:38.967
+Built on Google Cloud, so Marisol walks into court on Monday with a defense.
