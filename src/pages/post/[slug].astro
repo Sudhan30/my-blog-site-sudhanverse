@@ -17,7 +17,7 @@ const post = await getPostBySlug(slug);
 if (!post) Astro.response.status = 404;
 
 const stats = post ? (await getAllPostStats())[post.slug] || {likes: 0, comments: 0} : {likes: 0, comments: 0};
-const html = post ? renderMarkdown(post.content) : '';
+const {html, headings} = post ? renderMarkdown(post.content) : {html: '', headings: []};
 const readTime = post ? post.readTime || Math.max(1, Math.ceil(post.content.split(/\s+/).length / 220)) : 0;
 const category = post ? CATEGORY_META[post.category] : null;
 const coverInBody = !!post?.cover && post.content.includes(post.cover);
@@ -75,27 +75,33 @@ const jsonLd = post && {
           </div>
         </header>
 
-        {banner && <Fragment set:html={banner} />}
+        <div class="article-reading">
+          {headings.length >= 3 && <nav class="toc" aria-label="On this page">
+            <details id="article-contents">
+              <summary>On this page <span>{headings.length} sections</span></summary>
+              <ol class="toc-list">
+                {headings.map(h => <li><a href={'#' + h.id}>{h.label}</a></li>)}
+              </ol>
+            </details>
+          </nav>}
+          {banner && <Fragment set:html={banner} />}
 
-        {post.video ? (
-          <figure class="article-hero video-embed" id="recording">
-            <a class="recording-link" href={post.video} data-play-recording data-captions={post.captions}>
-              {(post.poster || post.cover) && <img src={post.poster || post.cover} alt="" />}
-              <span>Play recording</span>
-            </a>
-          </figure>
-        ) : post.cover && !coverInBody ? (
-          <figure class="article-hero"><img src={post.cover} alt={post.title} /></figure>
-        ) : null}
+          {post.video ? (
+            <figure class="article-hero video-embed" id="recording">
+              <a class="recording-link" href={post.video} data-play-recording data-captions={post.captions}>
+                {(post.poster || post.cover) && <img src={post.poster || post.cover} alt="" />}
+                <span>Play recording</span>
+              </a>
+            </figure>
+          ) : post.cover && !coverInBody ? (
+            <figure class="article-hero"><img src={post.cover} alt={post.title} /></figure>
+          ) : null}
 
-        {widget && <div class="article-interactive-slot" set:html={widget} />}
+          {widget && <div class="article-interactive-slot" set:html={widget} />}
 
-        <div class="article-body">
-          <div class="prose" id="article-content" set:html={html} />
-          <aside class="toc" id="toc" aria-label="On this page" hidden>
-            <p class="toc-title">On this page</p>
-            <ul class="toc-list" id="toc-list"></ul>
-          </aside>
+          <div class="article-body">
+            <div class="prose" id="article-content" set:html={html} />
+          </div>
         </div>
 
         {post.tags.length > 0 && (

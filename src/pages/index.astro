@@ -11,7 +11,19 @@ const index = await getPostIndex();
 const featured = index.posts.find(post => post.featured);
 const categories = Object.values(CATEGORY_META).filter(category => index.categories[category.id] > 0);
 const active = categories.find(category => category.id === Astro.url.searchParams.get('category'));
-const posts = active ? index.posts.filter(post => post.category === active.id) : index.posts;
+const query = (Astro.url.searchParams.get('q') || '').trim().slice(0, 160);
+const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
+const posts = index.posts.filter(post => {
+  if (active && post.category !== active.id) return false;
+  const text = [post.title, post.excerpt, CATEGORY_META[post.category].label, ...post.tags].join(' ').toLowerCase();
+  return terms.every(term => text.includes(term));
+});
+function archiveUrl(category?: string, search = query) {
+  const params = new URLSearchParams();
+  if (category) params.set('category', category);
+  if (search) params.set('q', search);
+  return (params.size ? '/?' + params.toString() : '/') + '#latest';
+}
 const firstInCategory = new Map(categories.map(c => [c.id, posts.find(post => post.category === c.id)?.slug]));
 const tags = Object.entries(index.tags).sort((a, b) => b[1] - a[1]).map(([t]) => t);
 ---
@@ -19,6 +31,7 @@ const tags = Object.entries(index.tags).sort((a, b) => b[1] - a[1]).map(([t]) =>
   title="Home"
   description="Sudharsana Rajasekaran's engineering logbook: privacy-first Android voice typing (BabbleScribe), winning AI hackathon builds, and production data & Kubernetes architecture deep dives."
   url="/"
+  noIndex={Boolean(query)}
 >
   <section class="hero">
     <div class="container">
@@ -33,9 +46,8 @@ const tags = Object.entries(index.tags).sort((a, b) => b[1] - a[1]).map(([t]) =>
           <span class="byline-role">{ROLE}</span>
         </div>
         <div class="byline-links">
-          <a href="https://sudharsana.dev" target="_blank" rel="noopener">Portfolio</a>
-          <a href="https://github.com/sudhan30" target="_blank" rel="noopener" aria-label="GitHub"><Icon name="github" size={18} /></a>
-          <a href="https://www.linkedin.com/in/sudharsanarajasekaran/" target="_blank" rel="noopener" aria-label="LinkedIn"><Icon name="linkedin" size={18} /></a>
+          <a class="section-link" href="#archive-search">Search the archive <Icon name="arrow-right" size={15} /></a>
+          <a href="https://sudharsana.dev" rel="author">Portfolio</a>
         </div>
       </div>
     </div>
@@ -43,11 +55,23 @@ const tags = Object.entries(index.tags).sort((a, b) => b[1] - a[1]).map(([t]) =>
   <div class="container home-sections">
     {featured && <FeaturedPost post={featured} />}
     <section class="writing-archive" id="latest" aria-labelledby="archive-title">
-      <h2 class="section-title" id="archive-title">Writing archive</h2>
+      <div class="archive-toolbar">
+        <h2 class="section-title" id="archive-title">Writing archive</h2>
+        <form action="/#latest" method="get" role="search" aria-label="Writing archive">
+          {active && <input type="hidden" name="category" value={active.id} />}
+          <label class="archive-search-label" for="archive-search">Search titles, topics, and summaries</label>
+          <input type="search" id="archive-search" name="q" value={query} maxlength="160" placeholder="Search titles, topics, and summaries" />
+          <button type="submit">Search</button>
+        </form>
+      </div>
       <nav class="archive-nav" aria-label="Filter writing">
-        <a href="/#latest" aria-current={!active ? 'page' : undefined}>All writing</a>
-        {categories.map(c => <a href={`/?category=${c.id}#latest`} aria-current={c.id === active?.id ? 'page' : undefined}>{c.label}</a>)}
+        <a href={archiveUrl()} aria-current={!active ? 'page' : undefined}>All writing</a>
+        {categories.map(c => <a href={archiveUrl(c.id)} aria-current={c.id === active?.id ? 'page' : undefined}>{c.label}</a>)}
       </nav>
+      {query && <p class="archive-results">
+        {posts.length === 0 ? 'No articles' : posts.length === 1 ? '1 article' : posts.length + ' articles'} matching “{query}”
+        <a href={archiveUrl(active?.id, '')}>Clear search</a>
+      </p>}
       <ul class="post-list archive-rows">
         {posts.map(post => <PostRow post={post} compact anchor={firstInCategory.get(post.category) === post.slug && post.category !== 'engineering' ? CATEGORY_META[post.category].slug : undefined} />)}
       </ul>

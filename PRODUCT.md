@@ -44,7 +44,7 @@ Read on desktop during evaluation and on phones from LinkedIn links. Posts are l
 
 ## Homepage publishing
 
-The blog highlights the newest entry with `featured: true`, using publication date and then ascending slug. A featured post can be an essay or a build. Its own media determines whether readers see a recording link. The full writing archive includes every post across categories.
+The blog highlights the newest entry with `featured: true`, using publication date and then ascending slug. A featured post can be an essay or a build. Its own media determines whether readers see a recording link. The full writing archive includes every post across categories. Readers can search titles, tags and summaries and share a filtered URL. Posts with at least three major sections include a linked contents menu in the rendered HTML.
 
 ## Product Principles
 
