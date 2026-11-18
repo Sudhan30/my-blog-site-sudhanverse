@@ -5,7 +5,7 @@ import '@astryxdesign/theme-neutral/theme.css';
 import '../styles/site.css';
 import Icon from '../components/Icon.astro';
 import Feedback from '../components/react/Feedback.tsx';
-import {AUTHOR, SITE_NAME, SITE_URL, TAGLINE} from '../lib/site';
+import {AUTHOR, PERSON, SITE_NAME, SITE_URL, TAGLINE} from '../lib/site';
 
 interface Props {
   title: string;
@@ -26,11 +26,11 @@ const blogLd = safeJson({
   name: TAGLINE,
   description,
   url: SITE_URL,
-  author: {'@type': 'Person', name: AUTHOR, url: 'https://sudharsana.dev'},
+  author: PERSON,
 });
 const path = Astro.url.pathname;
 const nav = [
-  {href: '/', label: 'All'},
+  {href: '/', label: 'Blog'},
   {href: '/category/open-source', label: 'Open Source'},
   {href: '/category/hackathons', label: 'Hackathons'},
   {href: '/category/engineering', label: 'Blog Posts'},
@@ -79,7 +79,7 @@ const nav = [
     <meta name="DC.publisher" content={SITE_NAME} />
     <meta name="DC.identifier" content={canonical} />
 
-    <meta property="og:title" content={title} />
+    <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
     <meta property="og:type" content={ogType} />
     <meta property="og:url" content={canonical} />

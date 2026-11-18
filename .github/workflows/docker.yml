@@ -28,6 +28,9 @@ jobs:
       - name: Build the Astro site
         run: bun run build
 
+      - name: Verify featured posts and archive ordering
+        run: bun test tests/featured-home.test.ts
+
       - name: Smoke test standalone mode (JSON storage fallback)
         run: |
           PORT=3099 HOST=127.0.0.1 bun server.mjs &

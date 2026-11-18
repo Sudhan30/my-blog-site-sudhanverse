@@ -3,11 +3,11 @@ import Icon from './Icon.astro';
 import CategoryBadge from './CategoryBadge.astro';
 import Engagement from './Engagement.astro';
 import {fmtFull, readingTime, type PostSummary, type Stats} from '../lib/site';
-interface Props { post: PostSummary; stats?: Stats; showCover?: boolean }
-const {post, stats, showCover = false} = Astro.props;
+interface Props { post: PostSummary; stats?: Stats; showCover?: boolean; compact?: boolean; anchor?: string }
+const {post, stats, showCover = false, compact = false, anchor} = Astro.props;
 const chips = post.highlights?.length ? post.highlights.slice(0, 3) : post.tags.slice(0, 4).map(t => `#${t}`);
 ---
-<li class="post-row">
+<li class="post-row" id={anchor}>
   <a href={`/post/${post.slug}`} class="post-row-link">
     <div class="post-row-main">
       <div class="card-meta">
@@ -18,7 +18,7 @@ const chips = post.highlights?.length ? post.highlights.slice(0, 3) : post.tags.
       <h3 class="card-title">{post.title} <Icon name="arrow-right" size={17} class="icon row-arrow" /></h3>
       <p class="card-excerpt">{post.excerpt}</p>
       <div class="card-foot">
-        <ul class="chips">{chips.map(c => <li>{c}</li>)}</ul>
+        {!compact && <ul class="chips">{chips.map(c => <li>{c}</li>)}</ul>}
         <Engagement slug={post.slug} stats={stats} />
       </div>
     </div>

@@ -4,7 +4,7 @@
 import { Pool } from 'pg';
 import { createHash } from 'crypto';
 import { secureJson } from '../middleware/security';
-import { likesStore, commentsStore, newsletterStore } from '../lib/storage';
+import { likesStore, commentsStore, newsletterStore, saveFeedback } from '../lib/storage';
 
 const DATABASE_URL = process.env.DATABASE_URL;
 const OLLAMA_HOST = process.env.OLLAMA_HOST || 'http://ollama-service:11434';
@@ -115,6 +115,13 @@ async function ensureSchema() {
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             );
 
+            CREATE TABLE IF NOT EXISTS reader_feedback (
+                id BIGINT GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+                name TEXT,
+                message TEXT NOT NULL,
+                created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+            );
+
             CREATE TABLE IF NOT EXISTS newsletter_subscribers (
                 id SERIAL PRIMARY KEY,
                 email TEXT NOT NULL UNIQUE,
@@ -155,7 +162,20 @@ async function ensureSchema() {
     }
 }
 
-ensureSchema();
+if (process.env.BLOG_SCHEMA_MANAGED_EXTERNALLY !== 'true') {
+    ensureSchema();
+}
+
+/** Check the same connection and engagement table used to serve readers. */
+export async function storageReady(): Promise<boolean> {
+    if (!pool) return process.env.BLOG_SCHEMA_MANAGED_EXTERNALLY !== 'true';
+    try {
+        await pool.query('SELECT id FROM likes LIMIT 0');
+        return true;
+    } catch {
+        return false;
+    }
+}
 
 export interface PostEngagement {
     likes: number;
@@ -188,6 +208,7 @@ export async function getAllPostStats(): Promise<Record<string, PostEngagement>>
             return stats;
         } catch (err) {
             console.error('Failed to query post stats from PostgreSQL:', err);
+            return {};
         }
     }
 
@@ -774,8 +795,17 @@ export async function apiRouter(req: Request, path: string): Promise<Response> {
     if (path === "/api/feedback" && method === "POST") {
         try {
             const body = await req.json() as { name?: string; message: string; feedbackType?: string; rating?: number };
-            if (!body.message?.trim()) {
+            if (typeof body.message !== 'string' || !body.message.trim()) {
                 return json({ error: 'Feedback message is required' }, 400);
+            }
+
+            const name = typeof body.name === 'string' ? body.name.trim().slice(0, 120) : '';
+            const message = body.message.trim();
+            if (message.length > 10000) return json({ error: 'Feedback is too long' }, 400);
+            if (pool) {
+                await pool.query('INSERT INTO reader_feedback (name, message) VALUES ($1, $2)', [name || null, message]);
+            } else {
+                await saveFeedback(name, message);
             }
 
             if (GOTIFY_TOKEN) {

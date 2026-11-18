@@ -54,7 +54,8 @@ if (cards.length) {
       const stats = data?.stats || {};
       cards.forEach(el => {
         const s = stats[el.dataset.engagementSlug || ''];
-        if (!s) return;
+        if (!s || !Number.isInteger(s.likes) || !Number.isInteger(s.comments)) return;
+        el.hidden = false;
         const likes = el.querySelector('.eng-likes');
         const comments = el.querySelector('.eng-comments');
         if (likes) likes.textContent = String(s.likes);
@@ -62,19 +63,4 @@ if (cards.length) {
       });
     })
     .catch(() => {});
-}
-
-// Home page: filter the three sections by pillar
-const filters = document.querySelectorAll<HTMLButtonElement>('[data-filter]');
-if (filters.length) {
-  const sections = document.querySelectorAll<HTMLElement>('[data-pillar-section]');
-  const apply = (value: string) => {
-    filters.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.filter === value)));
-    sections.forEach(s => {
-      s.hidden = !(value === 'all' || s.dataset.pillarSection === value);
-    });
-  };
-  filters.forEach(b => b.addEventListener('click', () => apply(b.dataset.filter || 'all')));
-  const initial = new URLSearchParams(location.search).get('category');
-  if (initial && Array.from(filters).some(button => button.dataset.filter === initial)) apply(initial);
 }

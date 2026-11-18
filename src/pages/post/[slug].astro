@@ -9,7 +9,7 @@ import {getPostBySlug, CATEGORY_META} from '../../../server/lib/posts';
 import {renderMarkdown} from '../../../server/lib/markdown';
 import {getAllPostStats} from '../../../server/routes/api';
 import {renderPostInteractiveBanner, renderPostInteractiveWidget} from '../../../server/templates/interactive-widgets';
-import {AUTHOR, SITE_URL, fmtFull} from '../../lib/site';
+import {AUTHOR, PERSON, PROFILE, ROLE, SITE_URL, fmtFull} from '../../lib/site';
 import '../../styles/labs.css';
 
 const slug = Astro.params.slug || '';
@@ -33,7 +33,7 @@ const jsonLd = post && {
   mainEntityOfPage: `${SITE_URL}/post/${post.slug}`,
   image: post.cover ? `${SITE_URL}${post.cover}` : undefined,
   keywords: post.tags.join(', '),
-  author: {'@type': 'Person', name: AUTHOR, url: 'https://sudharsana.dev'},
+  author: PERSON,
 };
 ---
 {!post ? (
@@ -67,7 +67,7 @@ const jsonLd = post && {
             <div class="article-meta">
               <img src="/assets/images/author-potrait-small.png" alt="" width="36" height="36" />
               <div>
-                <span class="article-meta-name">{AUTHOR}</span>
+                <a class="article-meta-name" href={PROFILE} rel="author">{AUTHOR}</a>
                 <span class="article-meta-sub"><time datetime={post.date}>{fmtFull(post.date)}</time> · {readTime} min read</span>
               </div>
             </div>
@@ -78,12 +78,11 @@ const jsonLd = post && {
         {banner && <Fragment set:html={banner} />}
 
         {post.video ? (
-          <figure class="article-hero video-embed">
-            <video controls playsinline preload="metadata" poster={post.poster || post.cover}>
-              <source src={post.video} type="video/mp4" />
-              {post.captions && <track kind="captions" src={post.captions} srclang="en" label="English" default />}
-              Your browser can't play this video. <a href={post.video}>Download it</a> instead.
-            </video>
+          <figure class="article-hero video-embed" id="recording">
+            <a class="recording-link" href={post.video} data-play-recording data-captions={post.captions}>
+              {(post.poster || post.cover) && <img src={post.poster || post.cover} alt="" />}
+              <span>Play recording</span>
+            </a>
           </figure>
         ) : post.cover && !coverInBody ? (
           <figure class="article-hero"><img src={post.cover} alt={post.title} /></figure>
@@ -110,7 +109,7 @@ const jsonLd = post && {
           <img src="/assets/images/author-potrait-small.png" alt="" width="52" height="52" loading="lazy" />
           <div class="author-info">
             <h2>{AUTHOR}</h2>
-            <p>AI and Data Engineer building local-first apps, autonomous agents, and self-hosted systems.</p>
+            <p>{ROLE}. I build data platforms and write about the decisions behind them.</p>
             <p class="author-links">
               <a href="https://sudharsana.dev" target="_blank" rel="noopener" aria-label="Portfolio"><Icon name="globe" size={18} /></a>
               <a href="https://github.com/sudhan30" target="_blank" rel="noopener" aria-label="GitHub"><Icon name="github" size={18} /></a>

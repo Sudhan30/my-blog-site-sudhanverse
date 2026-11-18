@@ -1,22 +1,18 @@
 ---
 import Base from '../layouts/Base.astro';
 import Icon from '../components/Icon.astro';
-import PillarPosts from '../components/PillarPosts.astro';
+import PostRow from '../components/PostRow.astro';
+import FeaturedPost from '../components/FeaturedPost.astro';
 import Newsletter from '../components/react/Newsletter.tsx';
-import {getPostIndex} from '../../server/lib/posts';
-import {getAllPostStats} from '../../server/routes/api';
+import {CATEGORY_META, getPostIndex} from '../../server/lib/posts';
+import {AUTHOR, ROLE} from '../lib/site';
 
-const [index, stats] = await Promise.all([getPostIndex(), getAllPostStats()]);
-const by = (c: string) => index.posts.filter(p => p.category === c);
-const sections = ([
-  {id: 'hackathon', anchor: 'hackathons', title: 'Hackathons', lede: 'AI agents and verification systems built and demoed against the clock.', href: '/category/hackathons', link: 'All hackathon builds', posts: by('hackathon')},
-  {id: 'open-source', anchor: 'open-source', title: 'Open Source', lede: 'Privacy-first apps and developer tools built in the open.', href: '/category/open-source', link: 'Open source page', posts: by('open-source')},
-  {id: 'engineering', anchor: 'latest', title: 'Engineering', lede: 'Production notes on local multi-model agents, LLM memory, self-hosted Kubernetes and cloud cost.', href: '/category/engineering', link: 'All engineering posts', posts: by('engineering')},
-] as const).filter(section => section.posts.length > 0);
-const filters = [
-  {id: 'all', label: 'All work', count: index.posts.length},
-  ...sections.map(section => ({id: section.id, label: section.title, count: section.posts.length})),
-];
+const index = await getPostIndex();
+const featured = index.posts.find(post => post.featured);
+const categories = Object.values(CATEGORY_META).filter(category => index.categories[category.id] > 0);
+const active = categories.find(category => category.id === Astro.url.searchParams.get('category'));
+const posts = active ? index.posts.filter(post => post.category === active.id) : index.posts;
+const firstInCategory = new Map(categories.map(c => [c.id, posts.find(post => post.category === c.id)?.slug]));
 const tags = Object.entries(index.tags).sort((a, b) => b[1] - a[1]).map(([t]) => t);
 ---
 <Base
@@ -28,13 +24,13 @@ const tags = Object.entries(index.tags).sort((a, b) => b[1] - a[1]).map(([t]) =>
     <div class="container">
       <h1 class="hero-title">Resolving dependencies, one idea at a time.</h1>
       <p class="hero-lede">
-        First-hand build logs: privacy-first open source software, AI agents shipped at hackathons, and data and LLM systems running on my own Kubernetes cluster.
+        I write about the data platforms I build, the architecture decisions behind them, and what I learn running distributed systems and shipping AI agents.
       </p>
       <div class="byline">
         <img src="/assets/images/author-potrait-small.png" alt="" class="byline-avatar" width="44" height="44" fetchpriority="high" />
         <div class="byline-text">
-          <span class="byline-name">Sudharsana Rajasekaran</span>
-          <span class="byline-role">Data Engineer and AI Systems Builder</span>
+          <span class="byline-name">{AUTHOR}</span>
+          <span class="byline-role">{ROLE}</span>
         </div>
         <div class="byline-links">
           <a href="https://sudharsana.dev" target="_blank" rel="noopener">Portfolio</a>
@@ -42,29 +38,21 @@ const tags = Object.entries(index.tags).sort((a, b) => b[1] - a[1]).map(([t]) =>
           <a href="https://www.linkedin.com/in/sudharsanarajasekaran/" target="_blank" rel="noopener" aria-label="LinkedIn"><Icon name="linkedin" size={18} /></a>
         </div>
       </div>
-      <div class="pillar-tabs" role="group" aria-label="Filter posts by category">
-        {filters.map(f => (
-          <button type="button" class="pillar-tab" data-filter={f.id} aria-pressed={f.id === 'all' ? 'true' : 'false'}>
-            {f.label} <span class="pillar-count">{f.count}</span>
-          </button>
-        ))}
-      </div>
     </div>
   </section>
-
   <div class="container home-sections">
-    {sections.map(s => (
-      <section class="pillar-section" id={s.anchor} data-pillar-section={s.id} aria-labelledby={`${s.anchor}-heading`}>
-        <div class="section-head">
-          <div>
-            <h2 class="section-title" id={`${s.anchor}-heading`}>{s.title}</h2>
-            <p class="section-lede">{s.lede}</p>
-          </div>
-          <a href={s.href} class="section-link">{s.link} <Icon name="arrow-right" size={15} /></a>
-        </div>
-        <PillarPosts category={s.id} posts={s.posts} stats={stats} />
-      </section>
-    ))}
+    {featured && <FeaturedPost post={featured} />}
+    <section class="writing-archive" id="latest" aria-labelledby="archive-title">
+      <h2 class="section-title" id="archive-title">Writing archive</h2>
+      <nav class="archive-nav" aria-label="Filter writing">
+        <a href="/#latest" aria-current={!active ? 'page' : undefined}>All writing</a>
+        {categories.map(c => <a href={`/?category=${c.id}#latest`} aria-current={c.id === active?.id ? 'page' : undefined}>{c.label}</a>)}
+      </nav>
+      <ul class="post-list archive-rows">
+        {posts.map(post => <PostRow post={post} compact anchor={firstInCategory.get(post.category) === post.slug && post.category !== 'engineering' ? CATEGORY_META[post.category].slug : undefined} />)}
+      </ul>
+      {!categories.some(c => c.id === 'open-source') && <a id="open-source" class="section-link" href="/category/open-source">Open source archive</a>}
+    </section>
 
     <section class="closing">
       <div>

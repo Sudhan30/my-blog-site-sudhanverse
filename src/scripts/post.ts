@@ -87,3 +87,28 @@ if (content && zoom && zoomImg) {
   });
   zoom.addEventListener('click', () => zoom.close());
 }
+
+const recording = document.querySelector<HTMLAnchorElement>('[data-play-recording]');
+recording?.addEventListener('click', event => {
+  if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+  event.preventDefault();
+  const player = document.createElement('video');
+  player.controls = true;
+  player.playsInline = true;
+  player.src = recording.href;
+  if (recording.dataset.captions) {
+    const captions = document.createElement('track');
+    captions.kind = 'captions';
+    captions.label = 'English';
+    captions.srclang = 'en';
+    captions.src = recording.dataset.captions;
+    captions.default = true;
+    player.append(captions);
+  }
+  const fallback = document.createElement('a');
+  fallback.href = recording.href;
+  fallback.textContent = 'Open video file';
+  recording.replaceWith(player, fallback);
+  player.focus();
+  void player.play().catch(() => player.focus());
+});

@@ -1,4 +1,5 @@
 import { join } from "path";
+import { randomUUID } from "node:crypto";
 import { readFile, writeFile, mkdir } from "fs/promises";
 
 const DATA_DIR = join(process.cwd(), "server", "data");
@@ -74,3 +75,11 @@ export interface NewsletterData {
 }
 
 export const newsletterStore = createStore<NewsletterData>("newsletter.json", { subscribers: [] });
+
+// Separate receipts let concurrent standalone submissions finish independently.
+export async function saveFeedback(name: string, message: string) {
+    const directory = join(DATA_DIR, "feedback");
+    await mkdir(directory, { recursive: true, mode: 0o700 });
+    const receipt = { name, message, createdAt: new Date().toISOString() };
+    await writeFile(join(directory, randomUUID() + ".json"), JSON.stringify(receipt), { flag: "wx", mode: 0o600 });
+}
