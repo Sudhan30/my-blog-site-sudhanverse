@@ -2,7 +2,7 @@
 
 **Author** Sudharsana Rajasekaran
 
-**Status** Draft · Overview and goals approved · Technical plan for review
+**Status** Draft · Technical plan approved · Alternatives for review
 
 **Date** 2026-11-18
 
@@ -26,7 +26,7 @@ The blog groups writing by category. Someone arriving for a recent build has to 
 
 1. **Make the evidence easy to find.** At 390 × 844 and on desktop, the portfolio’s opening screen shows the full name, staff title and a direct link to the customer identity case. The affiliate case follows. After a 30-second skim, a hiring reader should be able to name a system Sudharsana built, an architecture choice he made and a decision he reached with another team, and open the case supporting each answer.
 2. **Make authorship and outcomes citable.** From either homepage, a reader or retrieval tool can follow ordinary links with JavaScript disabled and identify the author, original page address, decision and qualified outcome. The customer identity passage keeps the 1.8 million organizations and 150+ stakeholders in context. The affiliate passage identifies whose results the figures describe and the period they cover. Page metadata agrees with the visible text.
-3. **Make the newest work accessible on a phone.** On the blog, readers can watch the featured build’s recording or open its article, then browse a newest-first archive across categories. At 320 and 390 pixels wide, long titles remain legible without sideways page scrolling. Hearth credits Squad 7, offers captions and a transcript, and transfers video bytes only after the reader chooses playback.
+3. **Make the newest work accessible on a phone.** On the blog, readers can open the newest featured post, watch its recording when available, and browse a newest-first archive across categories. At 320 and 390 pixels wide, long titles remain legible without sideways page scrolling. Hearth credits Squad 7, offers captions and a transcript, and transfers video bytes only after the reader chooses playback.
 4. **Keep navigation predictable.** Both sites use a recognizable author name and clear links between work and writing. Keyboard users can open a case or article and return to their place. A reader who requests reduced motion gets immediate navigation. Existing public links, feeds, likes, comments, theme and consent choices continue to work.
 5. **Measure discovery.** After release, verify that public pages expose the evidence above, then compare branded and subject queries against a dated baseline in Search Console where available. Track search and AI referrals where the data permits. Use those observations to guide later editorial changes.
 
@@ -43,7 +43,7 @@ The portfolio publishes static Astro pages. The blog renders Astro pages from Ma
 ```text
 Portfolio work collection → case summary + decision + source → portfolio home and /work/<slug>/
                                                                         ↕ ordinary links
-Blog Markdown → date-ordered post index → latest build + archive → /post/<slug>
+Blog Markdown → date-ordered post index → featured post + archive → /post/<slug>
                                                                      ├─ recording and captions
                                                                      └─ existing engagement API
 ```
@@ -56,16 +56,11 @@ Use the case entries for card copy. For customer identity, show the matching dec
 
 ### Blog entry, archive and recording
 
-`src/pages/index.astro` reads the date-ordered index from `server/lib/posts.ts`. Place a build preview below the tagline and first-person introduction. Follow it with one archive of all posts, including the featured one, so archive membership stays predictable. Use the existing title, excerpt, date and slug for each row. Sort equal publication dates by slug for a repeatable order. Category and tag pages remain destinations. Resolve existing home category queries to the matching list, fall back to all posts for unknown or empty categories, and preserve meaningful targets for old section fragments.
+The homepage reads the post index from `server/lib/posts.ts`. Order posts by publication date, newest first, with ties broken by slug in ascending order. The first entry with `featured: true` leads the homepage, whatever its category. Hearth qualifies today. A newer featured essay takes its place when published, even if the essay has no video. If no post is featured, the archive follows the introduction directly.
 
-Introduce a small Astro build-preview component. It receives one post and takes its poster, video and captions from that entry. Two distinct actions serve different readers. **Watch the recording** opens the article at a stable player anchor. **Read the build log** opens the article at its title. The homepage loads the poster only. At the article anchor, a recording link works without JavaScript. With JavaScript enabled, activating Play attaches the source and captions to a native inline player with controls. Until activation, the page contains no player source that can trigger a media request. The transcript remains ordinary article content, including when video playback fails. A build without a recording offers the article link alone.
+Place the featured post below the tagline and first-person introduction. Its linked title opens the article. If it has a recording, its poster and a separate **Watch the recording** link lead to the player in that same article. Use only the selected post’s media. On the homepage, load the poster alone. At the article anchor, a recording link works without JavaScript. With JavaScript enabled, activating Play attaches the source and captions to a native inline player with controls. The transcript remains readable if playback fails.
 
-**Owner decision — which entries qualify for the preview?** Both rules below select Hearth in the present collection. Both allow a future build without video. If no entries qualify, the archive follows the introduction directly.
-
-| Rule | How it works | Trade-off and failure case |
-| --- | --- | --- |
-| Newest featured post | Use the newest entry with the existing `featured: true` field. Mark the next build as featured when publishing. | Uses existing content as written. An essay marked featured would occupy the build slot, and an unmarked build would be missed. |
-| Newest post marked as a build | Add an optional `build` field to the Markdown reader and mark existing build entries during implementation. Select the newest marked entry regardless of category or featured status. | Keeps editorial highlights independent of build membership. An omitted mark leaves a build in the archive but out of the preview. |
+Follow the feature with a chronological archive of all posts, including the featured one. Use each row’s title, excerpt, date and slug. Keep category and tag pages accessible. Resolve existing homepage category queries to the matching list, fall back to all posts for unknown or empty categories, and preserve meaningful targets for old section fragments.
 
 ### Shared appearance, navigation and authorship
 
@@ -78,3 +73,13 @@ Use the portfolio homepage as the author profile URL and give Sudharsana one sta
 ### Failure behavior and interfaces
 
 The archive and lead case must render when the engagement database is slow or unavailable. Today the blog homepage waits for post statistics alongside the index. Render the homepage from the content index, then use the existing `/api/posts/stats` request to fill in counts when available. Omit unknown counts so readers can distinguish missing data from a measured zero. Post reactions and discussion continue to use the existing API, stable post slugs and identity keys. This design needs no database migration, cross-domain session or new public API.
+
+## Alternatives Considered
+
+The approved plan keeps the portfolio and blog on their existing Astro builds. They share a visual and authorship specification. Each implements it locally and can publish independently. This puts the cost of coordination in paired previews and checks on author details. [Alternatives weighed in the concepts brief](concepts_brief.md#alternatives-weighed)
+
+| Alternative | Benefit | Reason for rejection |
+| --- | --- | --- |
+| Rebuild both sites on a new framework or shared runtime | One component change could update both sites. | Rejected by author: the portfolio already publishes static case pages and the blog renders articles with working engagement features. A migration would require retesting both delivery paths and would couple releases without improving how quickly a reader can find the evidence. |
+| Limit the rebrand to typography and color | Styling changes could ship with few changes to the templates. | Rejected by author: the customer identity link would still be about four phone screens down, and a blog reader would still have to browse categories to find recent work. Meeting the approved goals requires changing the reading order. |
+| Add a separate build marker in Markdown | An editor could reserve the homepage feature for build logs and highlight essays elsewhere. | Rejected by author: the homepage should follow the existing editorial choice, including when the newest featured entry is an essay. A second marker would require backfilling posts and maintaining two flags. |
