@@ -11,12 +11,13 @@ interface Props {
   title: string;
   description: string;
   url: string;
+  noIndex?: boolean;
   ogType?: string;
   ogImage?: string;
   /** Extra structured data for this page (a post's BlogPosting, for example). */
   jsonLd?: Record<string, unknown>;
 }
-const {title, description, url, ogType = 'website', ogImage, jsonLd} = Astro.props;
+const {title, description, url, noIndex = false, ogType = 'website', ogImage, jsonLd} = Astro.props;
 const fullTitle = title === 'Home' ? `${TAGLINE} | ${SITE_NAME}` : `${title} | ${SITE_NAME}`;
 const canonical = url.startsWith('http') ? url : `${SITE_URL}${url}`;
 const safeJson = (o: unknown) => JSON.stringify(o).replace(/</g, '\\u003c');
@@ -66,7 +67,7 @@ const nav = [
 
     <meta name="description" content={description} />
     <meta name="author" content={AUTHOR} />
-    <meta name="robots" content="index, follow" />
+    <meta name="robots" content={noIndex ? 'noindex, follow' : 'index, follow'} />
     <link rel="canonical" href={canonical} />
     <link rel="alternate" type="application/rss+xml" title={SITE_NAME} href="/rss.xml" />
 

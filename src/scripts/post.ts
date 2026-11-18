@@ -3,15 +3,21 @@
 
 const content = document.getElementById('article-content');
 
-// Reading progress
+// Measure progress through the article text. Discussion length varies independently.
 const bar = document.getElementById('reading-progress');
-if (bar) {
+if (bar && content) {
   const update = () => {
-    const h = document.documentElement.scrollHeight - window.innerHeight;
-    bar.style.width = `${h > 0 ? (window.scrollY / h) * 100 : 0}%`;
+    const {top, height} = content.getBoundingClientRect();
+    const header = document.getElementById('site-header')?.offsetHeight || 0;
+    const viewport = Math.max(1, innerHeight - header);
+    const distance = Math.max(0, header - top);
+    const progress = top > header ? 0 : Math.min(1, distance / Math.max(1, height - viewport));
+    bar.style.transform = `scaleX(${progress})`;
   };
   update();
   window.addEventListener('scroll', update, {passive: true});
+  window.addEventListener('resize', update);
+  new ResizeObserver(update).observe(content);
 }
 
 // Copy buttons on code blocks
@@ -41,35 +47,29 @@ document.querySelectorAll<HTMLElement>('.table-wrap').forEach(w => {
   window.addEventListener('resize', update);
 });
 
-// "On this page", built from the H2s (only when there are three or more)
-const toc = document.getElementById('toc');
-const list = document.getElementById('toc-list');
-if (content && toc && list) {
-  const heads = Array.from(content.querySelectorAll<HTMLElement>('h2')).filter(h => h.id);
-  if (heads.length >= 3) {
-    heads.forEach(h => {
-      const li = document.createElement('li');
-      const a = document.createElement('a');
-      a.href = `#${h.id}`;
-      a.textContent = h.textContent;
-      li.appendChild(a);
-      list.appendChild(li);
+// Links and section IDs arrive with the HTML. Enhance the wide-screen rail.
+const contents = document.querySelector<HTMLDetailsElement>('#article-contents');
+if (contents && content) {
+  const wide = matchMedia('(min-width: 1380px)');
+  const setLayout = () => { contents.open = wide.matches; };
+  setLayout();
+  wide.addEventListener('change', setLayout);
+  const links = Array.from(contents.querySelectorAll<HTMLAnchorElement>('ol a'));
+  const sections = links.map(link => document.getElementById(link.hash.slice(1)));
+  const currentSection = () => {
+    let current = -1;
+    for (const [index, heading] of sections.entries()) {
+      if (heading && heading.getBoundingClientRect().top <= 120) current = index;
+    }
+    links.forEach((link, index) => {
+      if (index === current) link.setAttribute('aria-current', 'location');
+      else link.removeAttribute('aria-current');
     });
-    toc.hidden = false;
-    const links = Array.from(list.querySelectorAll('a'));
-    const setCurrent = (id: string) => links.forEach(l => l.classList.toggle('current', l.getAttribute('href') === `#${id}`));
-    const visible = new Set<string>();
-    const io = new IntersectionObserver(
-      entries => {
-        entries.forEach(e => (e.isIntersecting ? visible.add(e.target.id) : visible.delete(e.target.id)));
-        const first = heads.find(h => visible.has(h.id));
-        if (first) return setCurrent(first.id);
-        const above = heads.filter(h => h.getBoundingClientRect().top < 120);
-        if (above.length) setCurrent(above[above.length - 1].id);
-      },
-      {rootMargin: '-80px 0px -65% 0px'},
-    );
-    heads.forEach(h => io.observe(h));
+  };
+  currentSection();
+  if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver(currentSection, {rootMargin: '-100px 0px 0px'});
+    sections.forEach(heading => { if (heading) observer.observe(heading); });
   }
 }
 

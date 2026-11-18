@@ -17,16 +17,21 @@ function slugify(text: string): string {
         .replace(/-+/g, "-") || "section";
 }
 
-export function renderMarkdown(content: string): string {
+export function renderMarkdown(content: string) {
+    const headings: {id: string; label: string}[] = [];
     let html = marked.parse(content) as string;
 
     // Stable ids on h2/h3 so the table of contents can link to them
-    const seen = new Map<string, number>();
+    const seen = new Set<string>();
+    const suffixes = new Map<string, number>();
     html = html.replace(/<h([23])>([\s\S]*?)<\/h\1>/g, (_m, level: string, inner: string) => {
         const base = slugify(inner);
-        const n = seen.get(base) ?? 0;
-        seen.set(base, n + 1);
-        const id = n === 0 ? base : `${base}-${n + 1}`;
+        let id = base;
+        let suffix = suffixes.get(base) ?? 1;
+        while (seen.has(id)) id = `${base}-${++suffix}`;
+        suffixes.set(base, suffix);
+        seen.add(id);
+        if (level === '2') headings.push({id, label: decode(stripTags(inner))});
         return `<h${level} id="${id}">${inner}</h${level}>`;
     });
 
@@ -41,5 +46,5 @@ export function renderMarkdown(content: string): string {
         alt ? `<figure class="prose-figure">${img}<figcaption>${alt}</figcaption></figure>` : `<figure class="prose-figure">${img}</figure>`
     );
 
-    return html;
+    return {html, headings};
 }
