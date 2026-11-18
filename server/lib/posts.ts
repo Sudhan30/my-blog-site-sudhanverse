@@ -1,8 +1,9 @@
-import { readdir } from "fs/promises";
+import { readdir, readFile } from "fs/promises";
 import { join } from "path";
 import matter from "gray-matter";
 
-const CONTENT_DIR = join(import.meta.dir, "..", "..", "content", "posts");
+// Resolved from the working directory so it works the same under Node, Bun and the Astro build
+const CONTENT_DIR = join(process.cwd(), "content", "posts");
 
 export type PostCategory = "open-source" | "hackathon" | "engineering";
 
@@ -99,7 +100,7 @@ export async function getAllPosts(): Promise<Post[]> {
     const posts: Post[] = [];
     for (const file of mdFiles) {
         const filePath = join(CONTENT_DIR, file);
-        const content = await Bun.file(filePath).text();
+        const content = await readFile(filePath, "utf-8");
         const { data, content: body } = matter(content);
 
         posts.push({

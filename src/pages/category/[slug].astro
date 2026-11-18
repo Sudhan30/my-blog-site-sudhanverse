@@ -1,0 +1,8 @@
+---
+import CategoryPage from '../../components/CategoryPage.astro';
+import {resolveCategorySlug} from '../../../server/lib/posts';
+
+const category = resolveCategorySlug(decodeURIComponent(Astro.params.slug || ''));
+if (!category) return new Response('Category not found', {status: 404, headers: {'Content-Type': 'text/html; charset=utf-8'}});
+---
+<CategoryPage category={category} />

@@ -398,8 +398,8 @@ function renderHealthForceWidget(): string {
             },
             {
               title: 'ER Attending Physician (Trauma Bay Arrival)',
-              voice: '"He\'s here. Pull off the gauze and hang blood."',
-              rbac: 'Zero-Repetition Handoff: Doctor never says the patient\'s name or blood group—the agent binds to the active Trauma Bay 2 context.',
+              voice: '"He\\'s here. Pull off the gauze and hang blood."',
+              rbac: 'Zero-Repetition Handoff: Doctor never says the patient\\'s name or blood group—the agent binds to the active Trauma Bay 2 context.',
               out: 'Verified Order Prepared: 2 Units AB+ Packed RBC · Stat Type & Crossmatch · Contradiction Check: Clear',
               detail: 'The Cortex Agent pulls AB+ from the matched Synthea chart and translates "hang blood" into a structured, type-specific transfusion order.'
             },

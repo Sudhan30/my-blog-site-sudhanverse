@@ -1,0 +1,13 @@
+---
+import {Badge} from '@astryxdesign/core/Badge';
+import Icon from './Icon.astro';
+import {CATEGORY_META, type PostCategory} from '../../server/lib/posts';
+import {isWinner} from '../lib/site';
+interface Props { category: PostCategory; badge?: string }
+const {category, badge} = Astro.props;
+const label = badge || CATEGORY_META[category].shortLabel;
+const winner = category === 'hackathon' && isWinner(badge);
+const variant = category === 'open-source' ? 'green' : category === 'hackathon' ? (winner ? 'yellow' : 'orange') : 'blue';
+const iconName = category === 'open-source' ? 'code' : category === 'hackathon' ? (winner ? 'trophy' : 'zap') : 'layers';
+---
+<Badge variant={variant} label={label}><Icon slot="icon" name={iconName} size={12} /></Badge>

@@ -1,8 +1,8 @@
 ---
 version: 1
 slug: "server-templates-layout-ts"
-primary_target: "server/templates/layout.ts"
-related_targets: ["server/routes/home.ts","server/routes/post.ts","server/routes/tag.ts","public/styles/main.css"]
+primary_target: "src/layouts/Base.astro"
+related_targets: ["src/pages/index.astro","src/pages/post/[slug].astro","src/pages/tag/[tag].astro","src/components/CategoryPage.astro","src/styles/site.css"]
 ---
 
 # Surface brief: blog (home, post, tag)

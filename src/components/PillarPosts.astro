@@ -1,0 +1,12 @@
+---
+import HackathonCard from './HackathonCard.astro';
+import OssCard from './OssCard.astro';
+import PostRow from './PostRow.astro';
+import type {PostCategory} from '../../server/lib/posts';
+import type {PostSummary, Stats} from '../lib/site';
+interface Props { category: PostCategory; posts: PostSummary[]; stats?: Stats }
+const {category, posts, stats} = Astro.props;
+---
+{category === 'hackathon' && <div class="hack-grid">{posts.map((p, i) => <HackathonCard post={p} stats={stats} eager={i < 2} />)}</div>}
+{category === 'open-source' && <div class="oss-list">{posts.map(p => <OssCard post={p} stats={stats} />)}</div>}
+{category === 'engineering' && <ul class="post-list">{posts.map(p => <PostRow post={p} stats={stats} showCover />)}</ul>}

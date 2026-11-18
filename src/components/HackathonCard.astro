@@ -1,0 +1,34 @@
+---
+import Icon from './Icon.astro';
+import CategoryBadge from './CategoryBadge.astro';
+import Engagement from './Engagement.astro';
+import {fmtFull, readingTime, type PostSummary, type Stats} from '../lib/site';
+interface Props { post: PostSummary; stats?: Stats; eager?: boolean }
+const {post, stats, eager = false} = Astro.props;
+const eventShort = post.event ? post.event.split(' · ')[0] : 'Hackathon build';
+---
+<article class="card hack-card">
+  <a href={`/post/${post.slug}`} class="hack-card-link">
+    <div class="hack-media">
+      {post.cover && <img src={post.cover} alt="" loading={eager ? 'eager' : 'lazy'} width="1600" height="900" />}
+      {post.video && <span class="video-pill"><Icon name="play" size={11} filled /> Watch demo</span>}
+    </div>
+    <div class="hack-body">
+      <div class="card-meta">
+        <CategoryBadge category="hackathon" badge={post.badge} />
+        <time datetime={post.date}>{fmtFull(post.date)}</time>
+      </div>
+      <p class="hack-event">{eventShort}</p>
+      <h3 class="card-title">{post.title}</h3>
+      <p class="card-excerpt">{post.excerpt}</p>
+      {post.highlights?.length ? <ul class="chips">{post.highlights.map(h => <li>{h}</li>)}</ul> : null}
+      <div class="card-foot">
+        <span class="card-cta">Read story and demo <Icon name="arrow-right" size={15} /></span>
+        <span class="card-foot-meta">
+          <span>{readingTime(post)} min</span>
+          <Engagement slug={post.slug} stats={stats} />
+        </span>
+      </div>
+    </div>
+  </a>
+</article>

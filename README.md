@@ -16,17 +16,35 @@ The source code powering **[blog.sudharsana.dev](https://blog.sudharsana.dev)** 
 - **Local AI Integration (Ollama)**: Generates whimsical reader aliases and synthesizes "AI Reader Pulse" summaries of article discussions using local Gemma models (`OLLAMA_MODEL`, defaults to `gemma4:latest`), with deterministic fallbacks when Ollama is offline.
 - **Interactive Post Playgrounds**: Embedded interactive simulators for BabbleScribe, HealthForce, Recall Storm, and Text-to-SQL LangGraph directly inside articles.
 
+## Stack
+
+- **Astro** (server-rendered) with **React islands** built on Meta's **Astryx** design system (`@astryxdesign/core`, neutral theme).
+- Pages in `src/pages`, the page shell in `src/layouts/Base.astro`, site styles in `src/styles/site.css` (Astryx tokens).
+- Islands in `src/components/react`: likes, comments, newsletter, feedback. Everything else is static HTML.
+- The API (`server/routes/api.ts`) and Markdown loading (`server/lib`) are plain TypeScript and are mounted under `/api/*` by `src/pages/api/[...path].ts`.
+- `server.mjs` is the production entry. It serves static files (with byte ranges for video) and hands everything else to Astro.
+
 ## Quick Start (Standalone / Open Source)
 
 ```bash
 # 1. Install dependencies
 bun install
 
-# 2. Start development server (uses ./data/*.json automatically if DATABASE_URL is unset)
+# 2. Start the development server (uses ./server/data/*.json automatically if DATABASE_URL is unset)
 bun run dev
 ```
 
 Visit **http://localhost:3000**.
+
+To run the production build locally:
+
+```bash
+bun run build
+```
+
+```bash
+PORT=3000 bun server.mjs
+```
 
 ## Environment Variables
 
@@ -34,9 +52,9 @@ Copy `.env.example` to `.env` if you want to connect to PostgreSQL or a local Ol
 
 | Variable | Description | Default |
 | :--- | :--- | :--- |
-| `PORT` | HTTP server port | `3000` |
-| `DATABASE_URL` | Optional PostgreSQL connection string | Unset (uses `./data/*.json`) |
-| `OLLAMA_URL` | Optional Ollama endpoint for AI summaries & usernames | `http://localhost:11434` |
+| `PORT` | HTTP server port | `80` (`3000` in `bun run dev`) |
+| `DATABASE_URL` | Optional PostgreSQL connection string | Unset (uses `./server/data/*.json`) |
+| `OLLAMA_HOST` | Optional Ollama endpoint for AI summaries & usernames | `http://localhost:11434` |
 | `OLLAMA_MODEL` | Ollama model tag | `gemma4:latest` |
 
 ## Adding or Editing Posts

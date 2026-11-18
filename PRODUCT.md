@@ -24,10 +24,10 @@ Read on desktop during evaluation and on phones from LinkedIn links. Posts are l
 
 ## Capabilities and Constraints
 
-- Bun + TypeScript SSR, no framework. Templates are template strings in `server/templates/layout.ts` and `server/routes/*.ts`; one stylesheet `public/styles/main.css`.
-- Markdown posts in `content/posts/` with frontmatter (title, date, tags, excerpt, slug, readTime, featured, cover, video, poster, badge, event). One custom-template post in `server/templates/posts/`.
+- Astro (server-rendered, Node adapter) with React islands built on Meta's Astryx design system (`@astryxdesign/core`, neutral theme). Pages live in `src/pages`, the shell in `src/layouts/Base.astro`, site styles in `src/styles/site.css` on Astryx tokens. Pages ship no JavaScript except the islands (likes, comments, newsletter, feedback) and two small scripts. The API (`server/routes/api.ts`) and post loading (`server/lib`) are unchanged and run under Bun.
+- Markdown posts in `content/posts/` with frontmatter (title, date, category, tags, excerpt, slug, readTime, featured, cover, video, poster, captions, badge, event, highlights). Per-post playgrounds are in `server/templates/interactive-widgets.ts`.
 - Features to preserve: home (hero, featured hackathon posts, post list, about, newsletter signup, topics), post page (video embed, meta, tags, author block, like button, comments with sort, AI comment summary, pagination, image lightbox), tag pages, RSS, sitemap, light/dark theme with system detection, reading progress, feedback modal, cookie consent gating Google Analytics and in-house telemetry.
-- Deployed as an image to k3s via Flux (`my-blog-site-cluster-infra`).
+- Deployed as a container image to k3s with `scripts/deploy-k3s.sh` (manifests in `my-blog-site-cluster-infra`). The container listens on port 80 and serves `/health`.
 
 ## Brand Commitments
 
@@ -38,7 +38,7 @@ Read on desktop during evaluation and on phones from LinkedIn links. Posts are l
 
 ## Evidence on Hand
 
-- Seven posts, including two hackathon posts with cover images and a demo video (`public/assets/video/healthforce.mp4`); HealthForce won the Anthropic × Snowflake Intelligence at Work Hackathon.
+- Nine posts, including two hackathon posts with cover images and a demo video (`public/assets/video/healthforce.mp4`); HealthForce won the Anthropic × Snowflake Intelligence at Work Hackathon.
 - Architecture diagrams in `public/assets/images/*.svg`.
 - No testimonials, employer logos or metrics beyond what the posts state. Do not invent any.
 
