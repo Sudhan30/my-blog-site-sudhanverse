@@ -128,7 +128,7 @@ export async function getAllPosts(): Promise<Post[]> {
     }
 
     // Sort by date descending
-    posts.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime());
+    posts.sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime() || (a.slug < b.slug ? -1 : a.slug > b.slug ? 1 : 0));
     cachedPosts = posts;
     return posts;
 }

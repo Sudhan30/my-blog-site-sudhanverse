@@ -1,0 +1,19 @@
+---
+import {fmtFull, type PostSummary} from '../lib/site';
+const {post} = Astro.props as {post: PostSummary};
+const url = `/post/${post.slug}`;
+const cover = post.poster || post.cover;
+---
+<section class="feature-story" aria-labelledby="feature-title">
+  {cover && <a class="feature-media" href={post.video ? url + '#recording' : url} aria-label={post.video ? 'Watch the recording' : post.title}>
+    <img src={cover} alt="" width="1280" height="720" />
+    {post.video && <span>▶ &nbsp; Watch the recording</span>}
+  </a>}
+  <div class="feature-copy">
+    <p class="feature-date">Featured · <time datetime={post.date}>{fmtFull(post.date)}</time></p>
+    <h2 id="feature-title"><a href={url}>{post.title}</a></h2>
+    <p>{post.excerpt}</p>
+    <a class="section-link" href={url}>Read the article →</a>
+    {!cover && post.video && <a class="section-link" href={url + '#recording'}>Watch the recording</a>}
+  </div>
+</section>

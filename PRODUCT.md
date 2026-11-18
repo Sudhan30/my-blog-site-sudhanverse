@@ -42,6 +42,10 @@ Read on desktop during evaluation and on phones from LinkedIn links. Posts are l
 - Architecture diagrams in `public/assets/images/*.svg`.
 - No testimonials, employer logos or metrics beyond what the posts state. Do not invent any.
 
+## Homepage publishing
+
+The blog highlights the newest entry with `featured: true`, using publication date and then ascending slug. A featured post can be an essay or a build. Its own media determines whether readers see a recording link. The full writing archive includes every post across categories.
+
 ## Product Principles
 
 1. Signal seniority in the first screen: who, what they build, proof it ships.
