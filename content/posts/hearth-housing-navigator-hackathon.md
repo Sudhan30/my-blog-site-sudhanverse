@@ -78,11 +78,11 @@ Cases save automatically. The queue is sorted by hearing date, each case shows a
                  ▼
               Hearth agent (ADK, Gemini 2.5 Flash, Cloud Run)
                  │
-     ┌───────────┼──────────────────────────┐
-     ▼           ▼                          ▼
- BigQuery     MCP Toolbox               Rule checks
- AI.EMBED +   tract context,            relief funds,
- VECTOR_SEARCH  relief programs         hearing dates
+     ┌───────────┼───────────────────┐
+     ▼           ▼                   ▼
+ BigQuery        MCP Toolbox         Rule checks
+ AI.EMBED +      tract context,      relief funds,
+ VECTOR_SEARCH   relief programs     hearing dates
  then hard rules
 ```
 
