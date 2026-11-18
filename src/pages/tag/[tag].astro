@@ -1,0 +1,28 @@
+---
+import Base from '../../layouts/Base.astro';
+import Icon from '../../components/Icon.astro';
+import PostRow from '../../components/PostRow.astro';
+import {getPostsByTag} from '../../../server/lib/posts';
+import {getAllPostStats} from '../../../server/routes/api';
+
+const tag = decodeURIComponent(Astro.params.tag || '');
+const [posts, stats] = await Promise.all([getPostsByTag(tag), getAllPostStats()]);
+---
+<Base title={`Tag: ${tag}`} description={`Blog posts tagged with ${tag}`} url={`/tag/${encodeURIComponent(tag)}`}>
+  <div class="container page">
+    <header class="page-head">
+      <a href="/" class="back-link"><Icon name="arrow-left" /> All writing</a>
+      <h1 class="page-title">Posts tagged <span class="tag-name">#{tag}</span></h1>
+      <p class="page-lede">{posts.length} post{posts.length === 1 ? '' : 's'}</p>
+    </header>
+    {posts.length > 0 ? (
+      <ul class="post-list">{posts.map(p => <PostRow post={p} stats={stats} />)}</ul>
+    ) : (
+      <div class="empty">
+        <h2>No posts found for this tag</h2>
+        <p>Try another tag, or go back to the main page.</p>
+        <a href="/" class="section-link">Back to home <Icon name="arrow-right" /></a>
+      </div>
+    )}
+  </div>
+</Base>

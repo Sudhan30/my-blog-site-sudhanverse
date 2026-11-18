@@ -1,0 +1,32 @@
+---
+import Icon from './Icon.astro';
+import CategoryBadge from './CategoryBadge.astro';
+import Engagement from './Engagement.astro';
+import {fmtFull, readingTime, type PostSummary, type Stats} from '../lib/site';
+interface Props { post: PostSummary; stats?: Stats }
+const {post, stats} = Astro.props;
+---
+<article class="card oss-card">
+  <div class="oss-body">
+    <div class="card-meta">
+      <CategoryBadge category="open-source" badge={post.badge} />
+      {post.license && <span>{post.license}</span>}
+      <time datetime={post.date}>{fmtFull(post.date)}</time>
+    </div>
+    <h3 class="card-title"><a href={`/post/${post.slug}`}>{post.title}</a></h3>
+    <p class="card-excerpt">{post.excerpt}</p>
+    {post.highlights?.length ? <ul class="chips">{post.highlights.map(h => <li>{h}</li>)}</ul> : null}
+    <div class="card-foot">
+      <span class="oss-links">
+        <a href={`/post/${post.slug}`} class="card-cta">Read launch post <Icon name="arrow-right" size={15} /></a>
+        {post.releaseUrl && <a href={post.releaseUrl} target="_blank" rel="noopener" class="card-cta"><Icon name="download" size={15} /> Download</a>}
+        {post.repoUrl && <a href={post.repoUrl} target="_blank" rel="noopener" class="card-cta"><Icon name="github" size={15} /> GitHub</a>}
+      </span>
+      <span class="card-foot-meta">
+        <span>{readingTime(post)} min read</span>
+        <Engagement slug={post.slug} stats={stats} />
+      </span>
+    </div>
+  </div>
+  {post.cover && <a href={`/post/${post.slug}`} class="oss-cover" aria-hidden="true" tabindex="-1"><img src={post.cover} alt="" loading="lazy" /></a>}
+</article>

@@ -1,0 +1,268 @@
+---
+import '@astryxdesign/core/reset.css';
+import '@astryxdesign/core/astryx.css';
+import '@astryxdesign/theme-neutral/theme.css';
+import '../styles/site.css';
+import Icon from '../components/Icon.astro';
+import Feedback from '../components/react/Feedback.tsx';
+import {AUTHOR, SITE_NAME, SITE_URL, TAGLINE} from '../lib/site';
+
+interface Props {
+  title: string;
+  description: string;
+  url: string;
+  ogType?: string;
+  ogImage?: string;
+  /** Extra structured data for this page (a post's BlogPosting, for example). */
+  jsonLd?: Record<string, unknown>;
+}
+const {title, description, url, ogType = 'website', ogImage, jsonLd} = Astro.props;
+const fullTitle = title === 'Home' ? `${TAGLINE} | ${SITE_NAME}` : `${title} | ${SITE_NAME}`;
+const canonical = url.startsWith('http') ? url : `${SITE_URL}${url}`;
+const safeJson = (o: unknown) => JSON.stringify(o).replace(/</g, '\\u003c');
+const blogLd = safeJson({
+  '@context': 'https://schema.org',
+  '@type': 'Blog',
+  name: TAGLINE,
+  description,
+  url: SITE_URL,
+  author: {'@type': 'Person', name: AUTHOR, url: 'https://sudharsana.dev'},
+});
+const path = Astro.url.pathname;
+const nav = [
+  {href: '/', label: 'All'},
+  {href: '/category/open-source', label: 'Open Source'},
+  {href: '/category/hackathons', label: 'Hackathons'},
+  {href: '/category/engineering', label: 'Blog Posts'},
+];
+---
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#ffffff" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#0e0f11" media="(prefers-color-scheme: dark)" />
+    <title>{fullTitle}</title>
+
+    <!-- Theme: an explicit choice wins, otherwise follow the system. Runs before paint. -->
+    <script is:inline>
+      (function () {
+        function apply() {
+          var saved = null;
+          try { saved = localStorage.getItem('blog-theme-manual'); } catch (e) {}
+          var theme = saved === 'dark' || saved === 'light'
+            ? saved
+            : (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+          document.documentElement.setAttribute('data-theme', theme);
+          window.__blogTheme = theme;
+          window.dispatchEvent(new Event('blog-theme'));
+        }
+        apply();
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', apply);
+        window.addEventListener('pageshow', function (e) { if (e.persisted) apply(); });
+      })();
+    </script>
+
+    <meta name="description" content={description} />
+    <meta name="author" content={AUTHOR} />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href={canonical} />
+    <link rel="alternate" type="application/rss+xml" title={SITE_NAME} href="/rss.xml" />
+
+    <!-- Citation tags for AI answer engines -->
+    <meta name="citation_author" content={AUTHOR} />
+    <meta name="citation_title" content={fullTitle} />
+    <meta name="citation_journal_title" content={SITE_NAME} />
+    <meta name="DC.creator" content={AUTHOR} />
+    <meta name="DC.title" content={fullTitle} />
+    <meta name="DC.publisher" content={SITE_NAME} />
+    <meta name="DC.identifier" content={canonical} />
+
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content={ogType} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:site_name" content={SITE_NAME} />
+    {ogImage && <meta property="og:image" content={ogImage} />}
+    <meta property="og:locale" content="en_US" />
+
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    {ogImage && <meta name="twitter:image" content={ogImage} />}
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet" />
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+
+    <script is:inline type="application/ld+json" set:html={blogLd} />
+    {jsonLd && <script is:inline type="application/ld+json" set:html={safeJson(jsonLd)} />}
+  </head>
+  <body data-astryx-theme="neutral">
+    <a href="#main" class="skip-link">Skip to content</a>
+
+    <header class="site-header" id="site-header">
+      <div class="container header-inner">
+        <a href="/" class="logo" aria-label="Home">
+          <span class="logo-dot" aria-hidden="true"></span>
+          <span>{AUTHOR}</span>
+        </a>
+
+        <nav class="main-nav" id="main-nav" aria-label="Primary">
+          {nav.map(n => <a href={n.href} class="nav-link" aria-current={path === n.href ? 'page' : undefined}>{n.label}</a>)}
+          <a href="https://sudharsana.dev" target="_blank" rel="noopener" class="nav-link">Portfolio <Icon name="external-link" size={12} /></a>
+          <a href="https://github.com/sudhan30" target="_blank" rel="noopener" class="nav-link">GitHub</a>
+        </nav>
+
+        <div class="header-actions">
+          <a href="/rss.xml" class="icon-btn" aria-label="RSS feed" title="RSS feed"><Icon name="rss" /></a>
+          <button class="icon-btn" id="theme-toggle" type="button" aria-label="Toggle light and dark theme">
+            <Icon name="sun" class="icon sun-icon" />
+            <Icon name="moon" class="icon moon-icon" />
+          </button>
+          <button class="icon-btn mobile-menu-btn" id="mobile-menu-btn" type="button" aria-label="Toggle menu" aria-expanded="false" aria-controls="main-nav">
+            <Icon name="menu" class="icon menu-open" />
+            <Icon name="x" class="icon menu-close" />
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <main class="main-content" id="main">
+      <slot />
+    </main>
+
+    <footer class="site-footer">
+      <div class="container footer-inner">
+        <p class="footer-copy">&copy; {new Date().getFullYear()} {AUTHOR}</p>
+        <nav class="footer-links" aria-label="Footer">
+          <a href="/category/open-source">Open Source</a>
+          <a href="/category/hackathons">Hackathons</a>
+          <a href="/category/engineering">Engineering</a>
+          <a href="/rss.xml">RSS</a>
+          <a href="https://github.com/sudhan30" target="_blank" rel="noopener">GitHub</a>
+          <a href="https://www.linkedin.com/in/sudharsanarajasekaran/" target="_blank" rel="noopener">LinkedIn</a>
+          <a href="https://sudharsana.dev" target="_blank" rel="noopener">Portfolio</a>
+          <Feedback client:idle />
+        </nav>
+      </div>
+    </footer>
+
+    <div id="cookie-consent" class="cookie-consent" role="region" aria-label="Cookie consent" hidden>
+      <p>Analytics help improve this blog.</p>
+      <div class="cookie-actions">
+        <button type="button" class="btn btn-solid" id="cookie-accept">Accept</button>
+        <button type="button" class="btn btn-quiet" id="cookie-decline">Decline</button>
+      </div>
+    </div>
+
+    <script>
+      import '../scripts/site.ts';
+    </script>
+
+    <!-- Consent-gated analytics: Google Analytics plus the in-house telemetry endpoint. -->
+    <script is:inline>
+      (function () {
+        var banner = document.getElementById('cookie-consent');
+        var consent = null;
+        try { consent = localStorage.getItem('cookieConsent'); } catch (e) {}
+
+        if (consent === null) banner.hidden = false;
+        else if (consent === 'accepted') start();
+
+        document.getElementById('cookie-accept').addEventListener('click', function () {
+          try { localStorage.setItem('cookieConsent', 'accepted'); } catch (e) {}
+          banner.hidden = true;
+          start();
+        });
+        document.getElementById('cookie-decline').addEventListener('click', function () {
+          try { localStorage.setItem('cookieConsent', 'declined'); } catch (e) {}
+          banner.hidden = true;
+        });
+
+        function start() { loadGoogleAnalytics(); initTelemetry(); }
+
+        function loadGoogleAnalytics() {
+          var script = document.createElement('script');
+          script.async = true;
+          script.src = 'https://www.googletagmanager.com/gtag/js?id=G-F2C1BRDZDW';
+          document.head.appendChild(script);
+          window.dataLayer = window.dataLayer || [];
+          function gtag() { dataLayer.push(arguments); }
+          gtag('js', new Date());
+          gtag('config', 'G-F2C1BRDZDW', { anonymize_ip: true });
+        }
+
+        function generateId() {
+          return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function (c) {
+            var r = Math.random() * 16 | 0;
+            return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+          });
+        }
+
+        function initTelemetry() {
+          var telemetry = {
+            userId: localStorage.getItem('blog_user_id') || generateId(),
+            sessionId: sessionStorage.getItem('blog_session_id') || generateId(),
+            events: [],
+            pageLoadTime: Date.now(),
+
+            init: function () {
+              var self = this;
+              localStorage.setItem('blog_user_id', this.userId);
+              sessionStorage.setItem('blog_session_id', this.sessionId);
+              this.trackEvent('page_view', { url: location.pathname, title: document.title, referrer: document.referrer });
+
+              var maxScroll = 0;
+              window.addEventListener('scroll', function () {
+                var pct = (window.scrollY / (document.documentElement.scrollHeight - window.innerHeight)) * 100;
+                if (pct > maxScroll) maxScroll = Math.round(pct / 25) * 25;
+              }, { passive: true });
+
+              window.addEventListener('beforeunload', function () {
+                self.trackEvent('page_exit', {
+                  timeOnPage: Math.round((Date.now() - self.pageLoadTime) / 1000),
+                  maxScroll: maxScroll,
+                  url: location.pathname
+                });
+                self.flush();
+              });
+
+              document.addEventListener('click', function (e) {
+                var link = e.target.closest && e.target.closest('a');
+                if (link) self.trackEvent('link_click', { url: link.href, text: link.textContent.trim().substring(0, 50) });
+              });
+            },
+
+            trackEvent: function (name, data) {
+              data.userAgent = navigator.userAgent;
+              data.viewport = { width: innerWidth, height: innerHeight };
+              this.events.push({ name: name, timestamp: new Date().toISOString(), data: data });
+              if (this.events.length >= 5) this.flush();
+            },
+
+            flush: function () {
+              if (!this.events.length) return;
+              var body = JSON.stringify({
+                sessionId: this.sessionId,
+                userId: this.userId,
+                userAgent: navigator.userAgent,
+                viewport: { width: innerWidth, height: innerHeight },
+                events: this.events.slice()
+              });
+              this.events = [];
+              if (navigator.sendBeacon) navigator.sendBeacon('/api/telemetry', body);
+              else fetch('/api/telemetry', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: body, keepalive: true }).catch(function () {});
+            }
+          };
+          telemetry.init();
+          window.telemetry = telemetry;
+        }
+      })();
+    </script>
+  </body>
+</html>

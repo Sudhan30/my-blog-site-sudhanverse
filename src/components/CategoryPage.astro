@@ -1,0 +1,31 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from './Icon.astro';
+import PillarPosts from './PillarPosts.astro';
+import {CATEGORY_META, getPostIndex, getPostsByCategory, type PostCategory} from '../../server/lib/posts';
+import {getAllPostStats} from '../../server/routes/api';
+import {CATEGORY_ICON} from '../lib/site';
+interface Props { category: PostCategory }
+const {category} = Astro.props;
+const [posts, index, stats] = await Promise.all([getPostsByCategory(category), getPostIndex(), getAllPostStats()]);
+const meta = CATEGORY_META[category];
+const pillars = ['open-source', 'hackathon', 'engineering'] as const;
+---
+<Base title={meta.title} description={meta.description} url={`/category/${meta.slug}`}>
+  <div class="container page">
+    <header class="page-head">
+      <a href="/" class="back-link"><Icon name="arrow-left" /> All writing</a>
+      <h1 class="page-title">{meta.title}</h1>
+      <p class="page-lede">{meta.description}</p>
+      <nav class="pillar-tabs" aria-label="Browse by category">
+        <a href="/" class="pillar-tab">All work <span class="pillar-count">{index.posts.length}</span></a>
+        {pillars.map(cat => (
+          <a href={`/category/${CATEGORY_META[cat].slug}`} class="pillar-tab" aria-current={cat === category ? 'page' : undefined}>
+            <Icon name={CATEGORY_ICON[cat]} size={15} /> {CATEGORY_META[cat].label} <span class="pillar-count">{index.categories[cat] || 0}</span>
+          </a>
+        ))}
+      </nav>
+    </header>
+    {posts.length ? <PillarPosts category={category} posts={posts} stats={stats} /> : <p class="empty">Nothing here yet.</p>}
+  </div>
+</Base>

@@ -1,0 +1,136 @@
+---
+import Base from '../../layouts/Base.astro';
+import Icon from '../../components/Icon.astro';
+import CategoryBadge from '../../components/CategoryBadge.astro';
+import PostActions from '../../components/react/PostActions.tsx';
+import Applause from '../../components/react/Applause.tsx';
+import Comments from '../../components/react/Comments.tsx';
+import {getPostBySlug, CATEGORY_META} from '../../../server/lib/posts';
+import {renderMarkdown} from '../../../server/lib/markdown';
+import {getAllPostStats} from '../../../server/routes/api';
+import {renderPostInteractiveBanner, renderPostInteractiveWidget} from '../../../server/templates/interactive-widgets';
+import {AUTHOR, SITE_URL, fmtFull} from '../../lib/site';
+import '../../styles/labs.css';
+
+const slug = Astro.params.slug || '';
+const post = await getPostBySlug(slug);
+if (!post) Astro.response.status = 404;
+
+const stats = post ? (await getAllPostStats())[post.slug] || {likes: 0, comments: 0} : {likes: 0, comments: 0};
+const html = post ? renderMarkdown(post.content) : '';
+const readTime = post ? post.readTime || Math.max(1, Math.ceil(post.content.split(/\s+/).length / 220)) : 0;
+const category = post ? CATEGORY_META[post.category] : null;
+const coverInBody = !!post?.cover && post.content.includes(post.cover);
+const banner = post ? renderPostInteractiveBanner(post) : '';
+const widget = post ? renderPostInteractiveWidget(post.slug) : '';
+const jsonLd = post && {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: post.title,
+  description: post.excerpt,
+  datePublished: post.date,
+  url: `${SITE_URL}/post/${post.slug}`,
+  mainEntityOfPage: `${SITE_URL}/post/${post.slug}`,
+  image: post.cover ? `${SITE_URL}${post.cover}` : undefined,
+  keywords: post.tags.join(', '),
+  author: {'@type': 'Person', name: AUTHOR, url: 'https://sudharsana.dev'},
+};
+---
+{!post ? (
+  <Base title="Post Not Found" description="The requested blog post could not be found." url={`/post/${slug}`}>
+    <div class="container page">
+      <div class="empty">
+        <h1 class="page-title">Post not found</h1>
+        <p>The article you're looking for doesn't exist or may have moved.</p>
+        <a href="/" class="section-link">Back to home <Icon name="arrow-right" /></a>
+      </div>
+    </div>
+  </Base>
+) : (
+  <Base title={post.title} description={post.excerpt} url={`/post/${post.slug}`} ogType="article" ogImage={post.cover ? `${SITE_URL}${post.cover}` : undefined} jsonLd={jsonLd || undefined}>
+    <div class="reading-progress" id="reading-progress"></div>
+    <article class="article" data-category={post.category}>
+      <div class="container article-container">
+        <header class="article-header">
+          <nav class="crumbs" aria-label="Breadcrumb">
+            <a href="/" class="back-link"><Icon name="arrow-left" /> All writing</a>
+            <span aria-hidden="true">/</span>
+            <a href={`/category/${category!.slug}`} class="back-link">{category!.label}</a>
+          </nav>
+          <div class="article-badges">
+            <CategoryBadge category={post.category} badge={post.badge} />
+            {post.event && <span class="article-event">{post.event}</span>}
+          </div>
+          <h1 class="article-title">{post.title}</h1>
+          <p class="article-dek">{post.excerpt}</p>
+          <div class="article-meta-bar">
+            <div class="article-meta">
+              <img src="/assets/images/author-potrait-small.png" alt="" width="36" height="36" />
+              <div>
+                <span class="article-meta-name">{AUTHOR}</span>
+                <span class="article-meta-sub"><time datetime={post.date}>{fmtFull(post.date)}</time> · {readTime} min read</span>
+              </div>
+            </div>
+            <PostActions client:load slug={post.slug} likes={stats.likes} comments={stats.comments} />
+          </div>
+        </header>
+
+        {banner && <Fragment set:html={banner} />}
+
+        {post.video ? (
+          <figure class="article-hero video-embed">
+            <video controls playsinline preload="metadata" poster={post.poster || post.cover}>
+              <source src={post.video} type="video/mp4" />
+              {post.captions && <track kind="captions" src={post.captions} srclang="en" label="English" default />}
+              Your browser can't play this video. <a href={post.video}>Download it</a> instead.
+            </video>
+          </figure>
+        ) : post.cover && !coverInBody ? (
+          <figure class="article-hero"><img src={post.cover} alt={post.title} /></figure>
+        ) : null}
+
+        {widget && <div class="article-interactive-slot" set:html={widget} />}
+
+        <div class="article-body">
+          <div class="prose" id="article-content" set:html={html} />
+          <aside class="toc" id="toc" aria-label="On this page" hidden>
+            <p class="toc-title">On this page</p>
+            <ul class="toc-list" id="toc-list"></ul>
+          </aside>
+        </div>
+
+        {post.tags.length > 0 && (
+          <div class="article-tags">
+            <span class="article-tags-label">Topics</span>
+            <nav class="topics" aria-label="Topics">{post.tags.map(t => <a href={`/tag/${encodeURIComponent(t)}`}>#{t}</a>)}</nav>
+          </div>
+        )}
+
+        <section class="author-block">
+          <img src="/assets/images/author-potrait-small.png" alt="" width="52" height="52" loading="lazy" />
+          <div class="author-info">
+            <h2>{AUTHOR}</h2>
+            <p>AI and Data Engineer building local-first apps, autonomous agents, and self-hosted systems.</p>
+            <p class="author-links">
+              <a href="https://sudharsana.dev" target="_blank" rel="noopener" aria-label="Portfolio"><Icon name="globe" size={18} /></a>
+              <a href="https://github.com/sudhan30" target="_blank" rel="noopener" aria-label="GitHub"><Icon name="github" size={18} /></a>
+              <a href="https://www.linkedin.com/in/sudharsanarajasekaran/" target="_blank" rel="noopener" aria-label="LinkedIn"><Icon name="linkedin" size={18} /></a>
+            </p>
+          </div>
+          <div class="author-cta">
+            <span>Enjoyed this write-up?</span>
+            <Applause client:idle slug={post.slug} likes={stats.likes} comments={stats.comments} />
+          </div>
+        </section>
+
+        <Comments client:idle slug={post.slug} initialCount={stats.comments} />
+      </div>
+    </article>
+
+    <dialog class="image-zoom" id="image-zoom" aria-label="Enlarged image"><img alt="" /></dialog>
+
+    <script>
+      import '../../scripts/post.ts';
+    </script>
+  </Base>
+)}

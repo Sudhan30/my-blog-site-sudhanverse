@@ -1,0 +1,104 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+import PillarPosts from '../components/PillarPosts.astro';
+import Newsletter from '../components/react/Newsletter.tsx';
+import {getPostIndex} from '../../server/lib/posts';
+import {getAllPostStats} from '../../server/routes/api';
+
+const [index, stats] = await Promise.all([getPostIndex(), getAllPostStats()]);
+const by = (c: string) => index.posts.filter(p => p.category === c);
+const sections = [
+  {id: 'hackathon', anchor: 'hackathons', title: 'Hackathons', lede: 'AI agents and verification systems built and demoed against the clock.', href: '/category/hackathons', link: 'All hackathon builds', posts: by('hackathon')},
+  {id: 'open-source', anchor: 'open-source', title: 'Open Source', lede: 'Privacy-first apps and developer tools built in the open.', href: '/category/open-source', link: 'Open source page', posts: by('open-source')},
+  {id: 'engineering', anchor: 'latest', title: 'Engineering', lede: 'Production notes on local multi-model agents, LLM memory, self-hosted Kubernetes and cloud cost.', href: '/category/engineering', link: 'All engineering posts', posts: by('engineering')},
+] as const;
+const filters = [
+  {id: 'all', label: 'All work', count: index.posts.length},
+  {id: 'hackathon', label: 'Hackathons', count: by('hackathon').length},
+  {id: 'open-source', label: 'Open Source', count: by('open-source').length},
+  {id: 'engineering', label: 'Engineering', count: by('engineering').length},
+];
+const tags = Object.entries(index.tags).sort((a, b) => b[1] - a[1]).map(([t]) => t);
+---
+<Base
+  title="Home"
+  description="Sudharsana Rajasekaran's engineering logbook: privacy-first Android voice typing (BabbleScribe), winning AI hackathon builds, and production data & Kubernetes architecture deep dives."
+  url="/"
+>
+  <section class="hero">
+    <div class="container">
+      <h1 class="hero-title">Resolving dependencies, one idea at a time.</h1>
+      <p class="hero-lede">
+        First-hand build logs: privacy-first open source software, AI agents shipped at hackathons, and data and LLM systems running on my own Kubernetes cluster.
+      </p>
+      <div class="byline">
+        <img src="/assets/images/author-potrait-small.png" alt="" class="byline-avatar" width="44" height="44" fetchpriority="high" />
+        <div class="byline-text">
+          <span class="byline-name">Sudharsana Rajasekaran</span>
+          <span class="byline-role">Data Engineer and AI Systems Builder</span>
+        </div>
+        <div class="byline-links">
+          <a href="https://sudharsana.dev" target="_blank" rel="noopener">Portfolio</a>
+          <a href="https://github.com/sudhan30" target="_blank" rel="noopener" aria-label="GitHub"><Icon name="github" size={18} /></a>
+          <a href="https://www.linkedin.com/in/sudharsanarajasekaran/" target="_blank" rel="noopener" aria-label="LinkedIn"><Icon name="linkedin" size={18} /></a>
+        </div>
+      </div>
+      <div class="pillar-tabs" role="group" aria-label="Filter posts by category">
+        {filters.map(f => (
+          <button type="button" class="pillar-tab" data-filter={f.id} aria-pressed={f.id === 'all' ? 'true' : 'false'}>
+            {f.label} <span class="pillar-count">{f.count}</span>
+          </button>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <div class="container home-sections">
+    {sections.filter(s => s.posts.length).map(s => (
+      <section class="pillar-section" id={s.anchor} data-pillar-section={s.id} aria-labelledby={`${s.anchor}-heading`}>
+        <div class="section-head">
+          <div>
+            <h2 class="section-title" id={`${s.anchor}-heading`}>{s.title}</h2>
+            <p class="section-lede">{s.lede}</p>
+          </div>
+          <a href={s.href} class="section-link">{s.link} <Icon name="arrow-right" size={15} /></a>
+        </div>
+        <PillarPosts category={s.id} posts={s.posts} stats={stats} />
+      </section>
+    ))}
+
+    <section class="closing">
+      <div>
+        <h2 class="section-title">About the author</h2>
+        <div class="about">
+          <img src="/assets/images/author-potrait-small.png" alt="" class="about-avatar" width="56" height="56" loading="lazy" />
+          <div>
+            <p>I'm a data engineer who loves building end-to-end systems: enterprise data pipelines by day, and open source Android tools, hackathon AI agents and a self-hosted two-node K3s cluster by night.</p>
+            <p class="about-links">
+              <a href="https://sudharsana.dev" target="_blank" rel="noopener">Interactive portfolio</a>
+              <a href="https://github.com/sudhan30" target="_blank" rel="noopener">GitHub (@sudhan30)</a>
+            </p>
+          </div>
+        </div>
+      </div>
+      <div>
+        <h2 class="section-title">New posts by email</h2>
+        <p class="section-lede">No spam. A note when a new release, hackathon build or deep dive ships.</p>
+        <Newsletter client:idle />
+        <h3 class="topics-title">Browse by topic</h3>
+        <nav class="topics" aria-label="Topics">
+          {tags.slice(0, 10).map(t => <a href={`/tag/${encodeURIComponent(t)}`}>#{t}</a>)}
+        </nav>
+        {tags.length > 10 && (
+          <details class="topics-more">
+            <summary>All topics</summary>
+            <nav class="topics" aria-label="All topics">
+              {tags.slice(10).map(t => <a href={`/tag/${encodeURIComponent(t)}`}>#{t}</a>)}
+            </nav>
+          </details>
+        )}
+      </div>
+    </section>
+  </div>
+</Base>

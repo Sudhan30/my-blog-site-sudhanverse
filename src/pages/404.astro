@@ -1,0 +1,13 @@
+---
+import Base from '../layouts/Base.astro';
+import Icon from '../components/Icon.astro';
+---
+<Base title="Page Not Found" description="The requested page could not be found." url={Astro.url.pathname}>
+  <div class="container page">
+    <div class="empty">
+      <h1 class="page-title">Page not found</h1>
+      <p>That address doesn't match anything here. It may have moved.</p>
+      <a href="/" class="section-link">Back to home <Icon name="arrow-right" /></a>
+    </div>
+  </div>
+</Base>

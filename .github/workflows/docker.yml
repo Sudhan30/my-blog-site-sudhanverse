@@ -25,18 +25,23 @@ jobs:
       - name: Install dependencies
         run: bun install --frozen-lockfile || bun install
 
-      - name: Build server bundle
+      - name: Build the Astro site
         run: bun run build
 
       - name: Smoke test standalone mode (JSON storage fallback)
         run: |
-          PORT=3099 bun run server/index.ts &
+          PORT=3099 HOST=127.0.0.1 bun server.mjs &
           SERVER_PID=$!
-          sleep 2
+          sleep 3
           curl -fsS http://localhost:3099/health
           curl -fsS http://localhost:3099/ > /dev/null
           curl -fsS http://localhost:3099/category/open-source > /dev/null
           curl -fsS http://localhost:3099/category/hackathons > /dev/null
           curl -fsS http://localhost:3099/category/engineering > /dev/null
+          curl -fsS http://localhost:3099/rss.xml > /dev/null
+          curl -fsS http://localhost:3099/sitemap.xml > /dev/null
+          curl -fsS http://localhost:3099/robots.txt > /dev/null
           curl -fsS http://localhost:3099/api/posts/stats > /dev/null
+          # Video seeking depends on byte ranges
+          test "$(curl -s -o /dev/null -w '%{http_code}' -H 'Range: bytes=0-99' http://localhost:3099/assets/video/healthforce.mp4)" = "206"
           kill $SERVER_PID || true

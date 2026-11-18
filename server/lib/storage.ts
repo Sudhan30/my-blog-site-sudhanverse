@@ -1,7 +1,7 @@
 import { join } from "path";
 import { readFile, writeFile, mkdir } from "fs/promises";
 
-const DATA_DIR = join(import.meta.dir, "..", "data");
+const DATA_DIR = join(process.cwd(), "server", "data");
 
 interface DataStore<T> {
     read(): Promise<T>;
