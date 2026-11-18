@@ -76,5 +76,5 @@ if (filters.length) {
   };
   filters.forEach(b => b.addEventListener('click', () => apply(b.dataset.filter || 'all')));
   const initial = new URLSearchParams(location.search).get('category');
-  if (initial && ['open-source', 'hackathon', 'engineering'].includes(initial)) apply(initial);
+  if (initial && Array.from(filters).some(button => button.dataset.filter === initial)) apply(initial);
 }

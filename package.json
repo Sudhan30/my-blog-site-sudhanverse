@@ -3,10 +3,10 @@
     "version": "1.0.0",
     "private": true,
     "scripts": {
-        "dev": "astro dev",
-        "build": "astro build",
-        "start": "node server.mjs",
-        "preview": "astro build && PORT=3000 node server.mjs"
+        "dev": "bun --bun astro dev",
+        "build": "bun --bun astro build",
+        "start": "bun server.mjs",
+        "preview": "bun run build && PORT=3000 bun server.mjs"
     },
     "dependencies": {
         "@astrojs/node": "^11.1.14",

@@ -8,16 +8,14 @@ import {getAllPostStats} from '../../server/routes/api';
 
 const [index, stats] = await Promise.all([getPostIndex(), getAllPostStats()]);
 const by = (c: string) => index.posts.filter(p => p.category === c);
-const sections = [
+const sections = ([
   {id: 'hackathon', anchor: 'hackathons', title: 'Hackathons', lede: 'AI agents and verification systems built and demoed against the clock.', href: '/category/hackathons', link: 'All hackathon builds', posts: by('hackathon')},
   {id: 'open-source', anchor: 'open-source', title: 'Open Source', lede: 'Privacy-first apps and developer tools built in the open.', href: '/category/open-source', link: 'Open source page', posts: by('open-source')},
   {id: 'engineering', anchor: 'latest', title: 'Engineering', lede: 'Production notes on local multi-model agents, LLM memory, self-hosted Kubernetes and cloud cost.', href: '/category/engineering', link: 'All engineering posts', posts: by('engineering')},
-] as const;
+] as const).filter(section => section.posts.length > 0);
 const filters = [
   {id: 'all', label: 'All work', count: index.posts.length},
-  {id: 'hackathon', label: 'Hackathons', count: by('hackathon').length},
-  {id: 'open-source', label: 'Open Source', count: by('open-source').length},
-  {id: 'engineering', label: 'Engineering', count: by('engineering').length},
+  ...sections.map(section => ({id: section.id, label: section.title, count: section.posts.length})),
 ];
 const tags = Object.entries(index.tags).sort((a, b) => b[1] - a[1]).map(([t]) => t);
 ---
@@ -55,7 +53,7 @@ const tags = Object.entries(index.tags).sort((a, b) => b[1] - a[1]).map(([t]) =>
   </section>
 
   <div class="container home-sections">
-    {sections.filter(s => s.posts.length).map(s => (
+    {sections.map(s => (
       <section class="pillar-section" id={s.anchor} data-pillar-section={s.id} aria-labelledby={`${s.anchor}-heading`}>
         <div class="section-head">
           <div>
