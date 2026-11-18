@@ -25,7 +25,7 @@ At **Google Cloud's Agents for Impact 2026** hackathon, Squad 7 took Challenge 0
 
 **Marisol and Dev in the video are fictional composites. The complaint, violation and Census records are real New York City data. Eviction filing counts are modeled, and labeled as modeled everywhere they appear.**
 
-The video above is narrated and captioned. A full transcript is at the end of the post.
+The live demo went offline when the hackathon’s Google Cloud resources were shut down. You can watch the recorded walkthrough above with narration and captions, or read the transcript at the end of this post.
 
 ---
 

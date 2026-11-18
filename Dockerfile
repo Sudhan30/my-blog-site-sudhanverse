@@ -4,7 +4,7 @@ WORKDIR /app
 COPY package.json bun.lock ./
 RUN bun install --frozen-lockfile
 COPY . .
-RUN bun --bun astro build
+RUN bun run build
 
 # Production stage
 FROM oven/bun:1-slim
