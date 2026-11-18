@@ -7,7 +7,8 @@ import {Shell} from './Shell';
 
 /** "Send feedback" in the footer, with its dialog. */
 export default function Feedback() {
-  const [open, setOpen] = useState(false);
+  // Mount the dialog on first use, then let it handle closing and restoring focus.
+  const [open, setOpen] = useState<boolean | null>(null);
   const [name, setName] = useState('');
   const [message, setMessage] = useState('');
   const [busy, setBusy] = useState(false);
@@ -40,19 +41,21 @@ export default function Feedback() {
       <button type="button" className="link-btn" onClick={() => setOpen(true)}>
         Send feedback
       </button>
-      <Dialog isOpen={open} onOpenChange={setOpen} purpose="form" width={440}>
-        <DialogHeader title="Send feedback" subtitle="Have a suggestion or found an issue? Let me know." onOpenChange={setOpen} />
-        <form className="feedback-form" onSubmit={submit}>
-          <TextInput label="Your name" isOptional value={name} onChange={setName} htmlName="name" />
-          <TextArea label="Your feedback" isRequired rows={5} value={message} onChange={setMessage} htmlName="message" />
-          <div className="feedback-actions">
-            <p className={`form-note${note ? (note.ok ? ' is-ok' : ' is-error') : ''}`} role="status">
-              {note?.text}
-            </p>
-            <Button type="submit" variant="primary" label="Send feedback" isLoading={busy} isDisabled={!message.trim()} />
-          </div>
-        </form>
-      </Dialog>
+      {open !== null && (
+        <Dialog isOpen={open} onOpenChange={setOpen} purpose="form" width={440}>
+          <DialogHeader title="Send feedback" subtitle="Have a suggestion or found an issue? Let me know." onOpenChange={setOpen} />
+          <form className="feedback-form" onSubmit={submit}>
+            <TextInput label="Your name" isOptional value={name} onChange={setName} htmlName="name" />
+            <TextArea label="Your feedback" isRequired rows={5} value={message} onChange={setMessage} htmlName="message" />
+            <div className="feedback-actions">
+              <p className={`form-note${note ? (note.ok ? ' is-ok' : ' is-error') : ''}`} role="status">
+                {note?.text}
+              </p>
+              <Button type="submit" variant="primary" label="Send feedback" isLoading={busy} isDisabled={!message.trim()} />
+            </div>
+          </form>
+        </Dialog>
+      )}
     </Shell>
   );
 }
