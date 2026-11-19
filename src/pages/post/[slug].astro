@@ -77,10 +77,21 @@ const jsonLd = {
         </div>
         {highlights.length > 0 && (
           <aside class="spec-sheet" aria-label="System highlights">
-            <p class="spec-sheet-label">At a glance</p>
-            <ul class="spec-sheet-list">
-              {highlights.map(item => <li>{item}</li>)}
-            </ul>
+            <p class="spec-sheet-label">System Specs · At a Glance</p>
+            <div class="spec-grid">
+              {highlights.map(item => {
+                const idx = item.indexOf(':');
+                const hasKey = idx > 0 && idx < 28;
+                const key = hasKey ? item.slice(0, idx).trim() : '';
+                const val = hasKey ? item.slice(idx + 1).trim() : item;
+                return (
+                  <div class="spec-card">
+                    {key && <span class="spec-card-key">{key}</span>}
+                    <span class="spec-card-val">{val}</span>
+                  </div>
+                );
+              })}
+            </div>
           </aside>
         )}
       </header>

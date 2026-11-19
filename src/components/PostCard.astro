@@ -1,0 +1,55 @@
+---
+import Engagement from './Engagement.astro';
+import {CATEGORY_META} from '../../server/lib/posts';
+import {fmtFull, readingTime, type PostSummary, type Stats} from '../lib/site';
+
+interface Props {
+  post: PostSummary;
+  stats?: Stats;
+  anchor?: string;
+  level?: 2 | 3;
+}
+
+const {post, stats, anchor, level = 2} = Astro.props;
+const Heading = level === 2 ? 'h2' : 'h3';
+const cover = post.poster || post.cover;
+const isDiagram = Boolean(cover && cover.endsWith('.svg'));
+const isWinner = Boolean(post.badge && /winner|1st/i.test(post.badge));
+const visibleTags = post.tags.slice(0, 3);
+---
+<li class="bento-card" id={anchor}>
+  <a href={`/post/${post.slug}`} class="bento-card-link">
+    {cover && (
+      <div class={`bento-media${isDiagram ? ' is-diagram' : ''}`}>
+        <img src={cover} alt="" width="640" height="360" loading="lazy" />
+        <div class="bento-media-badges">
+          {post.badge && (
+            <span class={`media-badge${isWinner ? ' is-winner' : ''}`}>{post.badge}</span>
+          )}
+          {post.video && (
+            <span class="media-badge is-video">▶ Demo</span>
+          )}
+        </div>
+      </div>
+    )}
+    <div class="bento-body">
+      <div class="bento-meta">
+        <span class={`cat-pill cat-${post.category}`}>{CATEGORY_META[post.category].shortLabel}</span>
+        <span class="bento-date">
+          <time datetime={post.date}>{fmtFull(post.date)}</time> · {readingTime(post)} min
+        </span>
+      </div>
+      <Heading class="bento-title">{post.title}</Heading>
+      <p class="bento-excerpt">{post.excerpt}</p>
+      <div class="bento-foot">
+        {visibleTags.length > 0 && (
+          <ul class="chips" aria-label="Topics">
+            {visibleTags.map(tag => <li>#{tag}</li>)}
+          </ul>
+        )}
+        <Engagement slug={post.slug} stats={stats} />
+        <span class="bento-arrow" aria-hidden="true">→</span>
+      </div>
+    </div>
+  </a>
+</li>

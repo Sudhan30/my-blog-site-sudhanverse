@@ -11,22 +11,36 @@ const {posts} = Astro.props;
 {posts.length > 0 && (
   <section class="related-section" aria-labelledby="related-heading">
     <div class="related-head">
-      <h2 id="related-heading" class="related-title">Continue reading</h2>
+      <div>
+        <p class="section-kicker">Next up</p>
+        <h2 id="related-heading" class="related-title">Continue reading</h2>
+      </div>
       <a href="/#latest" class="section-link">Full archive →</a>
     </div>
     <ul class="related-grid">
-      {posts.map(post => (
-        <li class="related-card">
-          <a href={`/post/${post.slug}`} class="related-card-link">
-            <div class="related-meta">
-              <span class="row-category">{CATEGORY_META[post.category].shortLabel}</span>
-              <span><time datetime={post.date}>{fmtFull(post.date)}</time> · {readingTime(post)} min</span>
-            </div>
-            <h3 class="related-card-title">{post.title}</h3>
-            <p class="related-card-excerpt">{post.excerpt}</p>
-          </a>
-        </li>
-      ))}
+      {posts.map(post => {
+        const thumb = post.poster || post.cover;
+        const isDiagram = Boolean(thumb && thumb.endsWith('.svg'));
+        return (
+          <li class="related-card">
+            <a href={`/post/${post.slug}`} class="related-card-link">
+              {thumb && (
+                <div class={`related-media${isDiagram ? ' is-diagram' : ''}`}>
+                  <img src={thumb} alt="" width="400" height="225" loading="lazy" />
+                </div>
+              )}
+              <div class="related-body">
+                <div class="related-meta">
+                  <span class={`cat-pill cat-${post.category}`}>{CATEGORY_META[post.category].shortLabel}</span>
+                  <span><time datetime={post.date}>{fmtFull(post.date)}</time> · {readingTime(post)} min</span>
+                </div>
+                <h3 class="related-card-title">{post.title}</h3>
+                <p class="related-card-excerpt">{post.excerpt}</p>
+              </div>
+            </a>
+          </li>
+        );
+      })}
     </ul>
   </section>
 )}
