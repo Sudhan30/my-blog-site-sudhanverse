@@ -16,6 +16,7 @@ export default function Applause({slug, likes, comments}: {slug: string; likes: 
         aria-pressed={e.liked}
         onClick={toggleLike}
       />
+      {e.likeError && <p role="status">{e.likeError}</p>}
     </Shell>
   );
 }

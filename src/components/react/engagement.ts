@@ -3,7 +3,7 @@
 import {useRef, useSyncExternalStore} from 'react';
 import {getClientId, storage} from './client';
 
-export type Engagement = {likes: number; liked: boolean; comments: number};
+export type Engagement = {likes: number; liked: boolean; comments: number; likeError?: string};
 
 let state: Engagement = {likes: 0, liked: false, comments: 0};
 let slug = '';
@@ -45,7 +45,7 @@ export async function toggleLike() {
   const before = state;
   const liked = !before.liked;
   // Optimistic update, rolled back if the server disagrees.
-  set({liked, likes: Math.max(0, before.likes + (liked ? 1 : -1))});
+  set({liked, likeError: '', likes: Math.max(0, before.likes + (liked ? 1 : -1))});
   storage.write(`liked-${slug}`, String(liked));
   try {
     const res = await fetch(likesUrl(), {
@@ -61,7 +61,7 @@ export async function toggleLike() {
     set(next);
     storage.write(`liked-${slug}`, String(state.liked));
   } catch {
-    set({liked: before.liked, likes: before.likes});
+    set({liked: before.liked, likes: before.likes, likeError: 'Could not save your reaction. Please try again.'});
     storage.write(`liked-${slug}`, String(before.liked));
   } finally {
     pending = false;
