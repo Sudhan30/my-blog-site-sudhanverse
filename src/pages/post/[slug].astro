@@ -1,5 +1,6 @@
 ---
 import Base from '../../layouts/Base.astro';
+import {ArchiveTrail} from '../../components/react/ArchiveNavigation';
 import Icon from '../../components/Icon.astro';
 import CategoryBadge from '../../components/CategoryBadge.astro';
 import PostActions from '../../components/react/PostActions.tsx';
@@ -14,7 +15,7 @@ import '../../styles/labs.css';
 
 const slug = Astro.params.slug || '';
 const post = await getPostBySlug(slug);
-if (!post) Astro.response.status = 404;
+if (!post) return Astro.rewrite('/404');
 
 const stats = post ? (await getAllPostStats())[post.slug] || {likes: 0, comments: 0} : {likes: 0, comments: 0};
 const {html, headings} = post ? renderMarkdown(post.content) : {html: '', headings: []};
@@ -36,27 +37,12 @@ const jsonLd = post && {
   author: PERSON,
 };
 ---
-{!post ? (
-  <Base title="Post Not Found" description="The requested blog post could not be found." url={`/post/${slug}`}>
-    <div class="container page">
-      <div class="empty">
-        <h1 class="page-title">Post not found</h1>
-        <p>The article you're looking for doesn't exist or may have moved.</p>
-        <a href="/" class="section-link">Back to home <Icon name="arrow-right" /></a>
-      </div>
-    </div>
-  </Base>
-) : (
   <Base title={post.title} description={post.excerpt} url={`/post/${post.slug}`} ogType="article" ogImage={post.cover ? `${SITE_URL}${post.cover}` : undefined} jsonLd={jsonLd || undefined}>
     <div class="reading-progress" id="reading-progress"></div>
     <article class="article" data-category={post.category}>
       <div class="container article-container">
         <header class="article-header">
-          <nav class="crumbs" aria-label="Breadcrumb">
-            <a href="/" class="back-link"><Icon name="arrow-left" /> All writing</a>
-            <span aria-hidden="true">/</span>
-            <a href={`/category/${category!.slug}`} class="back-link">{category!.label}</a>
-          </nav>
+          <ArchiveTrail label={category!.label} href={`/category/${category!.slug}`} />
           <div class="article-badges">
             <CategoryBadge category={post.category} badge={post.badge} />
             {post.event && <span class="article-event">{post.event}</span>}
@@ -132,10 +118,9 @@ const jsonLd = post && {
       </div>
     </article>
 
-    <dialog class="image-zoom" id="image-zoom" aria-label="Enlarged image"><img alt="" /></dialog>
+    <dialog class="image-zoom" id="image-zoom" aria-label="Enlarged image"><button type="button" class="zoom-close">Close image</button><img alt="" /></dialog>
 
     <script>
       import '../../scripts/post.ts';
     </script>
   </Base>
-)}

@@ -81,3 +81,12 @@ test('contents labels and unique deep links come from the same rendered headings
   ]);
   for (const h of headings) expect(html).toContain('<h2 id="' + h.id + '">');
 });
+
+test('missing article and category pages keep their requested canonical and link to the archive', async () => {
+  for (const path of ['/post/missing', '/category/missing']) {
+    const html = await homepage([], path);
+    expect(html).toContain(`rel="canonical" href="https://blog.sudharsana.dev${path}"`);
+    expect(html).toContain('Page not found');
+    expect(html).toContain('href="/#latest"');
+  }
+});

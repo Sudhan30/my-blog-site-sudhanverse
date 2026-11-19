@@ -22,6 +22,7 @@ if (menuBtn && nav) {
   const setOpen = (open: boolean) => {
     nav.classList.toggle('open', open);
     menuBtn.setAttribute('aria-expanded', String(open));
+    if (open) nav.querySelector('a')?.focus();
   };
   menuBtn.addEventListener('click', () => setOpen(!nav.classList.contains('open')));
   nav.querySelectorAll('a').forEach(a => a.addEventListener('click', () => setOpen(false)));

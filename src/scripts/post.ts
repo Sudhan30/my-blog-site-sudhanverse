@@ -77,14 +77,23 @@ if (contents && content) {
 const zoom = document.getElementById('image-zoom') as HTMLDialogElement | null;
 const zoomImg = zoom?.querySelector('img');
 if (content && zoom && zoomImg) {
-  content.addEventListener('click', e => {
-    const t = e.target as HTMLElement;
-    if (t instanceof HTMLImageElement) {
-      zoomImg.src = t.src;
-      zoomImg.alt = t.alt;
+  let trigger: HTMLButtonElement | undefined;
+  content.querySelectorAll<HTMLImageElement>('img').forEach(image => {
+    if (image.closest('a, button')) return;
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'zoom-trigger';
+    button.setAttribute('aria-label', image.alt ? 'Enlarge ' + image.alt : 'Enlarge image');
+    image.replaceWith(button);
+    button.append(image);
+    button.addEventListener('click', () => {
+      trigger = button;
+      zoomImg.src = image.currentSrc || image.src;
+      zoomImg.alt = image.alt;
       zoom.showModal();
-    }
+    });
   });
+  zoom.addEventListener('close', () => trigger?.focus({preventScroll: true}));
   zoom.addEventListener('click', () => zoom.close());
 }
 

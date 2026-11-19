@@ -1,27 +1,22 @@
 ---
-import Icon from './Icon.astro';
-import CategoryBadge from './CategoryBadge.astro';
 import Engagement from './Engagement.astro';
+import {CATEGORY_META} from '../../server/lib/posts';
 import {fmtFull, readingTime, type PostSummary, type Stats} from '../lib/site';
-interface Props { post: PostSummary; stats?: Stats; showCover?: boolean; compact?: boolean; anchor?: string }
-const {post, stats, showCover = false, compact = false, anchor} = Astro.props;
-const chips = post.highlights?.length ? post.highlights.slice(0, 3) : post.tags.slice(0, 4).map(t => `#${t}`);
+interface Props { post: PostSummary; stats?: Stats; anchor?: string; level?: 2 | 3 }
+const {post, stats, anchor, level = 2} = Astro.props;
+const Heading = level === 2 ? 'h2' : 'h3';
 ---
 <li class="post-row" id={anchor}>
   <a href={`/post/${post.slug}`} class="post-row-link">
-    <div class="post-row-main">
-      <div class="card-meta">
-        <CategoryBadge category={post.category} badge={post.badge} />
-        <time datetime={post.date}>{fmtFull(post.date)}</time>
-        <span>{readingTime(post)} min read</span>
-      </div>
-      <h3 class="card-title">{post.title} <Icon name="arrow-right" size={17} class="icon row-arrow" /></h3>
-      <p class="card-excerpt">{post.excerpt}</p>
-      <div class="card-foot">
-        {!compact && <ul class="chips">{chips.map(c => <li>{c}</li>)}</ul>}
-        <Engagement slug={post.slug} stats={stats} />
-      </div>
+    <div class="card-meta">
+      <time datetime={post.date}>{fmtFull(post.date)}</time>
+      <span>{readingTime(post)} min read</span>
     </div>
-    {showCover && post.cover && <div class="post-row-cover" aria-hidden="true"><img src={post.cover} alt="" loading="lazy" /></div>}
+    <div class="post-row-main">
+      <span class="row-category">{CATEGORY_META[post.category].label}</span>
+      <Heading class="card-title">{post.title}</Heading>
+      <p class="card-excerpt">{post.excerpt}</p>
+      <Engagement slug={post.slug} stats={stats} />
+    </div>
   </a>
 </li>

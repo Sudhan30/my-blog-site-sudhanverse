@@ -1,6 +1,6 @@
 ---
 import Base from '../layouts/Base.astro';
-import Icon from '../components/Icon.astro';
+import {ArchiveEmpty} from '../components/react/ArchiveNavigation';
 import PostRow from '../components/PostRow.astro';
 import FeaturedPost from '../components/FeaturedPost.astro';
 import Newsletter from '../components/react/Newsletter.tsx';
@@ -36,20 +36,7 @@ const tags = Object.entries(index.tags).sort((a, b) => b[1] - a[1]).map(([t]) =>
   <section class="hero">
     <div class="container">
       <h1 class="hero-title">Resolving dependencies, one idea at a time.</h1>
-      <p class="hero-lede">
-        I write about the data platforms I build, the architecture decisions behind them, and what I learn running distributed systems and shipping AI agents.
-      </p>
-      <div class="byline">
-        <img src="/assets/images/author-potrait-small.png" alt="" class="byline-avatar" width="44" height="44" fetchpriority="high" />
-        <div class="byline-text">
-          <span class="byline-name">{AUTHOR}</span>
-          <span class="byline-role">{ROLE}</span>
-        </div>
-        <div class="byline-links">
-          <a class="section-link" href="#archive-search">Search the archive <Icon name="arrow-right" size={15} /></a>
-          <a href="https://sudharsana.dev" rel="author">Portfolio</a>
-        </div>
-      </div>
+      <p class="publication-author"><a href="https://sudharsana.dev" rel="author">{AUTHOR}</a> · {ROLE}</p>
     </div>
   </section>
   <div class="container home-sections">
@@ -73,8 +60,9 @@ const tags = Object.entries(index.tags).sort((a, b) => b[1] - a[1]).map(([t]) =>
         <a href={archiveUrl(active?.id, '')}>Clear search</a>
       </p>}
       <ul class="post-list archive-rows">
-        {posts.map(post => <PostRow post={post} compact anchor={firstInCategory.get(post.category) === post.slug && post.category !== 'engineering' ? CATEGORY_META[post.category].slug : undefined} />)}
+        {posts.map(post => <PostRow post={post} level={3} anchor={firstInCategory.get(post.category) === post.slug && post.category !== 'engineering' ? CATEGORY_META[post.category].slug : undefined} />)}
       </ul>
+      {posts.length === 0 && <ArchiveEmpty title="No writing found" description="Try a broader search or browse the full archive." />}
       {!categories.some(c => c.id === 'open-source') && <a id="open-source" class="section-link" href="/category/open-source">Open source archive</a>}
     </section>
 
@@ -96,7 +84,7 @@ const tags = Object.entries(index.tags).sort((a, b) => b[1] - a[1]).map(([t]) =>
         <h2 class="section-title">New posts by email</h2>
         <p class="section-lede">No spam. A note when a new release, hackathon build or deep dive ships.</p>
         <Newsletter client:idle />
-        <h3 class="topics-title">Browse by topic</h3>
+        <h3 class="topics-title" id="topics">Browse by topic</h3>
         <nav class="topics" aria-label="Topics">
           {tags.slice(0, 10).map(t => <a href={`/tag/${encodeURIComponent(t)}`}>#{t}</a>)}
         </nav>
