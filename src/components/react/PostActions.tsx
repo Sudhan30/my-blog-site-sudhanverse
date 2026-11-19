@@ -44,6 +44,7 @@ export default function PostActions({slug, likes, comments}: Props) {
         />
         <Button variant="secondary" size="md" label={copied ? 'Copied' : 'Share'} icon={<Icon name={copied ? 'check' : 'share-2'} />} onClick={share} />
       </div>
+      {e.likeError && <p role="status">{e.likeError}</p>}
     </Shell>
   );
 }

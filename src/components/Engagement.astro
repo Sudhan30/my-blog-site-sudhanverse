@@ -5,7 +5,7 @@ interface Props { slug: string; stats?: Stats }
 const {slug, stats} = Astro.props;
 const s = stats?.[slug] || {likes: 0, comments: 0};
 ---
-<span class="card-engagement" data-engagement-slug={slug} hidden={!stats}>
+<span class="card-engagement" data-engagement-slug={slug} hidden={!stats?.[slug]}>
   <span class="eng-stat" title="Likes"><Icon name="thumbs-up" size={13} /> <span class="eng-likes">{s.likes}</span></span>
   <span class="eng-stat" title="Comments"><Icon name="message-square" size={13} /> <span class="eng-comments">{s.comments}</span></span>
 </span>

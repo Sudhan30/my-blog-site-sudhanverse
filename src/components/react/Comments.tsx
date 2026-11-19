@@ -27,19 +27,27 @@ export default function Comments({slug, initialCount}: {slug: string; initialCou
   const [text, setText] = useState('');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState('');
+  const [listStatus, setListStatus] = useState<'loading' | 'ready' | 'error'>('loading');
+  const [reactionError, setReactionError] = useState('');
+  const requestId = useRef(0);
   const sectionRef = useRef<HTMLElement>(null);
 
   const load = useCallback(
     async (p: number, s: Sort) => {
+      const request = ++requestId.current;
+      setListStatus('loading');
       try {
         const res = await fetch(`${base}/comments?page=${p}&limit=${PER_PAGE}&sort=${s}&clientId=${encodeURIComponent(getClientId())}&_t=${Date.now()}`);
         const data = await res.json();
+        if (!res.ok || !Array.isArray(data.comments)) throw new Error('Discussion unavailable');
+        if (request !== requestId.current) return;
+        setListStatus('ready');
         const total = data.pagination?.total || 0;
         setComments(data.comments || []);
         setPage({page: p, total, totalPages: data.pagination?.totalPages || 0});
         setCommentCount(total);
       } catch {
-        setComments(c => c ?? []);
+        if (request === requestId.current) setListStatus('error');
       }
     },
     [base],
@@ -70,21 +78,22 @@ export default function Comments({slug, initialCount}: {slug: string; initialCou
 
   const changePage = (p: number) => {
     load(p, sort);
-    sectionRef.current?.scrollIntoView({behavior: 'smooth'});
+    sectionRef.current?.scrollIntoView();
   };
 
   const likeComment = async (c: Comment) => {
+    setReactionError('');
     try {
       const res = await fetch(`/api/comments/${c.id}/likes`, {
         method: c.user_liked ? 'DELETE' : 'POST',
         headers: {'Content-Type': 'application/json'},
         body: JSON.stringify({clientId: getClientId()}),
       });
-      if (!res.ok) return;
+      if (!res.ok) throw new Error('Reaction failed');
       const data = await res.json();
       setComments(list => (list || []).map(x => (x.id === c.id ? {...x, like_count: data.count, user_liked: data.liked} : x)));
     } catch {
-      /* leave the comment as it was */
+      setReactionError('Could not save your reaction. Please try again.');
     }
   };
 
@@ -174,7 +183,10 @@ export default function Comments({slug, initialCount}: {slug: string; initialCou
         </form>
 
         <div className="comment-list" aria-live="polite">
-          {comments === null ? null : comments.length === 0 ? (
+          {reactionError && <p role="alert">{reactionError}</p>}
+          {listStatus === 'loading' ? <p role="status">Loading discussion…</p> :
+           listStatus === 'error' ? <p role="alert">Could not load the discussion. <button type="button" onClick={() => load(page.page, sort)}>Retry</button></p> :
+           !comments?.length ? (
             <p className="comment-empty">No comments yet. Start the technical discussion above.</p>
           ) : (
             comments.map(c => {
