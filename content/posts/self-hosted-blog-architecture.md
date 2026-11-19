@@ -9,9 +9,9 @@ readTime: 12
 cover: /assets/images/k3s-blog-complete-architecture.svg
 badge: "Kubernetes & GitOps"
 highlights:
-  - "Self-Hosted K3s + FluxCD"
-  - "Prometheus + Grafana + Loki"
-  - "35W Idle Homelab Cluster"
+  - "Hardware: Mini PC (64GB RAM, integrated GPU) · 35W idle / 65W under load"
+  - "Cluster & GitOps: K3s + FluxCD declarative reconciliation + HPA (2–5 replicas)"
+  - "Data & Observability: PostgreSQL (50GB PVC, daily offsite backups) + Prometheus, Grafana, Loki"
 ---
 
 > "The best way to learn infrastructure is to own every layer of it."
@@ -46,7 +46,10 @@ Each namespace is isolated. Resource quotas prevent runaway processes. Network p
 
 ## The Blog Application
 
-Bun.js serves the blog. Server-side rendering for each request. Reads markdown files from the content directory, parses frontmatter, renders HTML with syntax highlighting. Fast. Simple. No client-side JavaScript hydration needed.
+Bun.js serves the blog. Server-side rendering for each request reads markdown files from the content directory, parses frontmatter, and renders HTML with syntax highlighting.
+
+> [!NOTE]
+> **2026 Architecture Evolution:** The infrastructure foundation below (K3s, FluxCD GitOps, PostgreSQL, Prometheus/Grafana/Loki, and Cloudflare) still powers this blog today. At the application layer, the original custom Bun template server has since evolved into **Astro 7 SSR + React 19 islands on Meta's Astryx design system** with build/render-time Shiki syntax highlighting.
 
 PostgreSQL stores metadata. Blog posts, tags, view counts, comment metadata. The app reads markdown from disk but queries Postgres for indexes, relationships, and aggregations.
 

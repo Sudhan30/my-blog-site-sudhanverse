@@ -175,6 +175,28 @@ export async function getPostsByCategory(category: PostCategory): Promise<Omit<P
     return index.posts.filter(p => p.category === category);
 }
 
+export async function getRelatedPosts(slug: string, limit = 3): Promise<Omit<Post, "content">[]> {
+    const index = await getPostIndex();
+    const current = index.posts.find(p => p.slug === slug);
+    if (!current) return [];
+
+    const currentTags = new Set(current.tags.map(t => t.toLowerCase()));
+    return index.posts
+        .filter(p => p.slug !== slug)
+        .map(candidate => {
+            const sharedTags = candidate.tags.filter(t => currentTags.has(t.toLowerCase())).length;
+            const sameCategory = candidate.category === current.category ? 1.5 : 0;
+            return { candidate, score: sharedTags * 2 + sameCategory };
+        })
+        .sort((a, b) =>
+            b.score - a.score ||
+            new Date(b.candidate.date).getTime() - new Date(a.candidate.date).getTime() ||
+            a.candidate.slug.localeCompare(b.candidate.slug)
+        )
+        .slice(0, limit)
+        .map(entry => entry.candidate);
+}
+
 export function resolveCategorySlug(slug: string): PostCategory | null {
     const normalized = slug.toLowerCase().trim();
     if (normalized === "open-source" || normalized === "opensource") return "open-source";

@@ -2,21 +2,39 @@
 import Engagement from './Engagement.astro';
 import {CATEGORY_META} from '../../server/lib/posts';
 import {fmtFull, readingTime, type PostSummary, type Stats} from '../lib/site';
-interface Props { post: PostSummary; stats?: Stats; anchor?: string; level?: 2 | 3 }
+
+interface Props {
+  post: PostSummary;
+  stats?: Stats;
+  anchor?: string;
+  level?: 2 | 3;
+}
+
 const {post, stats, anchor, level = 2} = Astro.props;
 const Heading = level === 2 ? 'h2' : 'h3';
+const visibleTags = post.tags.slice(0, 3);
 ---
 <li class="post-row" id={anchor}>
   <a href={`/post/${post.slug}`} class="post-row-link">
     <div class="card-meta">
       <time datetime={post.date}>{fmtFull(post.date)}</time>
       <span>{readingTime(post)} min read</span>
+      <span class="row-category">{CATEGORY_META[post.category].shortLabel}</span>
     </div>
     <div class="post-row-main">
-      <span class="row-category">{CATEGORY_META[post.category].label}</span>
-      <Heading class="card-title">{post.title}</Heading>
+      <div class="post-row-title-line">
+        <Heading class="card-title">{post.title}</Heading>
+        <span class="row-arrow" aria-hidden="true">→</span>
+      </div>
       <p class="card-excerpt">{post.excerpt}</p>
-      <Engagement slug={post.slug} stats={stats} />
+      <div class="post-row-foot">
+        {visibleTags.length > 0 && (
+          <ul class="chips" aria-label="Topics">
+            {visibleTags.map(tag => <li>#{tag}</li>)}
+          </ul>
+        )}
+        <Engagement slug={post.slug} stats={stats} />
+      </div>
     </div>
   </a>
 </li>

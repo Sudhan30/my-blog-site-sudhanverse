@@ -14,9 +14,9 @@ featured: true
 badge: "Squad 7 · BigQuery Vector Search"
 event: "Google Cloud Agents for Impact 2026 · Challenge 02: Housing Stability and Eviction Prevention"
 highlights:
-  - "Vector Search Proposes, Rules Decide"
-  - "Spanish Voice Intake"
-  - "33,980 Households a 311 Rule Would Miss"
+  - "Architecture: BigQuery AI.EMBED + VECTOR_SEARCH gated by deterministic SQL rules"
+  - "Equity Audit: 33,980 severely rent-burdened households across 37 tracts missed by a 311-only rule"
+  - "Intake Stack: Spanish Speech-to-Text · Gemini 2.5 Flash (ADK) · Firestore · Fillable PDF"
 ---
 
 > The city has already cited these conditions. Her court file doesn't know.
@@ -71,7 +71,7 @@ Cases save automatically. The queue is sorted by hearing date, each case shows a
 
 ## Architecture on Google Cloud
 
-```
+```text
  Paralegal ──> Intake Desk (React + Astryx, Cloud Run)
                  │   Speech-to-Text · Text-to-Speech · Maps
                  │   Gemini vision (notice, photos) · Firestore (cases)
@@ -86,6 +86,9 @@ Cases save automatically. The queue is sorted by hearing date, each case shows a
  then hard rules
 ```
 
+> [!IMPORTANT]
+> **Core Architectural Invariant — Vector Search Proposes, Rules Decide:** Semantic similarity surfaces candidate records across vocabulary gaps ("cold radiators" ↔ "provide ready access to heating system"), but deterministic SQL rules enforce residential status, open state, and the 800-metre radius. Both kept and excluded records are returned with explicit exclusion reasons so the paralegal can challenge any decision.
+
 1. **Agent:** Google's Agent Development Kit in Python, running Gemini 2.5 Flash on Vertex AI, deployed to Cloud Run.
 2. **Evidence search:** `AI.EMBED` with a Gemini embedding model and `VECTOR_SEARCH` in BigQuery, followed by SQL rules. Kept and excluded records are both returned, each exclusion with its reason.
 3. **Neighbourhood context:** MCP Toolbox for Databases on Cloud Run serves tract-level Census figures and the list of relief programs.
@@ -99,7 +102,8 @@ Cases save automatically. The queue is sorted by hearing date, each case shows a
 - **Real and modeled data are labeled.** Census and city records are real. Eviction filings are modeled and say so on screen.
 - **Demographics are never inputs.** Race and ethnicity columns are used only in an audit run after the fact, never in search, ranking or prompts.
 
-That audit found something worth the whole exercise. A rule that only helps tenants who already have an open 311 complaint would skip **37 census tracts holding 33,980 severely rent-burdened households**, places with high eviction pressure and almost no complaints on file. 74.9% of households in those tracts have no vehicle. People who fear retaliation do not file complaints. So Hearth routes those cases to an inspection request and to funds that do not require an open case.
+> [!WARNING]
+> **What the Fairness Audit Exposed:** A naive rule that only helps tenants with an existing open 311 complaint would skip **37 census tracts holding 33,980 severely rent-burdened households** — areas with high eviction pressure and almost no complaints on file (74.9% of households in those tracts have no vehicle, and tenants fearing retaliation rarely file). Hearth detects these tracts and routes cases to an inspection request and to relief funds that do not require an open 311 case.
 
 ## My part
 

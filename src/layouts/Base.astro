@@ -6,7 +6,9 @@ import '../styles/site.css';
 import Icon from '../components/Icon.astro';
 import {IconButton} from '@astryxdesign/core/IconButton';
 import Feedback from '../components/react/Feedback.tsx';
-import {AUTHOR, PERSON, SITE_NAME, SITE_URL, TAGLINE} from '../lib/site';
+import CommandSearch, {type SearchEntry} from '../components/react/CommandSearch.tsx';
+import {CATEGORY_META, getPostIndex} from '../../server/lib/posts';
+import {AUTHOR, PERSON, SITE_NAME, SITE_URL, TAGLINE, readingTime} from '../lib/site';
 
 interface Props {
   title: string;
@@ -32,9 +34,20 @@ const blogLd = safeJson({
 });
 const nav = [
   {href: '/#latest', label: 'Writing'},
-  {href: '/#topics', label: 'Topics'},
+  {href: '/category/engineering', label: 'Engineering'},
+  {href: '/category/hackathons', label: 'Hackathons'},
   {href: 'https://sudharsana.dev', label: 'Portfolio'},
 ];
+const postIndex = await getPostIndex();
+const searchItems: SearchEntry[] = postIndex.posts.map(post => ({
+  slug: post.slug,
+  title: post.title,
+  excerpt: post.excerpt,
+  category: CATEGORY_META[post.category].shortLabel,
+  date: post.date,
+  readTime: readingTime(post),
+  tags: post.tags,
+}));
 ---
 <!doctype html>
 <html lang="en">
@@ -106,7 +119,7 @@ const nav = [
     <a href="#main" class="skip-link">Skip to content</a>
 
     <noscript><style is:inline>
-      #theme-toggle, #mobile-menu-btn { display: none; }
+      #theme-toggle, #mobile-menu-btn, .cmd-trigger { display: none; }
       @media (max-width: 819px) {
         #site-header { height: auto; position: static; }
         #site-header .header-inner { flex-wrap: wrap; padding-block: 8px; }
@@ -121,10 +134,11 @@ const nav = [
         </a>
 
         <nav class="main-nav" id="main-nav" aria-label="Primary">
-          {nav.map(n => <a href={n.href} class="nav-link">{n.label}</a>)}
+          {nav.map(n => <a href={n.href} class="nav-link" target={n.href.startsWith('http') ? '_blank' : undefined} rel={n.href.startsWith('http') ? 'noopener' : undefined}>{n.label}</a>)}
         </nav>
 
         <div class="header-actions">
+          <CommandSearch client:idle items={searchItems} />
           <a href="/rss.xml" class="icon-btn" aria-label="RSS feed" title="RSS feed"><Icon name="rss" /></a>
           <IconButton id="theme-toggle" label="Toggle light and dark theme" variant="ghost" size="sm">
             <span slot="icon"><Icon name="sun" class="icon sun-icon" /><Icon name="moon" class="icon moon-icon" /></span>

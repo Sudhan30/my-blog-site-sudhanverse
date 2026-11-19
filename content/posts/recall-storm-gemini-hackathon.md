@@ -13,9 +13,9 @@ featured: true
 badge: "Million Token Track"
 event: "Gemini 4 Argon SF Hackathon · Track 1: Million Token Engineering"
 highlights:
-  - "646,825 Tokens Generated"
-  - "911 Files in One Pass"
-  - "21,459 Violations Caught"
+  - "Scale: 646,825 tokens across 911 files in 10 continuation hops with 0 argument mismatches"
+  - "Cross-File Integrity: 6,581 / 6,581 links resolved (longest passing link spanned 552,084 tokens)"
+  - "Verification Loop: 21,459 plan violations caught; held-out repair drove scheduling errors 21,284 → 0"
 ---
 
 > Consistent isn't correct.
@@ -28,7 +28,7 @@ Everything here was built at the event. Stores, stock and staffing are simulated
 
 ## The headline numbers
 
-| | |
+| Metric | Verified Result |
 |---|---|
 | Visible tokens in **one continued generation** | **646,825** |
 | Files written, across 10 continuation hops | **911** |
@@ -55,7 +55,8 @@ The hidden tests in `acceptance/` never appeared in any prompt.
 
 Here is the lesson of the day. The giant generation was **internally consistent**: names, imports and signatures all lined up across 911 files. But when our verifier ran the plan it produced, it found **21,459 mistakes**, mostly people booked at two shelves at once or scheduled outside their shift.
 
-Long context solved *coherence*. It did not solve *correctness*. Those are different axes, and you only see the gap if you build something that checks the output against the world.
+> [!IMPORTANT]
+> **Coherence ≠ Correctness:** Million-token context solved *syntactic and cross-file coherence* across 911 files. It did not solve *domain correctness*. Those are orthogonal axes, and you only see the gap when you build a deterministic verifier that checks the output against real-world constraints.
 
 ## Managed agents as the repair loop
 

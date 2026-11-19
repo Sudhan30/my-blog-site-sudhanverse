@@ -1,5 +1,5 @@
-// Reading aids on a post page: progress bar, code copy buttons, table scroll
-// hint, "On this page" list and image zoom. Plain DOM code.
+// Reading aids on a post page: progress bar, code copy buttons, heading anchor copy,
+// table scroll hint, "On this page" scrollspy, image zoom, and lazy video player.
 
 const content = document.getElementById('article-content');
 
@@ -20,8 +20,12 @@ if (bar && content) {
   new ResizeObserver(update).observe(content);
 }
 
-// Copy buttons on code blocks
-content?.querySelectorAll('pre').forEach(pre => {
+// Copy buttons on Shiki code blocks (mounted in .code-block-head) or standalone <pre>
+content?.querySelectorAll('figure.code-block, pre').forEach(node => {
+  if (node.tagName === 'PRE' && node.closest('figure.code-block')) return;
+  const pre = node.tagName === 'PRE' ? node : node.querySelector('pre');
+  if (!pre) return;
+  const host = node.querySelector('.code-block-head') || pre;
   const btn = document.createElement('button');
   btn.type = 'button';
   btn.className = 'code-copy-btn';
@@ -31,12 +35,30 @@ content?.querySelectorAll('pre').forEach(pre => {
     try {
       await navigator.clipboard.writeText(code ? code.innerText : pre.innerText);
       btn.textContent = 'Copied';
-      setTimeout(() => (btn.textContent = 'Copy'), 1800);
+      btn.dataset.copied = 'true';
+      setTimeout(() => {
+        btn.textContent = 'Copy';
+        delete btn.dataset.copied;
+      }, 1800);
     } catch {
       /* clipboard unavailable */
     }
   });
-  pre.appendChild(btn);
+  host.appendChild(btn);
+});
+
+// Clickable heading anchor copy feedback
+content?.querySelectorAll<HTMLAnchorElement>('.heading-anchor').forEach(anchor => {
+  anchor.addEventListener('click', async () => {
+    const url = new URL(anchor.href, window.location.href).toString();
+    try {
+      await navigator.clipboard.writeText(url);
+      anchor.dataset.copied = 'true';
+      setTimeout(() => delete anchor.dataset.copied, 1400);
+    } catch {
+      /* clipboard unavailable */
+    }
+  });
 });
 
 // Fade the right edge of tables that scroll sideways
@@ -47,10 +69,10 @@ document.querySelectorAll<HTMLElement>('.table-wrap').forEach(w => {
   window.addEventListener('resize', update);
 });
 
-// Links and section IDs arrive with the HTML. Enhance the wide-screen rail.
+// Links and section IDs arrive with the HTML. Enhance the wide-screen rail starting at 1160px.
 const contents = document.querySelector<HTMLDetailsElement>('#article-contents');
 if (contents && content) {
-  const wide = matchMedia('(min-width: 1380px)');
+  const wide = matchMedia('(min-width: 1160px)');
   const setLayout = () => { contents.open = wide.matches; };
   setLayout();
   wide.addEventListener('change', setLayout);
@@ -59,7 +81,7 @@ if (contents && content) {
   const currentSection = () => {
     let current = -1;
     for (const [index, heading] of sections.entries()) {
-      if (heading && heading.getBoundingClientRect().top <= 120) current = index;
+      if (heading && heading.getBoundingClientRect().top <= 128) current = index;
     }
     links.forEach((link, index) => {
       if (index === current) link.setAttribute('aria-current', 'location');
@@ -67,8 +89,9 @@ if (contents && content) {
     });
   };
   currentSection();
+  window.addEventListener('scroll', currentSection, {passive: true});
   if ('IntersectionObserver' in window) {
-    const observer = new IntersectionObserver(currentSection, {rootMargin: '-100px 0px 0px'});
+    const observer = new IntersectionObserver(currentSection, {rootMargin: '-100px 0px -60% 0px'});
     sections.forEach(heading => { if (heading) observer.observe(heading); });
   }
 }
@@ -97,6 +120,7 @@ if (content && zoom && zoomImg) {
   zoom.addEventListener('click', () => zoom.close());
 }
 
+// Lazy-loaded video player: zero video bytes transferred before Play
 const recording = document.querySelector<HTMLAnchorElement>('[data-play-recording]');
 recording?.addEventListener('click', event => {
   if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;

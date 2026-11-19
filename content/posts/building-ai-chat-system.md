@@ -9,9 +9,9 @@ readTime: 8
 cover: /assets/images/chat-architecture.svg
 badge: "LLM Systems"
 highlights:
-  - "Rolling Context Compression"
-  - "Linear Token Scaling"
-  - "Hybrid Search + Vision"
+  - "Runtime Stack: Bun/Hono + local Ollama (Gemma 3 12B) + PostgreSQL on K3s"
+  - "Bounded Memory: Async rolling summarization into conversation_summaries for linear token scaling"
+  - "Live Grounding: Brave Search API + Gotify alerts + FluxCD GitOps deployment"
 ---
 
 > "Building AI products is less about a single model and more about the system around it."
@@ -65,9 +65,10 @@ This GitOps approach ensures the cluster state always matches what's defined in 
 
 ## Smart Summarization and Practical Memory
 
-One of the hardest problems in LLM applications is memory. Sending the entire chat history on every request quickly becomes expensive and slow.
+One of the hardest problems in LLM applications is memory. Replaying the entire chat history on every turn drives latency and token costs up quadratically as conversations grow.
 
-**The solution is not infinite context windows, but intelligent compression.**
+> [!IMPORTANT]
+> **Bounded Context Beats Infinite Context:** Instead of stuffing raw message logs into every prompt, background workers periodically compress older turns into structured summaries stored in `conversation_summaries`. Prompt size stays bounded while conversational continuity holds.
 
 ### How It Works
 
