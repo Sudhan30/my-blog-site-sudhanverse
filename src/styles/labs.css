@@ -233,17 +233,12 @@
   height: 8px;
   border-radius: 2px;
   background: var(--accent);
-  animation: waveBar 1.1s ease-in-out infinite;
 }
 
-.bf-wave-bars span:nth-child(2n) { animation-delay: 0.15s; height: 14px; }
-.bf-wave-bars span:nth-child(3n) { animation-delay: 0.3s; height: 18px; }
-.bf-wave-bars span:nth-child(4n) { animation-delay: 0.45s; height: 10px; }
+.bf-wave-bars span:nth-child(2n) { height: 14px; }
+.bf-wave-bars span:nth-child(3n) { height: 18px; }
+.bf-wave-bars span:nth-child(4n) { height: 10px; }
 
-@keyframes waveBar {
-  0%, 100% { transform: scaleY(0.5); }
-  50% { transform: scaleY(1.25); }
-}
 
 .bf-raw-speech {
   flex: 1;
