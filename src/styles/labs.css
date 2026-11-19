@@ -20,7 +20,7 @@
   flex-direction: column;
   gap: 6px;
   flex: 1;
-  min-width: 240px;
+  min-width: min(240px, 100%);
 }
 
 .oss-release-badges {
@@ -201,7 +201,7 @@
 .bf-scenario-btn.active .bf-case-tag {
   background: var(--accent);
   border-color: var(--accent);
-  color: #ffffff;
+  color: var(--accent-ink);
 }
 
 .bf-pipeline-stage {

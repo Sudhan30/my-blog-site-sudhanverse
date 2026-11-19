@@ -1,7 +1,8 @@
 ---
 import Base from '../layouts/Base.astro';
 import Icon from './Icon.astro';
-import PillarPosts from './PillarPosts.astro';
+import PostRow from './PostRow.astro';
+import {ArchiveTrail, ArchiveEmpty} from './react/ArchiveNavigation';
 import {CATEGORY_META, getPostIndex, getPostsByCategory, type PostCategory} from '../../server/lib/posts';
 import {getAllPostStats} from '../../server/routes/api';
 import {CATEGORY_ICON} from '../lib/site';
@@ -14,11 +15,11 @@ const pillars = ['open-source', 'hackathon', 'engineering'] as const;
 <Base title={meta.title} description={meta.description} url={`/category/${meta.slug}`}>
   <div class="container page">
     <header class="page-head">
-      <a href="/" class="back-link"><Icon name="arrow-left" /> All writing</a>
+      <ArchiveTrail label={meta.label} />
       <h1 class="page-title">{meta.title}</h1>
       <p class="page-lede">{meta.description}</p>
       <nav class="pillar-tabs" aria-label="Browse by category">
-        <a href="/" class="pillar-tab">All work <span class="pillar-count">{index.posts.length}</span></a>
+        <a href="/#latest" class="pillar-tab">All writing <span class="pillar-count">{index.posts.length}</span></a>
         {pillars.map(cat => (
           <a href={`/category/${CATEGORY_META[cat].slug}`} class="pillar-tab" aria-current={cat === category ? 'page' : undefined}>
             <Icon name={CATEGORY_ICON[cat]} size={15} /> {CATEGORY_META[cat].label} <span class="pillar-count">{index.categories[cat] || 0}</span>
@@ -26,6 +27,6 @@ const pillars = ['open-source', 'hackathon', 'engineering'] as const;
         ))}
       </nav>
     </header>
-    {posts.length ? <PillarPosts category={category} posts={posts} stats={stats} /> : <p class="empty">Nothing here yet.</p>}
+    {posts.length ? <ul class="post-list">{posts.map(post => <PostRow post={post} stats={stats} />)}</ul> : <ArchiveEmpty title="No articles yet" description="Explore the other categories in the writing archive." />}
   </div>
 </Base>
