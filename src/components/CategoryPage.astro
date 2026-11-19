@@ -1,7 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import Icon from './Icon.astro';
-import PostRow from './PostRow.astro';
+import PostCard from './PostCard.astro';
 import {ArchiveTrail, ArchiveEmpty} from './react/ArchiveNavigation';
 import {CATEGORY_META, getPostIndex, getPostsByCategory, type PostCategory} from '../../server/lib/posts';
 import {getAllPostStats} from '../../server/routes/api';
@@ -18,15 +18,15 @@ const pillars = ['open-source', 'hackathon', 'engineering'] as const;
       <ArchiveTrail label={meta.label} />
       <h1 class="page-title">{meta.title}</h1>
       <p class="page-lede">{meta.description}</p>
-      <nav class="pillar-tabs" aria-label="Browse by category">
-        <a href="/#latest" class="pillar-tab">All writing <span class="pillar-count">{index.posts.length}</span></a>
+      <nav class="archive-pills" aria-label="Browse by category">
+        <a href="/#latest">All writing <span class="pill-count">{index.posts.length}</span></a>
         {pillars.map(cat => (
-          <a href={`/category/${CATEGORY_META[cat].slug}`} class="pillar-tab" aria-current={cat === category ? 'page' : undefined}>
-            <Icon name={CATEGORY_ICON[cat]} size={15} /> {CATEGORY_META[cat].label} <span class="pillar-count">{index.categories[cat] || 0}</span>
+          <a href={`/category/${CATEGORY_META[cat].slug}`} aria-current={cat === category ? 'page' : undefined}>
+            <Icon name={CATEGORY_ICON[cat]} size={14} /> {CATEGORY_META[cat].label} <span class="pill-count">{index.categories[cat] || 0}</span>
           </a>
         ))}
       </nav>
     </header>
-    {posts.length ? <ul class="post-list">{posts.map(post => <PostRow post={post} stats={stats} />)}</ul> : <ArchiveEmpty title="No articles yet" description="Explore the other categories in the writing archive." />}
+    {posts.length ? <ul class="card-grid">{posts.map(post => <PostCard post={post} stats={stats} />)}</ul> : <ArchiveEmpty title="No articles yet" description="Explore the other categories in the writing archive." />}
   </div>
 </Base>

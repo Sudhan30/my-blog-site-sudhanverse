@@ -1,7 +1,7 @@
 ---
 import Base from '../layouts/Base.astro';
 import {ArchiveEmpty} from '../components/react/ArchiveNavigation';
-import PostRow from '../components/PostRow.astro';
+import PostCard from '../components/PostCard.astro';
 import FeaturedPost from '../components/FeaturedPost.astro';
 import Newsletter from '../components/react/Newsletter.tsx';
 import {CATEGORY_META, getPostIndex} from '../../server/lib/posts';
@@ -26,6 +26,7 @@ function archiveUrl(category?: string, search = query) {
 }
 const firstInCategory = new Map(categories.map(c => [c.id, posts.find(post => post.category === c.id)?.slug]));
 const tags = Object.entries(index.tags).sort((a, b) => b[1] - a[1]).map(([t]) => t);
+const topTags = tags.slice(0, 6);
 ---
 <Base
   title="Home"
@@ -33,57 +34,122 @@ const tags = Object.entries(index.tags).sort((a, b) => b[1] - a[1]).map(([t]) =>
   url="/"
   noIndex={Boolean(query)}
 >
-  <section class="hero">
-    <div class="container">
-      <p class="hero-kicker"><a href="https://sudharsana.dev" rel="author">{AUTHOR}</a> · {ROLE}</p>
-      <h1 class="hero-title">Resolving dependencies, one idea at a time.</h1>
-      <p class="hero-lede">First-hand architecture notes, trade-offs, and postmortems from production data pipelines, AI agents, Android privacy tools, and a self-hosted Kubernetes cluster.</p>
+  <section class="hero-band">
+    <div class="container hero-grid">
+      <div class="hero-copy">
+        <p class="hero-pill">
+          <span class="status-dot" aria-hidden="true"></span>
+          <a href="https://sudharsana.dev" rel="author">{AUTHOR}</a> · {ROLE}
+        </p>
+        <h1 class="hero-title">Resolving dependencies, one idea at a time.</h1>
+        <p class="hero-lede">
+          First-hand architecture deep dives, production trade-offs, and honest postmortems from enterprise data platforms, AI agents, Android privacy tools, and self-hosted infrastructure.
+        </p>
+        <div class="hero-ctas">
+          <a class="cta-primary" href="#latest">Explore deep dives <span aria-hidden="true">↓</span></a>
+          <a class="cta-secondary" href="https://sudharsana.dev" target="_blank" rel="noopener">Interactive portfolio ↗</a>
+        </div>
+      </div>
+
+      <aside class="hero-bento" aria-label="Publication overview">
+        <div class="hero-bento-head">
+          <span class="hero-bento-kicker">Engineering Logbook</span>
+          <span class="hero-bento-stack">K3s · OCI · Astro</span>
+        </div>
+        <dl class="hero-stats">
+          <div>
+            <dt>Deep dives</dt>
+            <dd>{index.posts.length}</dd>
+          </div>
+          <div>
+            <dt>Systems</dt>
+            <dd>{index.categories.engineering}</dd>
+          </div>
+          <div>
+            <dt>Hackathons</dt>
+            <dd>{index.categories.hackathon}</dd>
+          </div>
+        </dl>
+        <div class="hero-bento-topics">
+          <span class="hero-bento-label">Core focus</span>
+          <nav class="topics" aria-label="Featured topics">
+            {topTags.map(t => <a href={`/tag/${encodeURIComponent(t)}`}>#{t}</a>)}
+          </nav>
+        </div>
+      </aside>
     </div>
   </section>
+
   <div class="container home-sections">
     {featured && <FeaturedPost post={featured} />}
+
     <section class="writing-archive" id="latest" aria-labelledby="archive-title">
-      <div class="archive-toolbar">
-        <h2 class="section-title" id="archive-title">Writing archive</h2>
-        <form action="/#latest" method="get" role="search" aria-label="Writing archive">
+      <div class="archive-header">
+        <div>
+          <p class="section-kicker">Published Engineering Work</p>
+          <h2 class="section-title" id="archive-title">Writing archive</h2>
+        </div>
+        <form class="archive-search-form" action="/#latest" method="get" role="search" aria-label="Writing archive">
           {active && <input type="hidden" name="category" value={active.id} />}
           <label class="archive-search-label" for="archive-search">Search titles, topics, and summaries</label>
-          <input type="search" id="archive-search" name="q" value={query} maxlength="160" placeholder="Search titles, topics, and summaries" />
-          <button type="submit">Search</button>
+          <input type="search" id="archive-search" name="q" value={query} maxlength="160" placeholder="Filter by title, stack, or topic…" />
+          <button type="submit">Filter</button>
         </form>
       </div>
-      <nav class="archive-nav" aria-label="Filter writing">
-        <a href={archiveUrl()} aria-current={!active ? 'page' : undefined}>All writing</a>
-        {categories.map(c => <a href={archiveUrl(c.id)} aria-current={c.id === active?.id ? 'page' : undefined}>{c.label}</a>)}
+
+      <nav class="archive-pills" aria-label="Filter writing">
+        <a href={archiveUrl()} aria-current={!active ? 'page' : undefined}>
+          All writing <span class="pill-count">{index.posts.length}</span>
+        </a>
+        {categories.map(c => (
+          <a href={archiveUrl(c.id)} aria-current={c.id === active?.id ? 'page' : undefined}>
+            {c.label} <span class="pill-count">{index.categories[c.id]}</span>
+          </a>
+        ))}
       </nav>
-      {query && <p class="archive-results">
-        {posts.length === 0 ? 'No articles' : posts.length === 1 ? '1 article' : posts.length + ' articles'} matching “{query}”
-        <a href={archiveUrl(active?.id, '')}>Clear search</a>
-      </p>}
-      <ul class="post-list archive-rows">
-        {posts.map(post => <PostRow post={post} level={3} anchor={firstInCategory.get(post.category) === post.slug && post.category !== 'engineering' ? CATEGORY_META[post.category].slug : undefined} />)}
+
+      {query && (
+        <p class="archive-results">
+          {posts.length === 0 ? 'No articles' : posts.length === 1 ? '1 article' : posts.length + ' articles'} matching “{query}”
+          <a href={archiveUrl(active?.id, '')}>Clear search</a>
+        </p>
+      )}
+
+      <ul class="card-grid archive-rows">
+        {posts.map(post => (
+          <PostCard
+            post={post}
+            level={3}
+            anchor={firstInCategory.get(post.category) === post.slug && post.category !== 'engineering' ? CATEGORY_META[post.category].slug : undefined}
+          />
+        ))}
       </ul>
+
       {posts.length === 0 && <ArchiveEmpty title="No writing found" description="Try a broader search or browse the full archive." />}
-      {!categories.some(c => c.id === 'open-source') && <a id="open-source" class="section-link" href="/category/open-source">Open source archive</a>}
+      {!categories.some(c => c.id === 'open-source') && <a id="open-source" class="section-link archive-extra-link" href="/category/open-source">Open source archive →</a>}
     </section>
 
     <section class="closing">
-      <div>
-        <h2 class="section-title">About the author</h2>
+      <div class="closing-card">
+        <p class="section-kicker">Author</p>
+        <h2 class="section-title">About {AUTHOR}</h2>
         <div class="about">
-          <img src="/assets/images/author-potrait-small.png" alt="" class="about-avatar" width="56" height="56" loading="lazy" />
+          <img src="/assets/images/author-potrait-small.png" alt="" class="about-avatar" width="60" height="60" loading="lazy" />
           <div>
-            <p>I'm a data engineer who loves building end-to-end systems: enterprise data pipelines by day, and open source Android tools, hackathon AI agents and a self-hosted two-node K3s cluster by night.</p>
+            <p>Staff Data Engineer building end-to-end systems: enterprise data platforms by day, and privacy-first Android tools, hackathon AI agents, and a self-hosted Kubernetes cluster by night.</p>
             <p class="about-links">
-              <a href="https://sudharsana.dev" target="_blank" rel="noopener">Interactive portfolio</a>
-              <a href="https://github.com/sudhan30" target="_blank" rel="noopener">GitHub (@sudhan30)</a>
+              <a href="https://sudharsana.dev" target="_blank" rel="noopener">Interactive portfolio ↗</a>
+              <a href="https://github.com/sudhan30" target="_blank" rel="noopener">GitHub (@sudhan30) ↗</a>
+              <a href="https://www.linkedin.com/in/sudharsanarajasekaran/" target="_blank" rel="noopener">LinkedIn ↗</a>
             </p>
           </div>
         </div>
       </div>
-      <div>
-        <h2 class="section-title">New posts by email</h2>
-        <p class="section-lede">No spam. A note when a new release, hackathon build or deep dive ships.</p>
+
+      <div class="closing-card">
+        <p class="section-kicker">Stay Updated</p>
+        <h2 class="section-title">New deep dives by email</h2>
+        <p class="section-lede">No noise. Just a note when a new architecture post, release, or hackathon build ships.</p>
         <Newsletter client:idle />
         <h3 class="topics-title" id="topics">Browse by topic</h3>
         <nav class="topics" aria-label="Topics">
@@ -91,7 +157,7 @@ const tags = Object.entries(index.tags).sort((a, b) => b[1] - a[1]).map(([t]) =>
         </nav>
         {tags.length > 10 && (
           <details class="topics-more">
-            <summary>All topics</summary>
+            <summary>All topics ({tags.length})</summary>
             <nav class="topics" aria-label="All topics">
               {tags.slice(10).map(t => <a href={`/tag/${encodeURIComponent(t)}`}>#{t}</a>)}
             </nav>

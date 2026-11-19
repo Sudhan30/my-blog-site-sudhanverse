@@ -1,21 +1,22 @@
 ---
-import {Link} from '@astryxdesign/core/Link';
-import {Stack} from '@astryxdesign/core/Stack';
-import {Divider} from '@astryxdesign/core/Divider';
 import {CATEGORY_META} from '../../server/lib/posts';
 import {fmtFull, readingTime, type PostSummary} from '../lib/site';
 
 const {post} = Astro.props as {post: PostSummary};
 const url = `/post/${post.slug}`;
 const cover = post.poster || post.cover;
+const isDiagram = Boolean(cover && cover.endsWith('.svg'));
 const categoryLabel = CATEGORY_META[post.category].shortLabel;
 const highlights = (post.highlights || []).slice(0, 3);
 ---
 <section class="feature-story" aria-labelledby="feature-title">
   <div class="feature-copy">
+    <div class="feature-badges">
+      <span class="feature-pill">Featured</span>
+      <span class={`cat-pill cat-${post.category}`}>{categoryLabel}</span>
+      {post.badge && <span class="meta-pill">{post.badge}</span>}
+    </div>
     <p class="feature-date">
-      <span class="feature-kicker">Featured · {categoryLabel}</span>
-      <span aria-hidden="true">·</span>
       <time datetime={post.date}>{fmtFull(post.date)}</time>
       <span aria-hidden="true">·</span>
       <span>{readingTime(post)} min read</span>
@@ -28,21 +29,18 @@ const highlights = (post.highlights || []).slice(0, 3);
       </ul>
     )}
     <div class="feature-actions">
-      <Stack direction="horizontal" gap={4} wrap="wrap">
-        <Link href={url}>Read deep dive →</Link>
-        {post.video && <Link href={url + '#recording'}>Watch recording</Link>}
-      </Stack>
+      <a class="cta-primary" href={url}>Read deep dive <span aria-hidden="true">→</span></a>
+      {post.video && <a class="cta-secondary" href={url + '#recording'}>▶ Watch recording</a>}
     </div>
   </div>
   {cover && post.video ? (
     <a class="feature-media-link" href={url + '#recording'} aria-label={`Watch recording for ${post.title}`}>
       <img class="feature-poster" src={cover} alt="" width="1280" height="720" fetchpriority="high" />
-      <span class="feature-play-badge" aria-hidden="true">▶ Watch recording</span>
+      <span class="feature-play-badge" aria-hidden="true">▶ Play demo recording</span>
     </a>
   ) : cover ? (
-    <a class="feature-media-link" href={url} aria-label={`Read ${post.title}`}>
+    <a class={`feature-media-link${isDiagram ? ' is-diagram' : ''}`} href={url} aria-label={`Read ${post.title}`}>
       <img class="feature-poster" src={cover} alt="" width="1280" height="720" fetchpriority="high" />
     </a>
   ) : null}
-  <div class="feature-rule"><Divider /></div>
 </section>
