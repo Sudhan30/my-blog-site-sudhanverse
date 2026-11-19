@@ -13,9 +13,9 @@ featured: true
 badge: "1st Place Winner"
 event: "Anthropic × Snowflake Intelligence at Work Hackathon"
 highlights:
-  - "1.42M Synthetic Records"
-  - "3-Role Cortex Agent"
-  - "Dynamic RBAC Masking"
+  - "Data Scale: 1.42M synthetic patients · 64M visits · 763M observations (Synthea on Snowflake)"
+  - "Orchestration: One Snowflake Cortex Agent (Claude) serving Paramedic, ER Doctor, and Nurse"
+  - "Governance: Tag-based PII/PHI masking · break-glass audit log · ≥25-person clean room aggregates"
 ---
 
 > "He's here. Pull off the gauze and hang blood."
@@ -81,15 +81,15 @@ The doctor says only *"He's here. Pull off the gauze and hang blood."*
 
 On the nurse's phone, the gauze item is struck off ("Removed by Dr. Okafor") and **"2 units packed red cells, A-positive, type-specific, warmed"** appears, along with where the blood type came from (a prior type and screen at another health system) and a new task to send a fresh type and screen.
 
-The guardrails matter more than the trick:
-
-- A type on file is **history, not a crossmatch**, so it always orders a fresh type and screen.
-- It names O-negative as the stopgap if the patient crashes first.
-- It never claims blood is released, and never guesses a group that isn't on file.
+> [!WARNING]
+> **Clinical Safety Guardrails Over Demo Tricks:**
+> - A blood type on file is **history, not a crossmatch**, so the agent always pairs the order with a fresh type and screen.
+> - It explicitly names **O-negative** as the stopgap if the patient crashes before confirmation.
+> - It never claims blood is released, and never guesses a blood group that is not on file.
 
 ## Architecture on Snowflake
 
-```
+```text
 Browser (Next.js) ──► /api/agent ──SSE──► Cortex Agent  HEALTHLINE.GOLD.ER_ASSISTANT
                      (key-pair JWT)       ├─ identify_patient    funnel + ranked candidates + bedside checks
                                           ├─ get_patient_chart   alerts, vitals, meds, care sites

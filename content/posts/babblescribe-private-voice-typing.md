@@ -11,9 +11,9 @@ cover: /assets/images/babblescribe/screens.png
 badge: "Coming soon to Google Play"
 event: "Android 11+ · ARM64"
 highlights:
-  - "Private voice typing"
-  - "On your phone, your key or your server"
-  - "Many languages"
+  - "Execution Modes: On-device (~100 MB Whisper/Parakeet/Moonshine), self-hosted GPU, or BYO API key"
+  - "Enforced Privacy: Android Keystore keys, encrypted-at-rest history, DNS check on local-only mode"
+  - "Faithful Polishing: 62/63 spoken corrections applied · 51/51 look-alike negations preserved"
 ---
 
 I talk much faster than I type. On a phone the gap is worse, and it is worse again when I switch languages halfway through a sentence. The dictation built into most keyboards either sends every word to a server I do not control, or falls apart at the switch.
@@ -26,13 +26,15 @@ So I built my own. **BabbleScribe** is private voice typing for Android. You spe
 
 ## Three ways to be heard
 
-The first screen asks one question: how should BabbleScribe hear you? Every answer is a real choice about where your audio goes.
+The first screen asks one question: how should BabbleScribe hear you? Every answer is a real architectural choice about where your audio travels.
 
-- **On my phone.** Download a speech model once (Whisper, Parakeet or Moonshine, around 100 MB) and dictate offline. No key, no account, nothing leaves the phone.
-- **My cloud key.** Bring your own key for OpenAI, Groq, OpenRouter, ElevenLabs speech to text or any OpenAI compatible service. Your audio goes to that company and nobody else. I never see it, because I do not run anything in the middle.
-- **My own server.** Pair a GPU box you run yourself with a setup code. Mine sits at home and runs Whisper large v3, a speech model tuned for one of my languages, and a small Gemma model for cleanup.
+| Mode | Audio Destination | Requirements | Fallback Role |
+|---|---|---|---|
+| **On my phone** | Never leaves device | One-time ~100 MB model download (Whisper, Parakeet, or Moonshine) | Offline-safe default; no key or account |
+| **My cloud key** | Direct to your chosen provider (OpenAI, Groq, OpenRouter, ElevenLabs, or OpenAI-compatible API) | Bring your own API key; zero middleman relay | High-accuracy cloud fallback |
+| **My own server** | Your self-hosted GPU box (paired via setup code) | Home/private server (e.g., Whisper large-v3 + language-tuned model + small Gemma cleanup) | Primary low-cost, private high-accuracy tier |
 
-You do not have to pick only one. The **Speech flow** puts providers in an order you choose, for example my server first, then Groq, then the phone. If a step cannot take a dictation (offline, out of credits, rate limited, server busy), BabbleScribe quietly moves to the next one and tells you in one short line which provider handled it.
+You do not have to pick only one. The **Speech flow** chains providers in an order you choose — for example, home server first, then Groq, then on-device. If a step cannot take a dictation (offline, out of credits, rate-limited, or server busy), BabbleScribe automatically fails over to the next provider and displays in one short line which tier handled it.
 
 ## Dictate anywhere
 
@@ -64,17 +66,17 @@ This week I dictated:
 
 I expected *"Hey, can we schedule a meeting in 10 minutes?"* I got both numbers back, neatly punctuated.
 
-Two things were wrong, and only one of them was the model.
+> [!IMPORTANT]
+> **Root Cause — Two Bugs Masking Each Other:**
+> 1. **Contradictory prompt rules:** One clause asked the model to apply spoken corrections, while three stronger clauses forbade removing words or altering numbers. Careful models like Claude Haiku chose the conservative reading and kept both numbers.
+> 2. **Over-eager post-check:** The negation safety guard only recognized `"no"` as a correction at the start of a sentence. When `"the meeting is with Sarah, no no, with Priya"` was correctly cleaned to `"the meeting is with Priya"`, the verifier flagged it as a dropped negation and reverted to raw text.
 
-1. **The instructions argued with themselves.** One clause said to apply spoken corrections. Three louder ones said to never remove words, to preserve every number, and that "a meeting at seven stays a meeting at seven." A careful model like Claude Haiku took the safe reading and kept everything.
-2. **The safety check threw away correct answers.** The check that stops a model from dropping a "not" only treated "no" as a correction when it started a sentence. So "the meeting is with Sarah, no no, with Priya" cleaned to "the meeting is with Priya" was rejected as a lost negation, and the raw text came back.
+I built a small regression suite before touching anything: 21 dictations where a correction should be applied (numbers, names, days, units, and Tamil examples using "இல்ல", roughly "no"), plus 17 look-alikes that must survive untouched (such as *"not 20 but 10 people came"* and *"sorry I'm late, I'll be there in 10"*).
 
-I built a small test set before touching anything: 21 dictations where a correction should be applied (numbers, names, days, units, and a few in Tamil with "இல்ல", which means roughly "no"), and 17 look alikes that must survive untouched, like "not 20 but 10 people came" and "sorry I'm late, I'll be there in 10."
-
-| | Corrections applied | Look alikes left alone |
+| Configuration | Corrections applied | Look-alikes preserved |
 |---|---|---|
-| Old instructions, old check | 11 of 21 | 17 of 17 |
-| New instructions, new check (3 runs each) | 62 of 63 | 51 of 51 |
+| Old instructions + old guard | 11 of 21 | 17 of 17 |
+| New instructions + new guard (3 runs each) | **62 of 63** | **51 of 51** |
 
 The fix was boring in the best way: state the correction rule plainly with examples, say that "preserve numbers" means *never invent or change one*, not *keep the one you took back*, and teach the check to recognise a correction "no" by its shape. The check still rejects "there is no problem" turning into "there is a problem," and it got stricter elsewhere: a stray "actually" no longer excuses a dropped "not."
 

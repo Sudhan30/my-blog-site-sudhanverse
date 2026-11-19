@@ -9,9 +9,9 @@ readTime: 5
 cover: /assets/images/self-hosted-k8s-architecture.svg
 badge: "Systems Trade-offs"
 highlights:
-  - "Serverless vs Self-Hosted K3s"
-  - "Cost & Control Trade-offs"
-  - "Local Radeon GPU Inference"
+  - "Portfolio (sudharsana.dev): Firebase Hosting + Cloud Functions + Firestore + BigQuery"
+  - "Blog (blog.sudharsana.dev): Self-hosted K3s + PostgreSQL + FluxCD GitOps + local Radeon GPU"
+  - "Core Principle: Match operational surface area to workload constraints, not hype"
 ---
 
 > "The best infrastructure is the one that matches your constraints."
@@ -26,13 +26,17 @@ This is not a cloud versus homelab argument. It is a constraints and intent argu
 
 ## Why I Built Them This Way
 
-I work on data engineering and backend systems professionally, but most of that happens inside large organizations where many layers are abstracted away. I wanted at least a couple of projects where I own the entire path from code to DNS record.
+I work on data engineering and backend systems professionally, where large organizations rightly abstract away many infrastructure layers. I wanted two production properties where I own the entire path from application code to DNS record — not to read about it, but to run it, break it, and fix it.
 
-Not to read about it. To run it. To break it. To fix it.
+| Dimension | Portfolio (`sudharsana.dev`) | Blog (`blog.sudharsana.dev`) |
+|---|---|---|
+| **Runtime** | Serverless (Firebase Hosting + Cloud Functions) | Self-hosted K3s on an apartment mini PC |
+| **Data & Analytics** | Firestore + BigQuery | PostgreSQL + Prometheus/Grafana + Dagster |
+| **AI Workload** | External API (lightweight job-fit evaluator) | Local Radeon GPU + Ollama inference |
+| **Deployment** | Single-command `firebase deploy` | GitOps via GitHub Actions + FluxCD |
+| **Failure Domain** | Managed global CDN & automatic failover | Single node — if the box goes down, the site goes down |
 
-There is a big difference between knowing how systems work and feeling the consequences when they do not.
-
-Owning the full stack forces you to think about things that rarely show up in tutorials. DNS propagation delays. TLS renewal. Cache invalidation. What happens when your only node runs out of memory. What a timeout really means when a user is waiting on the other side of the world.
+Owning the full stack forces you to confront details that rarely show up in tutorials: DNS propagation delays, TLS renewal, layered cache invalidation, node memory pressure, and real tail-latency timeouts.
 
 I also lean heavily on AI for scaffolding, first drafts, and documentation. It lets me try more ideas in less time, but the responsibility for design decisions is still mine.
 

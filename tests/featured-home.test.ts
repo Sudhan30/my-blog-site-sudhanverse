@@ -72,14 +72,43 @@ test('a search with no matches keeps a way back to the archive', async () => {
   expect(html).toContain('href="/#latest">Clear search');
 });
 
-test('contents labels and unique deep links come from the same rendered headings', () => {
-  const {html, headings} = renderMarkdown('## A & B\n\n### A & B\n\n## A & B\n\n## **A B-3**');
+test('contents labels and unique deep links come from the same rendered headings', async () => {
+  const {html, headings} = await renderMarkdown('## A & B\n\n### A & B\n\n## A & B\n\n## **A B-3**');
   expect(headings).toEqual([
-    {id: 'a-b', label: 'A & B'},
-    {id: 'a-b-3', label: 'A & B'},
-    {id: 'a-b-3-2', label: 'A B-3'},
+    {id: 'a-b', label: 'A & B', level: 2},
+    {id: 'a-b-2', label: 'A & B', level: 3},
+    {id: 'a-b-3', label: 'A & B', level: 2},
+    {id: 'a-b-3-2', label: 'A B-3', level: 2},
   ]);
-  for (const h of headings) expect(html).toContain('<h2 id="' + h.id + '">');
+  for (const h of headings) {
+    expect(html).toContain(`<h${h.level} id="${h.id}" class="prose-heading">`);
+    expect(html).toContain(`class="heading-anchor" href="#${h.id}"`);
+  }
+});
+
+test('fenced code blocks render with Shiki dual-theme variables and language header', async () => {
+  const {html} = await renderMarkdown('```sql\nSELECT count(*) FROM posts;\n```');
+  expect(html).toContain('<figure class="code-block" data-lang="sql">');
+  expect(html).toContain('<span class="code-block-lang">SQL</span>');
+  expect(html).toContain('--shiki-light:');
+  expect(html).toContain('--shiki-dark:');
+});
+
+test('engineering callouts transform GitHub alert blockquotes into styled asides', async () => {
+  const {html} = await renderMarkdown('> [!IMPORTANT]\n> **Invariant:** Rules decide after vector search.');
+  expect(html).toContain('<aside class="callout callout-important" role="note">');
+  expect(html).toContain('<p class="callout-title">Key Decision</p>');
+  expect(html).toContain('Rules decide after vector search.');
+});
+
+test('article pages render system highlights and related engineering posts', async () => {
+  const html = await homepage([
+    {slug: 'k3s-cluster', date: '2026-11-18', tags: ['kubernetes', 'gitops']},
+    {slug: 'flux-rollouts', date: '2026-11-17', tags: ['kubernetes', 'gitops']},
+    {slug: 'sql-agent', date: '2026-11-16', tags: ['sql']},
+  ], '/post/k3s-cluster');
+  expect(html).toContain('Continue reading');
+  expect(html).toContain('href="/post/flux-rollouts"');
 });
 
 test('missing article and category pages keep their requested canonical and link to the archive', async () => {

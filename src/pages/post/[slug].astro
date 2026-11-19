@@ -3,10 +3,11 @@ import Base from '../../layouts/Base.astro';
 import {ArchiveTrail} from '../../components/react/ArchiveNavigation';
 import Icon from '../../components/Icon.astro';
 import CategoryBadge from '../../components/CategoryBadge.astro';
+import RelatedPosts from '../../components/RelatedPosts.astro';
 import PostActions from '../../components/react/PostActions.tsx';
 import Applause from '../../components/react/Applause.tsx';
 import Comments from '../../components/react/Comments.tsx';
-import {getPostBySlug, CATEGORY_META} from '../../../server/lib/posts';
+import {getPostBySlug, getRelatedPosts, CATEGORY_META} from '../../../server/lib/posts';
 import {renderMarkdown} from '../../../server/lib/markdown';
 import {getAllPostStats} from '../../../server/routes/api';
 import {renderPostInteractiveBanner, renderPostInteractiveWidget} from '../../../server/templates/interactive-widgets';
@@ -17,14 +18,22 @@ const slug = Astro.params.slug || '';
 const post = await getPostBySlug(slug);
 if (!post) return Astro.rewrite('/404');
 
-const stats = post ? (await getAllPostStats())[post.slug] || {likes: 0, comments: 0} : {likes: 0, comments: 0};
-const {html, headings} = post ? renderMarkdown(post.content) : {html: '', headings: []};
-const readTime = post ? post.readTime || Math.max(1, Math.ceil(post.content.split(/\s+/).length / 220)) : 0;
-const category = post ? CATEGORY_META[post.category] : null;
-const coverInBody = !!post?.cover && post.content.includes(post.cover);
-const banner = post ? renderPostInteractiveBanner(post) : '';
-const widget = post ? renderPostInteractiveWidget(post.slug) : '';
-const jsonLd = post && {
+const [statsMap, rendered, related] = await Promise.all([
+  getAllPostStats(),
+  renderMarkdown(post.content),
+  getRelatedPosts(post.slug, 3),
+]);
+const stats = statsMap[post.slug] || {likes: 0, comments: 0};
+const {html, headings} = rendered;
+const readTime = post.readTime || Math.max(1, Math.ceil(post.content.split(/\s+/).length / 220));
+const category = CATEGORY_META[post.category];
+const coverInBody = !!post.cover && post.content.includes(post.cover);
+const banner = renderPostInteractiveBanner(post);
+const widget = renderPostInteractiveWidget(post.slug);
+const h2Count = headings.filter(h => h.level === 2).length;
+const showToc = h2Count >= 3 || headings.length >= 4;
+const highlights = post.highlights || [];
+const jsonLd = {
   '@context': 'https://schema.org',
   '@type': 'BlogPosting',
   headline: post.title,
@@ -37,90 +46,113 @@ const jsonLd = post && {
   author: PERSON,
 };
 ---
-  <Base title={post.title} description={post.excerpt} url={`/post/${post.slug}`} ogType="article" ogImage={post.cover ? `${SITE_URL}${post.cover}` : undefined} jsonLd={jsonLd || undefined}>
-    <div class="reading-progress" id="reading-progress"></div>
-    <article class="article" data-category={post.category}>
-      <div class="container article-container">
-        <header class="article-header">
-          <ArchiveTrail label={category!.label} href={`/category/${category!.slug}`} />
-          <div class="article-badges">
-            <CategoryBadge category={post.category} badge={post.badge} />
-            {post.event && <span class="article-event">{post.event}</span>}
-          </div>
-          <h1 class="article-title">{post.title}</h1>
-          <p class="article-dek">{post.excerpt}</p>
-          <div class="article-meta-bar">
-            <div class="article-meta">
-              <img src="/assets/images/author-potrait-small.png" alt="" width="36" height="36" />
-              <div>
-                <a class="article-meta-name" href={PROFILE} rel="author">{AUTHOR}</a>
-                <span class="article-meta-sub"><time datetime={post.date}>{fmtFull(post.date)}</time> · {readTime} min read</span>
-              </div>
+<Base
+  title={post.title}
+  description={post.excerpt}
+  url={`/post/${post.slug}`}
+  ogType="article"
+  ogImage={post.cover ? `${SITE_URL}${post.cover}` : undefined}
+  jsonLd={jsonLd}
+>
+  <div class="reading-progress" id="reading-progress"></div>
+  <article class="article" data-category={post.category}>
+    <div class="container article-container">
+      <header class="article-header">
+        <ArchiveTrail label={category.label} href={`/category/${category.slug}`} />
+        <div class="article-badges">
+          <CategoryBadge category={post.category} badge={post.badge} />
+          {post.event && <span class="article-event">{post.event}</span>}
+        </div>
+        <h1 class="article-title">{post.title}</h1>
+        <p class="article-dek">{post.excerpt}</p>
+        <div class="article-meta-bar">
+          <div class="article-meta">
+            <img src="/assets/images/author-potrait-small.png" alt="" width="36" height="36" />
+            <div>
+              <a class="article-meta-name" href={PROFILE} rel="author">{AUTHOR}</a>
+              <span class="article-meta-sub"><time datetime={post.date}>{fmtFull(post.date)}</time> · {readTime} min read</span>
             </div>
-            <PostActions client:load slug={post.slug} likes={stats.likes} comments={stats.comments} />
           </div>
-        </header>
+          <PostActions client:load slug={post.slug} likes={stats.likes} comments={stats.comments} />
+        </div>
+        {highlights.length > 0 && (
+          <aside class="spec-sheet" aria-label="System highlights">
+            <p class="spec-sheet-label">At a glance</p>
+            <ul class="spec-sheet-list">
+              {highlights.map(item => <li>{item}</li>)}
+            </ul>
+          </aside>
+        )}
+      </header>
 
-        <div class="article-reading">
-          {headings.length >= 3 && <nav class="toc" aria-label="On this page">
+      <div class="article-reading">
+        {showToc && (
+          <nav class="toc" aria-label="On this page">
             <details id="article-contents">
-              <summary>On this page <span>{headings.length} sections</span></summary>
+              <summary>On this page <span>{h2Count} sections</span></summary>
               <ol class="toc-list">
-                {headings.map(h => <li><a href={'#' + h.id}>{h.label}</a></li>)}
+                {headings.map(h => (
+                  <li class={h.level === 3 ? 'toc-sub' : undefined}>
+                    <a href={'#' + h.id}>{h.label}</a>
+                  </li>
+                ))}
               </ol>
             </details>
-          </nav>}
-          {banner && <Fragment set:html={banner} />}
-
-          {post.video ? (
-            <figure class="article-hero video-embed" id="recording">
-              <a class="recording-link" href={post.video} data-play-recording data-captions={post.captions}>
-                {(post.poster || post.cover) && <img src={post.poster || post.cover} alt="" />}
-                <span>Play recording</span>
-              </a>
-            </figure>
-          ) : post.cover && !coverInBody ? (
-            <figure class="article-hero"><img src={post.cover} alt={post.title} /></figure>
-          ) : null}
-
-          {widget && <div class="article-interactive-slot" set:html={widget} />}
-
-          <div class="article-body">
-            <div class="prose" id="article-content" set:html={html} />
-          </div>
-        </div>
-
-        {post.tags.length > 0 && (
-          <div class="article-tags">
-            <span class="article-tags-label">Topics</span>
-            <nav class="topics" aria-label="Topics">{post.tags.map(t => <a href={`/tag/${encodeURIComponent(t)}`}>#{t}</a>)}</nav>
-          </div>
+          </nav>
         )}
+        {banner && <Fragment set:html={banner} />}
 
-        <section class="author-block">
-          <img src="/assets/images/author-potrait-small.png" alt="" width="52" height="52" loading="lazy" />
-          <div class="author-info">
-            <h2>{AUTHOR}</h2>
-            <p>{ROLE}. I build data platforms and write about the decisions behind them.</p>
-            <p class="author-links">
-              <a href="https://sudharsana.dev" target="_blank" rel="noopener" aria-label="Portfolio"><Icon name="globe" size={18} /></a>
-              <a href="https://github.com/sudhan30" target="_blank" rel="noopener" aria-label="GitHub"><Icon name="github" size={18} /></a>
-              <a href="https://www.linkedin.com/in/sudharsanarajasekaran/" target="_blank" rel="noopener" aria-label="LinkedIn"><Icon name="linkedin" size={18} /></a>
-            </p>
-          </div>
-          <div class="author-cta">
-            <span>Enjoyed this write-up?</span>
-            <Applause client:idle slug={post.slug} likes={stats.likes} comments={stats.comments} />
-          </div>
-        </section>
+        {post.video ? (
+          <figure class="article-hero video-embed" id="recording">
+            <a class="recording-link" href={post.video} data-play-recording data-captions={post.captions}>
+              {(post.poster || post.cover) && <img src={post.poster || post.cover} alt="" />}
+              <span>▶ Play recording</span>
+            </a>
+          </figure>
+        ) : post.cover && !coverInBody ? (
+          <figure class="article-hero"><img src={post.cover} alt={post.title} /></figure>
+        ) : null}
 
-        <Comments client:idle slug={post.slug} initialCount={stats.comments} />
+        {widget && <div class="article-interactive-slot" set:html={widget} />}
+
+        <div class="article-body">
+          <div class="prose" id="article-content" set:html={html} />
+        </div>
       </div>
-    </article>
 
-    <dialog class="image-zoom" id="image-zoom" aria-label="Enlarged image"><button type="button" class="zoom-close">Close image</button><img alt="" /></dialog>
+      {post.tags.length > 0 && (
+        <div class="article-tags">
+          <span class="article-tags-label">Topics</span>
+          <nav class="topics" aria-label="Topics">{post.tags.map(t => <a href={`/tag/${encodeURIComponent(t)}`}>#{t}</a>)}</nav>
+        </div>
+      )}
 
-    <script>
-      import '../../scripts/post.ts';
-    </script>
-  </Base>
+      <section class="author-block">
+        <img src="/assets/images/author-potrait-small.png" alt="" width="52" height="52" loading="lazy" />
+        <div class="author-info">
+          <h2>{AUTHOR}</h2>
+          <p>{ROLE}. I build data platforms and write about the engineering trade-offs behind shipped systems.</p>
+          <p class="author-links">
+            <a href="https://sudharsana.dev" target="_blank" rel="noopener" aria-label="Portfolio"><Icon name="globe" size={18} /></a>
+            <a href="https://github.com/sudhan30" target="_blank" rel="noopener" aria-label="GitHub"><Icon name="github" size={18} /></a>
+            <a href="https://www.linkedin.com/in/sudharsanarajasekaran/" target="_blank" rel="noopener" aria-label="LinkedIn"><Icon name="linkedin" size={18} /></a>
+          </p>
+        </div>
+        <div class="author-cta">
+          <span>Found this useful?</span>
+          <Applause client:idle slug={post.slug} likes={stats.likes} comments={stats.comments} />
+        </div>
+      </section>
+
+      <RelatedPosts posts={related} />
+
+      <Comments client:idle slug={post.slug} initialCount={stats.comments} />
+    </div>
+  </article>
+
+  <dialog class="image-zoom" id="image-zoom" aria-label="Enlarged image"><button type="button" class="zoom-close">Close image</button><img alt="" /></dialog>
+
+  <script>
+    import '../../scripts/post.ts';
+  </script>
+</Base>

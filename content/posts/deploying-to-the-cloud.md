@@ -9,9 +9,9 @@ readTime: 9
 cover: /assets/images/firebase-portfolio-complete-architecture.svg
 badge: "Cloud & FinOps"
 highlights:
-  - "97% Load-Balancer Cost Cut"
-  - "Serverless Edge Hosting"
-  - "Automated CI/CD Pipeline"
+  - "FinOps Fix: Eliminated $18/mo idle Cloud Load Balancer (97% of $21.50/mo static-site bill)"
+  - "Serverless Backend: 6 rate-limited Cloud Functions + Secret Manager + Firestore + BigQuery"
+  - "Hybrid AI Boundary: Serverless frontend calling self-hosted Ollama on K3s for job-fit analysis"
 ---
 
 > "Cost optimization isn't about being cheap. It's about being smart with resources."
@@ -22,9 +22,10 @@ Learning cloud architecture is as much about economics as it is about engineerin
 
 I set up a Google Cloud Storage bucket for the static files and put a Cloud Load Balancer in front of it for HTTPS. Custom domain through Cloudflare DNS. Felt pretty professional.
 
-Then the bill came. $18 a month for the load balancer alone. Another $0.50 for storage, $1 for data transfer. Total: ~$21.50/month. For a static site getting maybe 100 visitors a month.
+Then the bill came: **$18/month** for the load balancer alone, **$0.50** for storage, and **$1.00** for data transfer — roughly **$21.50/month** for a static site getting ~100 visitors a month.
 
-97% of my cost was the load balancer doing almost nothing.
+> [!IMPORTANT]
+> **FinOps Diagnosis:** 97% of the monthly bill was paying for a dedicated Cloud Load Balancer idling in front of static assets. Switching to Firebase Hosting eliminated the fixed load-balancer floor while adding global edge caching and automatic TLS.
 
 ## Finding Firebase
 
@@ -47,7 +48,16 @@ Deployments are automated through GitHub Actions. Push to main, and the site reb
 
 ### Backend Layer - Cloud Functions
 
-The portfolio runs **six Cloud Functions**, each handling specific tasks:
+The portfolio runs **six Cloud Functions**, each isolated behind explicit per-IP or global rate limits:
+
+| Function | Responsibility | Backing Store / Service | Rate Limit |
+|---|---|---|---|
+| **Page View Tracker** | Atomic visit counter + math milestone checks (prime, perfect, Fibonacci) | Firestore | 20 req/min |
+| **Contact Form Handler** | Input validation, persistence, and HTML SMTP email delivery | Firestore + Secret Manager | 3 req/min per IP |
+| **Feedback Handler** | 1–5 star ratings with optional anonymous comments & email alerts | Firestore + Secret Manager | 5 req/hr per IP |
+| **Job Description Analyzer** | Compares pasted JDs against structured resume JSON | Self-hosted Ollama on K3s | 10 req/hr per IP |
+| **OTel Data Processor** | Real-time CCPA-consented traces, Core Web Vitals, and logs | BigQuery + Pub/Sub | 200 req/min |
+| **OTel Batch Processor** | Async Pub/Sub consumer compressing and archiving telemetry | Cloud Storage + BigQuery | Event-driven |
 
 #### 1. Page View Tracker
 Tracks website visits and celebrates mathematical milestones. When someone visits, it increments a Firestore counter and checks if the number is special (prime, perfect, or Fibonacci). Hit visit 1,597? You get a Fibonacci celebration. Visit 28? That's a perfect number.

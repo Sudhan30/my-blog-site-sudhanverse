@@ -9,9 +9,9 @@ readTime: 9
 cover: /assets/images/data-agent-architecture.svg
 badge: "AI Agents & SQL"
 highlights:
-  - "Dual-Model Routing"
-  - "Read-Only SQL Boundary"
-  - "100% Local GPU Inference"
+  - "Dual-Model Split: Gemma3 12B (intent + prose) paired with Qwen3 8B (native Ollama tool calling)"
+  - "Context Isolation: Gemma3 sees only tool summaries; Qwen3 sees only schema + SQL examples"
+  - "Safety Boundary: Read-only Postgres role, SQL validation, and 100% local zero-cost inference"
 ---
 
 > "Laziness is the mother of invention."
@@ -94,7 +94,8 @@ Here is the flow:
 8. **Gemma3 12B** receives the raw results and formats them into a **natural language answer** with markdown
 9. Answer streams back to the user via **SSE**
 
-The key design decision is that Gemma3 never sees the full database schema. It only knows tool names and one-line descriptions — enough to detect intent, not enough to bloat its context window. Qwen3 gets the full schema and SQL examples, but never needs conversation history. Each model operates with a focused, minimal context.
+> [!IMPORTANT]
+> **Context Isolation Between Models:** Gemma3 never sees the full database schema — it only receives tool names and one-line descriptions, keeping its context window lean for conversation. Qwen3 receives the full schema and SQL examples, but zero conversation history. Each model runs with a minimal, purpose-built prompt.
 
 ---
 
